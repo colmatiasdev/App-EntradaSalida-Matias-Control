@@ -3,19 +3,32 @@
  * Desplegar como "Aplicación web": ejecutar como yo, quién tiene acceso: cualquiera.
  * Copiar la URL de despliegue en config.js → APP_SCRIPT_URL.
  *
- * Hojas/tabs por mes: ENERO, FEBRERO, MARZO, ABRIL, MAYO, JUNIO,
+ * Tablas (hojas) del documento: ENERO, FEBRERO, MARZO, ABRIL, MAYO, JUNIO,
  * JULIO, AGOSTO, SEPTIEMBRE, OCTUBRE, NOVIEMBRE, DICIEMBRE.
- * Todas con las mismas columnas: ID-VENTA, FECHA_OPERATIVA, HORA, ID-PRODUCTO, CATEGORIA, PRODUCTO, MONTO.
+ * Todas con las mismas columnas y PK = ID-VENTA.
  */
 
+/** ID del Google Sheet (solo el ID, no la URL completa).
+ *  Obtenerlo de: https://docs.google.com/spreadsheets/d/ESTE_ES_EL_ID/edit
+ *  No usar la URL de publicación (/pub?output=csv). */
 var SPREADSHEET_ID = 'REEMPLAZAR_CON_ID_DE_TU_HOJA';
 
+/** Nombres de las hojas/tabs de ventas por mes (índice 0 = ENERO … 11 = DICIEMBRE). */
 var NOMBRES_HOJAS_MES = [
   'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
   'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
 ];
 
-var COLUMNAS_VENTAS = ['ID-VENTA', 'FECHA_OPERATIVA', 'HORA', 'ID-PRODUCTO', 'CATEGORIA', 'PRODUCTO', 'MONTO'];
+/** Columnas de todas las tablas de ventas (ENERO … DICIEMBRE). PK = ID-VENTA. */
+var COLUMNAS_VENTAS = [
+  'ID-VENTA',
+  'FECHA_OPERATIVA',
+  'HORA',
+  'ID-PRODUCTO',
+  'CATEGORIA',
+  'PRODUCTO',
+  'MONTO'
+];
 
 function doGet(e) {
   return respuestaJson({ ok: true, mensaje: 'Usar POST para operaciones.' });
@@ -64,7 +77,7 @@ function guardarVenta(params) {
   }
 
   if (!SPREADSHEET_ID || SPREADSHEET_ID.indexOf('REEMPLAZAR') !== -1 || SPREADSHEET_ID.length < 40) {
-    return respuestaJson({ ok: false, error: 'Configura SPREADSHEET_ID en Code.gs con el ID de tu Google Sheet (ver URL del documento).' });
+    return respuestaJson({ ok: false, error: 'Configura SPREADSHEET_ID en Code.gs con el ID de tu Google Sheet (ver URL del documento, no la URL de publicación).' });
   }
 
   var ss;
@@ -73,6 +86,7 @@ function guardarVenta(params) {
   } catch (err) {
     return respuestaJson({ ok: false, error: 'No se pudo abrir el Sheet. Revisa que SPREADSHEET_ID sea correcto y que el script tenga acceso al documento.' });
   }
+
   var sheet = obtenerOCrearHoja(ss, hojaNombre);
 
   if (sheet.getLastRow() === 0) {
