@@ -21,7 +21,7 @@
      * URL del Web App de Google Apps Script (despliegue). ÚNICA fuente de datos de la app.
      * Copiar aquí la URL que da "Implementar" > "Aplicación web" en el proyecto Apps Script vinculado al Sheet anterior.
      */
-    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFGJ5RXn5oKzsCTEfWtXqzMBfcp2aOPZaIdEHTI60sqYsQwsdy0bXWVBx_G5pcWJ8D/exec',
+    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzguxE6JGeQMAwxFC_kgaNBLbFyJx94wUtQxH7IXXzUl4Y21aB7nwcqGo4IerL_tA9z/exec',
 
     /** Nombres de las hojas (igual que en Code.gs y tables.js). */
     HOJA_PRODUCTOS: 'PRODUCTOS',

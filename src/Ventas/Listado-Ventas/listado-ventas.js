@@ -10,21 +10,13 @@
     'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
   ];
 
-  /** Orden de columnas: nombre del mes + columnas de la tabla del mes. */
-  var columnasTabla = [
-    'MES',
-    'FECHA_OPERATIVA',
-    'HORA',
-    'NOMBRE-APELLIDO',
-    'TIPO-LISTA-PRECIO',
-    'ID-VENTA',
-    'ID-PRODUCTO',
-    'CATEGORIA',
-    'PRODUCTO',
-    'CANTIDAD',
-    'PRECIO',
-    'MONTO'
-  ];
+  /** Columnas de ventas por mes (desde tables.js). Se usan para orden y normalización. */
+  var COLUMNAS_VENTAS_DEF = (APP_TABLES && APP_TABLES.ENERO && APP_TABLES.ENERO.columns)
+    ? APP_TABLES.ENERO.columns
+    : ['ID-VENTA', 'AÑO', 'FECHA_OPERATIVA', 'HORA', 'NOMBRE-APELLIDO', 'TIPO-LISTA-PRECIO', 'ID-PRODUCTO', 'CATEGORIA', 'PRODUCTO', 'CANTIDAD', 'PRECIO', 'MONTO'];
+
+  /** Orden de columnas: MES + columnas de la tabla del mes (según APP_TABLES). */
+  var columnasTabla = ['MES'].concat(COLUMNAS_VENTAS_DEF);
 
   /** Columnas que no se muestran en la tabla. */
   var columnasOcultas = ['MES', 'AÑO', 'ID-VENTA', 'ID-PRODUCTO'];
@@ -35,6 +27,27 @@
   var currentNombreMes = '';
   var currentPage = 1;
   var pageSize = 25;
+
+  /**
+   * Normaliza una fila de venta para usar las claves esperadas (columnas de APP_TABLES).
+   * Así se muestran correctamente los datos aunque el Sheet devuelva cabeceras con distinta capitalización.
+   */
+  function normalizarFilaVenta(fila, columnasEsperadas) {
+    var cols = columnasEsperadas || COLUMNAS_VENTAS_DEF;
+    var out = {};
+    var keys = Object.keys(fila || {});
+    cols.forEach(function (col) {
+      var val = fila[col];
+      if (val === undefined) {
+        var colLower = col.toLowerCase();
+        for (var k = 0; k < keys.length; k++) {
+          if (keys[k].toLowerCase() === colLower) { val = fila[keys[k]]; break; }
+        }
+      }
+      out[col] = val !== undefined && val !== null ? val : '';
+    });
+    return out;
+  }
 
   function fmtMoney(n) {
     return '$\u00a0' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
@@ -182,11 +195,14 @@
       })
       .then(function (data) {
         if (data && data.ok && Array.isArray(data.datos)) {
-          var datos = data.datos.filter(function (r) {
-            var rowAnio = r.AÑO !== undefined && r.AÑO !== null && r.AÑO !== '' ? parseInt(String(r.AÑO), 10) : null;
-            if (rowAnio === null) return true;
-            return rowAnio === anio;
-          });
+          var columnasMes = (APP_TABLES && APP_TABLES[mes] && APP_TABLES[mes].columns) ? APP_TABLES[mes].columns : COLUMNAS_VENTAS_DEF;
+          var datos = data.datos
+            .map(function (r) { return normalizarFilaVenta(r, columnasMes); })
+            .filter(function (r) {
+              var rowAnio = r.AÑO !== undefined && r.AÑO !== null && r.AÑO !== '' ? parseInt(String(r.AÑO), 10) : null;
+              if (rowAnio === null) return true;
+              return rowAnio === anio;
+            });
           pintarTabla(mes, datos);
           mostrarMensaje('Se cargaron ' + datos.length + ' registro(s) de ' + mes + ' ' + anio + '.');
         } else {
@@ -218,12 +234,8 @@
     var tableSearch = document.getElementById('table-search');
     if (tableSearch) tableSearch.value = '';
 
-    var columnas = columnasTabla;
-    if (datos.length > 0) {
-      var clavesFila = Object.keys(datos[0]);
-      columnas = ['MES'].concat(clavesFila.filter(function (k) { return k !== 'MES'; }));
-    }
-    columnas = columnas.filter(function (c) { return columnasOcultas.indexOf(c) === -1; });
+    var columnasMes = (APP_TABLES && APP_TABLES[nombreMes] && APP_TABLES[nombreMes].columns) ? APP_TABLES[nombreMes].columns : COLUMNAS_VENTAS_DEF;
+    var columnas = ['MES'].concat(columnasMes).filter(function (c) { return columnasOcultas.indexOf(c) === -1; });
     currentColumnas = columnas;
 
     thead.innerHTML = '';

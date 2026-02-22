@@ -337,7 +337,10 @@
     };
     var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
     var msgGuardar = document.getElementById('nueva-venta-guardar-msg');
-    if (btnGuardar) btnGuardar.disabled = true;
+    if (btnGuardar) {
+      btnGuardar.disabled = true;
+      btnGuardar.setAttribute('aria-busy', 'true');
+    }
     if (msgGuardar) { msgGuardar.textContent = 'Guardando…'; msgGuardar.className = 'nueva-venta__guardar-msg'; }
     var bodyForm = 'data=' + encodeURIComponent(JSON.stringify(payload));
     var urlGuardar = (CORS_PROXY && CORS_PROXY.length > 0)
@@ -364,26 +367,27 @@
       .then(function (data) {
         var ok = data && (data.ok === true || data.success === true);
         if (ok) {
-          carrito = [];
-          pintarResumen();
-          mostrarMensajeGuardar('Venta guardada correctamente.', false);
+          mostrarMensajeGuardar('Venta guardada. Redirigiendo al inicio…', false);
+          setTimeout(function () {
+            window.location.href = '../../../index.html';
+          }, 1200);
         } else {
           mostrarMensajeGuardar(data && (data.error || data.mensaje) || 'Error al guardar.', true);
+          if (btnGuardar) { btnGuardar.disabled = false; btnGuardar.removeAttribute('aria-busy'); }
         }
       })
       .catch(function (err) {
         var msg = err && err.message ? err.message : String(err);
         var esCors = /failed to fetch|networkerror|cors|blocked|access-control/i.test(msg);
         if (esCors) {
-          carrito = [];
-          pintarResumen();
-          mostrarMensajeGuardar('Venta enviada. Revisa el Sheet para confirmar (la respuesta fue bloqueada por CORS).', false);
+          mostrarMensajeGuardar('Venta enviada. Redirigiendo al inicio…', false);
+          setTimeout(function () {
+            window.location.href = '../../../index.html';
+          }, 1200);
         } else {
           mostrarMensajeGuardar('Error: ' + msg, true);
+          if (btnGuardar) { btnGuardar.disabled = false; btnGuardar.removeAttribute('aria-busy'); }
         }
-      })
-      .then(function () {
-        if (btnGuardar) btnGuardar.disabled = carrito.length === 0;
       });
   }
 
