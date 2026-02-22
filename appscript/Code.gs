@@ -1,17 +1,17 @@
 /**
- * Web App - AMB (Alta, Modificación, Baja) sobre las tablas del Sheet.
+ * Web App - ÚNICO origen de datos para la app (productos, clientes, ventas).
  * Desplegar como "Aplicación web": ejecutar como yo, quién tiene acceso: cualquiera.
- * URL de despliegue → config.js APP_SCRIPT_URL.
+ * La URL de despliegue debe estar en src/Config/config.js como APP_SCRIPT_URL.
  *
- * Tablas definidas:
- * - CLIENTES: PK ID-CLIENTE. Columnas: ID-CLIENTE, NOMBRE-APELLIDO, TIPO-LISTA-PRECIO, WHATSAPP, OBSERVACION, HABILITADO
- * - PRODUCTOS: PK ID-PRODUCTO. Columnas: ID-PRODUCTO, CATEGORIA, NOMBRE-PRODUCTO, PRECIO-MAYORISTA, PRECIO-DISTRIBUIDOR, HABILITADO
- * - ENERO (y meses): PK ID-VENTA. Columnas: ID-VENTA, AÑO, FECHA_OPERATIVA, HORA, NOMBRE-APELLIDO, TIPO-LISTA-PRECIO, ID-PRODUCTO, CATEGORIA, PRODUCTO, CANTIDAD, PRECIO, MONTO
- * - RESUMEN-VENTAS: PK MES. Columnas: MES, DIA, CATEGORIA, NOMBRE-PRODUCTO, CANTIDAD, MONTO. Acciones: resumenAlta, resumenBaja, resumenModificacion, resumenLeer
+ * IMPORTANTE: SPREADSHEET_ID debe ser el mismo que en config.js. Este script debe estar
+ * vinculado al mismo Google Sheet que usa la app (o pegar aquí el ID de ese Sheet).
+ *
+ * Tablas (hojas): CLIENTES, PRODUCTOS, ENERO..DICIEMBRE, RESUMEN-VENTAS.
+ * Columnas según TABLAS más abajo (coincidir con src/Config/tables.js).
  */
 
-/** ID del Google Sheet. Poner solo el ID (ej: 1R05n3t2cgmzX-z58b9Sgx4He9k9Y9NAm9myQXbEwv3Q) o la URL completa. */
-var SPREADSHEET_ID = '1R05n3t2cgmzX-z58b9Sgx4He9k9Y9NAm9myQXbEwv3Q';
+/** ID del Google Sheet. DEBE coincidir con SPREADSHEET_ID en src/Config/config.js. */
+var SPREADSHEET_ID = '1RHxRu86apW8ccrHy0AmhDy9oOqrQdDDzL3O2zjtiyqI';
 
 /** Definición de tablas (hoja, PK, columnas). Coincidir con src/Config/tables.js */
 var TABLAS = {
@@ -203,12 +203,17 @@ function clienteLeer(params) {
   var filas = [];
   for (var i = 1; i < datos.length; i++) {
     var obj = {};
-    for (var c = 0; c < headers.length; c++) obj[headers[c]] = datos[i][c];
+    for (var c = 0; c < headers.length; c++) {
+      var val = datos[i][c];
+      obj[headers[c]] = (val !== undefined && val !== null) ? val : '';
+    }
+    var pkVal = (obj[def.pk] !== undefined && obj[def.pk] !== null) ? String(obj[def.pk]).trim() : '';
+    if (pkVal === '') continue;
     filas.push(obj);
   }
   var id = params[def.pk] || params.id;
   if (id) {
-    filas = filas.filter(function (f) { return String(f[def.pk]) === String(id); });
+    filas = filas.filter(function (f) { return String(f[def.pk]).trim() === String(id).trim(); });
   }
   return respuestaJson({ ok: true, datos: filas });
 }
@@ -270,12 +275,17 @@ function productoLeer(params) {
   var filas = [];
   for (var i = 1; i < datos.length; i++) {
     var obj = {};
-    for (var c = 0; c < headers.length; c++) obj[headers[c]] = datos[i][c];
+    for (var c = 0; c < headers.length; c++) {
+      var val = c < datos[i].length ? datos[i][c] : '';
+      obj[headers[c]] = (val !== undefined && val !== null) ? val : '';
+    }
+    var pkVal = (obj[def.pk] !== undefined && obj[def.pk] !== null) ? String(obj[def.pk]).trim() : '';
+    if (pkVal === '') continue;
     filas.push(obj);
   }
   var id = params[def.pk] || params.id;
   if (id) {
-    filas = filas.filter(function (f) { return String(f[def.pk]) === String(id); });
+    filas = filas.filter(function (f) { return String(f[def.pk]).trim() === String(id).trim(); });
   }
   return respuestaJson({ ok: true, datos: filas });
 }
@@ -321,7 +331,7 @@ function ventaAlta(params) {
   }
   if (filas.length === 0) return respuestaJson({ ok: true, mensaje: 'Sin ítems.' });
   var startRow = sheet.getLastRow() + 1;
-  sheet.getRange(startRow, 1, startRow + filas.length - 1, def.columns.length).setValues(filas);
+  sheet.getRange(startRow, 1, filas.length, def.columns.length).setValues(filas);
   return respuestaJson({ ok: true, mensaje: 'Venta guardada.' });
 }
 
@@ -404,10 +414,13 @@ function ventaLeer(params) {
   var filas = [];
   for (var i = 1; i < datos.length; i++) {
     var obj = {};
-    for (var c = 0; c < headers.length; c++) obj[headers[c]] = datos[i][c];
+    for (var c = 0; c < headers.length; c++) {
+      var val = c < datos[i].length ? datos[i][c] : '';
+      obj[headers[c]] = (val !== undefined && val !== null) ? val : '';
+    }
     filas.push(obj);
   }
-  if (idVenta) filas = filas.filter(function (f) { return String(f['ID-VENTA']) === String(idVenta); });
+  if (idVenta) filas = filas.filter(function (f) { return String(f['ID-VENTA'] || '').trim() === String(idVenta).trim(); });
   return respuestaJson({ ok: true, datos: filas });
 }
 

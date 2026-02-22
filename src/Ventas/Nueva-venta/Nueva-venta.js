@@ -12,23 +12,36 @@
   var productos = [];
   var carrito = [];
 
+  function claveEnFila(fila, columna) {
+    if (fila[columna] !== undefined && fila[columna] !== null) return fila[columna];
+    var norm = (columna || '').trim().toUpperCase();
+    for (var k in fila) {
+      if (fila.hasOwnProperty(k) && (k || '').trim().toUpperCase() === norm) return fila[k];
+    }
+    return undefined;
+  }
+
   function normalizarProductos(filas) {
+    if (!TABLA || !TABLA.columns || !filas.length) return [];
     var cols = TABLA.columns;
     return filas
       .filter(function (f) {
-        var hab = (f['HABILITADO'] || '').toUpperCase();
+        var hab = (claveEnFila(f, 'HABILITADO') || '').toString().trim().toUpperCase().replace(/Í/g, 'I');
         return hab === 'SI';
       })
       .map(function (f) {
         var p = {};
         cols.forEach(function (c) {
+          var val = claveEnFila(f, c);
           if (c === 'PRECIO-MAYORISTA' || c === 'PRECIO-DISTRIBUIDOR') {
-            p[c] = Number(f[c]) || 0;
+            p[c] = Number(val) || 0;
           } else {
-            p[c] = (f[c] || '');
+            p[c] = val !== undefined && val !== null ? String(val).trim() : '';
           }
         });
-        p.PRECIO = Number(f['PRECIO-MAYORISTA']) || Number(f['PRECIO-DISTRIBUIDOR']) || 0;
+        var precioMay = Number(claveEnFila(f, 'PRECIO-MAYORISTA')) || 0;
+        var precioDist = Number(claveEnFila(f, 'PRECIO-DISTRIBUIDOR')) || 0;
+        p.PRECIO = precioMay || precioDist;
         return p;
       });
   }
@@ -122,30 +135,41 @@
 
   function pintarListado() {
     var contenedor = document.getElementById('nueva-venta-productos');
+    if (!contenedor) return;
     var catFiltro = (document.getElementById('nueva-venta-categoria') || {}).value || '';
+    var catFiltroNorm = (catFiltro || '').trim().toUpperCase();
+    // Agrupar por categoría (clave normalizada en mayúsculas para que coincida con el combo)
     var porCategoria = {};
     productos.forEach(function (p) {
-      var c = p.CATEGORIA || 'Otros';
-      if (!porCategoria[c]) porCategoria[c] = [];
-      porCategoria[c].push(p);
+      var c = (p.CATEGORIA || '').trim() || 'Otros';
+      var cNorm = c.toUpperCase();
+      if (!porCategoria[cNorm]) porCategoria[cNorm] = { label: c, items: [] };
+      porCategoria[cNorm].items.push(p);
     });
     var categoriasOrden = Object.keys(porCategoria).sort();
-    if (catFiltro) categoriasOrden = categoriasOrden.filter(function (c) { return c === catFiltro; });
+    if (catFiltroNorm) {
+      categoriasOrden = categoriasOrden.filter(function (c) { return c === catFiltroNorm; });
+    }
     contenedor.innerHTML = '';
-    categoriasOrden.forEach(function (categoria) {
-      var productosCat = porCategoria[categoria];
+    categoriasOrden.forEach(function (categoriaNorm) {
+      var grupo = porCategoria[categoriaNorm];
+      var productosCat = grupo ? grupo.items : [];
+      var labelCategoria = grupo ? grupo.label : categoriaNorm;
       var seccion = document.createElement('div');
       seccion.className = 'nueva-venta__grupo';
-      seccion.innerHTML = '<h3 class="nueva-venta__grupo-titulo">' + escapeHtml(categoria) + '</h3>';
+      seccion.innerHTML = '<h3 class="nueva-venta__grupo-titulo">' + escapeHtml(labelCategoria) + '</h3>';
       var ul = document.createElement('ul');
       ul.className = 'nueva-venta__productos';
       productosCat.forEach(function (p) {
         var li = document.createElement('li');
         li.className = 'nueva-venta__item';
+        var nombre = (p['NOMBRE-PRODUCTO'] || '').trim() || '(Sin nombre)';
+        var precio = getPrecioParaCliente(p);
+        var idProd = (p[TABLA.pk] || '').toString().trim();
         li.innerHTML =
-          '<span class="nueva-venta__item-nombre">' + escapeHtml(p['NOMBRE-PRODUCTO']) + '</span>' +
-          '<span class="nueva-venta__item-precio">' + formatearPrecio(getPrecioParaCliente(p)) + '</span>' +
-          '<button type="button" class="nueva-venta__btn-add" data-id="' + escapeHtml(p[TABLA.pk]) + '">Agregar</button>';
+          '<span class="nueva-venta__item-nombre">' + escapeHtml(nombre) + '</span>' +
+          '<span class="nueva-venta__item-precio">' + formatearPrecio(precio) + '</span>' +
+          '<button type="button" class="nueva-venta__btn-add" data-id="' + escapeHtml(idProd) + '">Agregar</button>';
         li.querySelector('.nueva-venta__btn-add').addEventListener('click', function () {
           agregarAlCarrito(p);
         });

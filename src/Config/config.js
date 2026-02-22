@@ -1,48 +1,47 @@
 /**
  * Configuración centralizada de la aplicación.
- * Origen de datos: Google Sheet vía Apps Script (APP_SCRIPT_URL).
- * El documento y las hojas están definidos en appscript/Code.gs (SPREADSHEET_ID y TABLAS).
+ *
+ * ÚNICO ORIGEN DE DATOS: APP_SCRIPT_URL (Web App de Google Apps Script).
+ * - Productos → productoLeer → hoja PRODUCTOS
+ * - Clientes  → clienteLeer  → hoja CLIENTES
+ * - Ventas   → ventaLeer / guardarVenta → hojas ENERO..DICIEMBRE
+ * El Sheet usado está definido en appscript/Code.gs (SPREADSHEET_ID). Debe coincidir con SPREADSHEET_ID de abajo.
  */
 (function (global) {
   'use strict';
 
   var Config = {
     /**
-     * ID del Google Sheet. Debe coincidir con SPREADSHEET_ID en appscript/Code.gs.
-     * Se obtiene de la URL de edición del Sheet: .../spreadsheets/d/ESTE_ID/edit
+     * ID del Google Sheet. DEBE SER EL MISMO que en appscript/Code.gs (variable SPREADSHEET_ID).
+     * Se obtiene de la URL de edición: .../spreadsheets/d/ESTE_ID/edit
      */
-    SPREADSHEET_ID: '1R05n3t2cgmzX-z58b9Sgx4He9k9Y9NAm9myQXbEwv3Q',
+    SPREADSHEET_ID: '1RHxRu86apW8ccrHy0AmhDy9oOqrQdDDzL3O2zjtiyqI',
 
     /**
-     * URL del Web App de Google Apps Script (despliegue).
-     * productoLeer → hoja PRODUCTOS | clienteLeer → hoja CLIENTES | ventaAlta/ventaLeer → ENERO..DICIEMBRE
+     * URL del Web App de Google Apps Script (despliegue). ÚNICA fuente de datos de la app.
+     * Copiar aquí la URL que da "Implementar" > "Aplicación web" en el proyecto Apps Script vinculado al Sheet anterior.
      */
-    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwbOd1_5vHZhUVa83aXXPxHA7fcHVpJNXNIdT5WvvWbjDEFY3gekaEo87AY0sWK6GMR/exec',
+    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbxFGJ5RXn5oKzsCTEfWtXqzMBfcp2aOPZaIdEHTI60sqYsQwsdy0bXWVBx_G5pcWJ8D/exec',
 
-    /** Nombres de las hojas del Sheet (deben coincidir con Code.gs y tables.js). */
+    /** Nombres de las hojas (igual que en Code.gs y tables.js). */
     HOJA_PRODUCTOS: 'PRODUCTOS',
     HOJA_CLIENTES: 'CLIENTES',
 
     /**
-     * Categorías para el filtro de productos en Nueva venta.
-     * Deben coincidir con los valores de la columna CATEGORIA en la hoja PRODUCTOS.
-     * El orden aquí define el orden en el combo. Editar para agregar, quitar o reordenar.
+     * Categorías para el filtro en Nueva venta. Mismo orden que en la hoja PRODUCTOS (columna CATEGORIA).
      */
     CATEGORIAS: [
       'ALFAJOR',
       'BUDINES',
-      'HOJALDRE',
-      'PANADERIA',
       'ROSCAS',
+      'HOJALDRE',
+      'GALLETAS',
+      'PANADERIA',
+      'ESPECIALIDADES',
       'VARIOS'
     ],
 
-    /** URL pública CSV del Sheet (Compartir > Publicar en la web). */
-    SHEET_WEB_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT28rd4v_LKDBh45YSVSCW3qhW2_HFkMR6ktjKaFGYFtM5D7iTtd4XYgSMoI15uRd0fH5c4Ir8jAFzg/pub?output=csv',
-
-    /**
-     * Proxy CORS. Dejar vacío '' para enviar directo al Apps Script.
-     */
+    /** Proxy CORS. Dejar '' para usar directo APP_SCRIPT_URL. */
     CORS_PROXY: ''
   };
 

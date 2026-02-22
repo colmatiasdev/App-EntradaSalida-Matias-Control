@@ -36,7 +36,7 @@
           return;
         }
         var clientes = data.datos.filter(function (c) {
-          var h = (c.HABILITADO || '').toUpperCase();
+          var h = (c.HABILITADO || '').toString().trim().toUpperCase().replace(/Í/g, 'I');
           return h === 'SI';
         });
         mensaje.textContent = '';
