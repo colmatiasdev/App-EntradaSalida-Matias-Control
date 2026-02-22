@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toti Sanguicería - Ventas</title>
+  <link rel="stylesheet" href="css/estilos.css">
+</head>
+<body>
+  <header class="header">
+    <div class="header__logo">
+      <h1>Toti Sanguicería</h1>
+      <span class="header__subtitle">Sistema de Ventas</span>
+    </div>
+    <nav class="nav">
+      <ul class="nav__menu">
+        <li class="nav__item">
+          <a href="src/Ventas/nueva-venta.html" class="nav__link nav__link--active">
+            Nueva venta
+          </a>
+        </li>
+        <li class="nav__item">
+          <a href="src/Ventas/ventas-por-meses.html" class="nav__link">
+            Ventas por meses
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <h2 class="hero__title">Bienvenido al sistema de ventas</h2>
+      <p class="hero__text">
+        Selecciona una opción del menú para comenzar: registrar una nueva venta o consultar las ventas por mes.
+      </p>
+      <div class="hero__cards">
+        <a href="src/Ventas/nueva-venta.html" class="card">
+          <span class="card__icon">🛒</span>
+          <h3 class="card__title">Nueva venta</h3>
+          <p class="card__text">Registrar una nueva venta en el sistema.</p>
+        </a>
+        <a href="src/Ventas/ventas-por-meses.html" class="card">
+          <span class="card__icon">📅</span>
+          <h3 class="card__title">Ventas por meses</h3>
+          <p class="card__text">Consultar y analizar ventas por período mensual.</p>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>&copy; Toti Sanguicería - Ventas</p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>
