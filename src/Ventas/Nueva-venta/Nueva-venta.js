@@ -168,17 +168,41 @@
       var subtotal = item.producto.PRECIO * item.cantidad;
       total += subtotal;
       var tr = document.createElement('tr');
+      var qty = item.cantidad;
+      var trashSvg = '<svg class="nueva-venta__icon-trash" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>';
       tr.innerHTML =
         '<td>' + escapeHtml(item.producto['NOMBRE-PRODUCTO']) + '</td>' +
         '<td class="nueva-venta__th-num">' + formatearPrecio(item.producto.PRECIO) + '</td>' +
-        '<td class="nueva-venta__th-num">' +
-        '<input type="number" min="1" value="' + item.cantidad + '" class="nueva-venta__input-qty" data-id="' + escapeHtml(id) + '">' +
-        '</td>' +
+        '<td class="nueva-venta__th-num nueva-venta__td-qty">' +
+        '<div class="nueva-venta__qty-wrap">' +
+        '<button type="button" class="nueva-venta__qty-btn nueva-venta__qty-minus" data-id="' + escapeHtml(id) + '" aria-label="Disminuir cantidad">−</button>' +
+        '<input type="number" min="1" value="' + qty + '" class="nueva-venta__input-qty" data-id="' + escapeHtml(id) + '" aria-label="Cantidad">' +
+        '<button type="button" class="nueva-venta__qty-btn nueva-venta__qty-plus" data-id="' + escapeHtml(id) + '" aria-label="Aumentar cantidad">+</button>' +
+        '</div></td>' +
         '<td class="nueva-venta__th-num nueva-venta__subtotal">' + formatearPrecio(subtotal) + '</td>' +
-        '<td><button type="button" class="nueva-venta__btn-quitar" data-id="' + escapeHtml(id) + '">Quitar</button></td>';
-      tr.querySelector('.nueva-venta__input-qty').addEventListener('input', function () {
-        actualizarCantidad(id, this.value);
+        '<td><button type="button" class="nueva-venta__btn-quitar" data-id="' + escapeHtml(id) + '" aria-label="Quitar del resumen" title="Quitar">' + trashSvg + '</button></td>';
+      var inputQty = tr.querySelector('.nueva-venta__input-qty');
+      var btnMinus = tr.querySelector('.nueva-venta__qty-minus');
+      var btnPlus = tr.querySelector('.nueva-venta__qty-plus');
+      function syncQty() {
+        var val = parseInt(inputQty.value, 10);
+        if (isNaN(val) || val < 1) val = 1;
+        inputQty.value = val;
+        actualizarCantidad(id, val);
+        btnMinus.disabled = val <= 1;
+      }
+      inputQty.addEventListener('input', function () { syncQty(); });
+      inputQty.addEventListener('change', function () { syncQty(); });
+      btnMinus.addEventListener('click', function () {
+        var v = parseInt(inputQty.value, 10) || 1;
+        if (v > 1) { inputQty.value = v - 1; syncQty(); }
       });
+      btnPlus.addEventListener('click', function () {
+        var v = parseInt(inputQty.value, 10) || 0;
+        inputQty.value = v + 1;
+        syncQty();
+      });
+      btnMinus.disabled = qty <= 1;
       tr.querySelector('.nueva-venta__btn-quitar').addEventListener('click', function () {
         quitarDelCarrito(id);
       });
