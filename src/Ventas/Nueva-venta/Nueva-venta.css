@@ -133,3 +133,44 @@
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
+
+.nueva-venta__guardar {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.nueva-venta__btn-guardar {
+  padding: 0.6rem 1.25rem;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.nueva-venta__btn-guardar:hover:not(:disabled) {
+  background: var(--color-primary-dark);
+}
+
+.nueva-venta__btn-guardar:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.nueva-venta__guardar-msg {
+  font-size: 0.9rem;
+  color: var(--color-text-muted);
+}
+
+.nueva-venta__guardar-msg.ok {
+  color: #0a0;
+}
+
+.nueva-venta__guardar-msg.err {
+  color: var(--color-primary);
+}

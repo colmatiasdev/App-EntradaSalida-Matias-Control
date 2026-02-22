@@ -9,6 +9,15 @@
     PRODUCTOS: {
       pk: 'ID-PRODUCTO',
       columns: ['ID-PRODUCTO', 'CATEGORIA', 'NOMBRE-PRODUCTO', 'PRECIO', 'HABILITADO']
+    },
+    /** Nombres de las hojas/tabs por mes (1=ENERO … 12=DICIEMBRE). */
+    NOMBRES_HOJAS_MES: [
+      'ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO',
+      'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'
+    ],
+    VENTAS: {
+      /** Columnas comunes a todas las hojas de ventas (ENERO … DICIEMBRE). */
+      columns: ['ID-VENTA', 'FECHA_OPERATIVA', 'HORA', 'ID-PRODUCTO', 'CATEGORIA', 'PRODUCTO', 'MONTO']
     }
   };
 

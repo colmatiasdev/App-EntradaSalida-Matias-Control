@@ -2,7 +2,10 @@
   'use strict';
 
   var TABLA = window.APP_TABLES && window.APP_TABLES.PRODUCTOS;
+  var TABLA_VENTAS = window.APP_TABLES && window.APP_TABLES.VENTAS;
   var CSV_URL = window.APP_CONFIG && window.APP_CONFIG.GOOGLE_SHEET_CSV_URL;
+  var APP_SCRIPT_URL = window.APP_CONFIG && window.APP_CONFIG.APP_SCRIPT_URL;
+  var NEGOCIO = window.APP_NEGOCIO;
   var productos = [];
   var carrito = [];
 
@@ -129,14 +132,19 @@
     var tabla = document.getElementById('nueva-venta-tabla');
     var tbody = document.getElementById('nueva-venta-tabla-body');
     var totalEl = document.getElementById('nueva-venta-total');
+    var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
+    var msgGuardar = document.getElementById('nueva-venta-guardar-msg');
+    if (msgGuardar) { msgGuardar.textContent = ''; msgGuardar.className = 'nueva-venta__guardar-msg'; }
     if (carrito.length === 0) {
       vacio.hidden = false;
       tabla.hidden = true;
       totalEl.textContent = '0';
+      if (btnGuardar) btnGuardar.disabled = true;
       return;
     }
     vacio.hidden = true;
     tabla.hidden = false;
+    if (btnGuardar) btnGuardar.disabled = false;
     tbody.innerHTML = '';
     var total = 0;
     carrito.forEach(function (item) {
@@ -163,8 +171,86 @@
     totalEl.textContent = formatearPrecio(total);
   }
 
+  function getTotalVenta() {
+    var t = 0;
+    carrito.forEach(function (item) {
+      t += item.producto.PRECIO * item.cantidad;
+    });
+    return t;
+  }
+
+  function guardarVenta() {
+    if (carrito.length === 0) return;
+    if (!APP_SCRIPT_URL) {
+      mostrarMensajeGuardar('Configura APP_SCRIPT_URL en config.js', true);
+      return;
+    }
+    if (!NEGOCIO || !NEGOCIO.getFechaOperativa) {
+      mostrarMensajeGuardar('Falta cargar negocio.js', true);
+      return;
+    }
+    var fechaOp = NEGOCIO.getFechaOperativa();
+    var nombreHoja = NEGOCIO.getNombreHojaMes(fechaOp);
+    var total = getTotalVenta();
+    var ahora = new Date();
+    var hora = ahora.getHours() + ':' + (ahora.getMinutes() < 10 ? '0' : '') + ahora.getMinutes();
+    var idVenta = 'V-' + Date.now();
+    var payload = {
+      accion: 'guardarVenta',
+      hoja: nombreHoja,
+      idVenta: idVenta,
+      fechaOperativa: fechaOp,
+      hora: hora,
+      total: total,
+      items: carrito.map(function (item) {
+        return {
+          idProducto: item.producto[TABLA.pk],
+          categoria: item.producto.CATEGORIA,
+          producto: item.producto['NOMBRE-PRODUCTO'],
+          monto: item.producto.PRECIO * item.cantidad
+        };
+      })
+    };
+    var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
+    var msgGuardar = document.getElementById('nueva-venta-guardar-msg');
+    if (btnGuardar) btnGuardar.disabled = true;
+    if (msgGuardar) { msgGuardar.textContent = 'Guardando…'; msgGuardar.className = 'nueva-venta__guardar-msg'; }
+    fetch(APP_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+      .then(function (res) { return res.json ? res.json() : res.text(); })
+      .then(function (data) {
+        var ok = data && (data.ok === true || data.success === true);
+        if (ok) {
+          carrito = [];
+          pintarResumen();
+          mostrarMensajeGuardar('Venta guardada correctamente.', false);
+        } else {
+          mostrarMensajeGuardar(data && (data.error || data.mensaje) || 'Error al guardar.', true);
+        }
+      })
+      .catch(function (err) {
+        mostrarMensajeGuardar('Error de conexión. Revisa APP_SCRIPT_URL y que el Web App esté desplegado.', true);
+      })
+      .then(function () {
+        if (btnGuardar) btnGuardar.disabled = carrito.length === 0;
+      });
+  }
+
+  function mostrarMensajeGuardar(texto, esError) {
+    var msg = document.getElementById('nueva-venta-guardar-msg');
+    if (!msg) return;
+    msg.textContent = texto;
+    msg.className = 'nueva-venta__guardar-msg ' + (esError ? 'err' : 'ok');
+  }
+
   function init() {
     document.getElementById('nueva-venta-categoria').addEventListener('change', pintarListado);
+    var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
+    if (btnGuardar) btnGuardar.addEventListener('click', guardarVenta);
     cargarProductos();
   }
 
