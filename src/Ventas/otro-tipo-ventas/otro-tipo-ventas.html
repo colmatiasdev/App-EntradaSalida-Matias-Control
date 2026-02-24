@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Otro tipo de ventas - Panificacion Colombres</title>
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../Footer/footer.css">
+  <link rel="stylesheet" href="otro-tipo-ventas.css">
+</head>
+<body>
+  <header class="header header--no-nav">
+    <div class="header__logo">
+      <h1>Panificacion Colombres</h1>
+      <span class="header__subtitle">Sistema de Ventas</span>
+    </div>
+    <a href="../../../index.html" class="header__inicio">Inicio</a>
+    <nav class="nav" aria-hidden="true" hidden>
+      <ul class="nav__menu">
+        <li class="nav__item">
+          <a href="../Nueva-venta/Nueva-venta.html" class="nav__link">Nueva venta</a>
+        </li>
+        <li class="nav__item">
+          <a href="../Listado-Ventas/listado-ventas.html" class="nav__link">Listado de ventas</a>
+        </li>
+        <li class="nav__item">
+          <a href="otro-tipo-ventas.html" class="nav__link nav__link--active">Otro tipo de ventas</a>
+        </li>
+        <li class="nav__item">
+          <a href="../../Gastos-Salida/gastos-salida.html" class="nav__link">Gastos de Salida</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>Otro tipo de ventas</h1>
+    </div>
+
+    <section class="otro-tipo-ventas__intro">
+      <p class="otro-tipo-ventas__texto">En esta sección podés cargar las operaciones de <strong id="otro-tipo-ventas-nombre-apellido">MATIAS</strong></p>
+    </section>
+
+    <section class="otro-tipo-ventas__formulario" aria-labelledby="otro-tipo-ventas-form-title">
+      <h2 id="otro-tipo-ventas-form-title" class="otro-tipo-ventas__form-title">Nueva operación</h2>
+      <form id="otro-tipo-ventas-form" class="otro-tipo-ventas__form" novalidate>
+        <div class="otro-tipo-ventas__fields">
+          <div class="otro-tipo-ventas__field">
+            <span class="otro-tipo-ventas__label">Tipo de operación</span>
+            <label id="otro-tipo-ventas-tipo-operacion" class="otro-tipo-ventas__valor-static">VENTA</label>
+          </div>
+          <div class="otro-tipo-ventas__field">
+            <label for="otro-tipo-ventas-producto" class="otro-tipo-ventas__label">Producto</label>
+            <input type="text" id="otro-tipo-ventas-producto" class="otro-tipo-ventas__input" placeholder="Nombre del producto" aria-label="Producto" autocomplete="off">
+          </div>
+          <div class="otro-tipo-ventas__field otro-tipo-ventas__field--precio">
+            <label for="otro-tipo-ventas-precio" class="otro-tipo-ventas__label">Precio</label>
+            <input type="number" id="otro-tipo-ventas-precio" class="otro-tipo-ventas__input otro-tipo-ventas__input--numero" placeholder="0" min="0" step="0.01" aria-label="Precio" inputmode="decimal">
+          </div>
+        </div>
+        <div class="otro-tipo-ventas__actions">
+          <button type="submit" id="otro-tipo-ventas-btn-guardar" class="otro-tipo-ventas__btn-guardar">Guardar</button>
+        </div>
+      </form>
+    </section>
+
+    <section class="otro-tipo-ventas__contenido" id="otro-tipo-ventas-contenido">
+      <p class="otro-tipo-ventas__mensaje" id="otro-tipo-ventas-mensaje" aria-live="polite">Completá producto y precio para registrar.</p>
+      <p class="otro-tipo-ventas__guardar-msg" id="otro-tipo-ventas-guardar-msg" aria-live="polite" hidden></p>
+    </section>
+  </main>
+
+  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+
+  <script src="../../Config/config.js"></script>
+  <script src="../../Config/tables.js"></script>
+  <script src="../../Config/negocio.js"></script>
+  <script src="../../../main.js"></script>
+  <script src="../../Footer/footer.js"></script>
+  <script src="otro-tipo-ventas.js"></script>
+</body>
+</html>

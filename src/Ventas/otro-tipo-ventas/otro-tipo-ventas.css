@@ -1,4 +1,4 @@
-/* Gastos de Salida */
+/* Otro tipo de ventas (misma estructura que Gastos de Salida) */
 .header--no-nav .nav {
   display: none !important;
 }
@@ -22,12 +22,12 @@
   color: #fff;
 }
 
-.gastos-salida__intro {
+.otro-tipo-ventas__intro {
   margin-bottom: 1.25rem;
 }
 
 /* Formulario: card y estructura */
-.gastos-salida__formulario {
+.otro-tipo-ventas__formulario {
   background: var(--color-surface);
   border: 1px solid #e8e5e1;
   border-radius: var(--radius, 8px);
@@ -36,39 +36,37 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
-.gastos-salida__form-title {
+.otro-tipo-ventas__form-title {
   margin: 0 0 1.25rem;
   font-size: 1.1rem;
   font-weight: 600;
   color: var(--color-text);
 }
 
-.gastos-salida__form {
+.otro-tipo-ventas__form {
   display: block;
 }
 
-.gastos-salida__fields {
+.otro-tipo-ventas__fields {
   display: grid;
   gap: 1.25rem;
   margin-bottom: 1.5rem;
 }
 
-/* Cada campo: label arriba, control abajo (mejor en móvil) */
-.gastos-salida__field {
+.otro-tipo-ventas__field {
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
 }
 
-.gastos-salida__label {
+.otro-tipo-ventas__label {
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--color-text);
 }
 
-/* Controles: altura táctil mínima ~44px en móvil */
-.gastos-salida__combo,
-.gastos-salida__input {
+.otro-tipo-ventas__combo,
+.otro-tipo-ventas__input {
   width: 100%;
   min-height: 44px;
   padding: 0.6rem 0.75rem;
@@ -79,23 +77,35 @@
   background: var(--color-surface);
 }
 
-.gastos-salida__combo:focus,
-.gastos-salida__input:focus {
+.otro-tipo-ventas__combo:focus,
+.otro-tipo-ventas__input:focus {
   outline: none;
   border-color: var(--color-primary);
   box-shadow: 0 0 0 2px rgba(180, 30, 55, 0.15);
 }
 
-.gastos-salida__input--numero {
+.otro-tipo-ventas__input--numero {
   max-width: 10rem;
 }
 
-/* Botón Guardar: ancho completo en móvil, altura táctil */
-.gastos-salida__actions {
+.otro-tipo-ventas__valor-static {
+  display: block;
+  min-height: 44px;
+  padding: 0.6rem 0.75rem;
+  box-sizing: border-box;
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: var(--radius, 8px);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+.otro-tipo-ventas__actions {
   margin-top: 0.5rem;
 }
 
-.gastos-salida__btn-guardar {
+.otro-tipo-ventas__btn-guardar {
   display: block;
   width: 100%;
   min-height: 48px;
@@ -112,39 +122,38 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.gastos-salida__btn-guardar:hover:not(:disabled) {
+.otro-tipo-ventas__btn-guardar:hover:not(:disabled) {
   background: var(--color-primary-dark, #9a1830);
 }
 
-.gastos-salida__btn-guardar:active:not(:disabled) {
+.otro-tipo-ventas__btn-guardar:active:not(:disabled) {
   transform: scale(0.98);
 }
 
-.gastos-salida__btn-guardar:disabled {
+.otro-tipo-ventas__btn-guardar:disabled {
   opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Mensajes */
-.gastos-salida__guardar-msg {
+.otro-tipo-ventas__guardar-msg {
   margin-top: 0.75rem;
   font-size: 0.95rem;
 }
 
-.gastos-salida__guardar-msg.ok {
+.otro-tipo-ventas__guardar-msg.ok {
   color: var(--color-success, #0a6b0a);
 }
 
-.gastos-salida__guardar-msg.err {
+.otro-tipo-ventas__guardar-msg.err {
   color: var(--color-error, #b91c1c);
 }
 
-.gastos-salida__texto {
+.otro-tipo-ventas__texto {
   color: var(--color-text-muted);
   font-size: 0.95rem;
 }
 
-.gastos-salida__contenido {
+.otro-tipo-ventas__contenido {
   background: var(--color-surface);
   border: 1px solid #e8e5e1;
   border-radius: var(--radius);
@@ -152,59 +161,57 @@
   min-height: 120px;
 }
 
-.gastos-salida__mensaje {
+.otro-tipo-ventas__mensaje {
   color: var(--color-text-muted);
   font-size: 0.95rem;
   margin: 0;
 }
 
-/* ——— Desktop: formulario en grid 2–3 columnas ——— */
 @media (min-width: 640px) {
-  .gastos-salida__formulario {
+  .otro-tipo-ventas__formulario {
     padding: 1.75rem;
   }
 
-  .gastos-salida__fields {
+  .otro-tipo-ventas__fields {
     grid-template-columns: 1fr 1fr minmax(8rem, 1fr);
     align-items: end;
     gap: 1rem;
   }
 
-  .gastos-salida__field--precio {
+  .otro-tipo-ventas__field--precio {
     max-width: 10rem;
   }
 
-  .gastos-salida__input--numero {
+  .otro-tipo-ventas__input--numero {
     max-width: none;
   }
 
-  .gastos-salida__actions {
+  .otro-tipo-ventas__actions {
     margin-top: 0;
     margin-bottom: 0;
   }
 
-  .gastos-salida__btn-guardar {
+  .otro-tipo-ventas__btn-guardar {
     width: auto;
     min-width: 10rem;
     min-height: 44px;
   }
 }
 
-/* ——— Móvil: uso completo del ancho y safe area ——— */
 @media (max-width: 639px) {
-  .gastos-salida__formulario {
+  .otro-tipo-ventas__formulario {
     padding: 1.25rem;
     padding-left: max(1.25rem, env(safe-area-inset-left));
     padding-right: max(1.25rem, env(safe-area-inset-right));
   }
 
-  .gastos-salida__contenido {
+  .otro-tipo-ventas__contenido {
     padding: 1rem;
     padding-left: max(1rem, env(safe-area-inset-left));
     padding-right: max(1rem, env(safe-area-inset-right));
   }
 
-  .gastos-salida__field--precio .gastos-salida__input--numero {
+  .otro-tipo-ventas__field--precio .otro-tipo-ventas__input--numero {
     max-width: none;
   }
 }

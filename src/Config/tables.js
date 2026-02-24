@@ -89,6 +89,13 @@
       columns: ['MES', 'DIA', 'CATEGORIA', 'NOMBRE-PRODUCTO', 'CANTIDAD', 'MONTO']
     },
 
+    /** Tabla OPERACIONES-GENERALES: operaciones generales con descripción e importe. */
+    OPERACIONES_GENERALES: {
+      sheet: 'OPERACIONES-GENERALES',
+      pk: 'ID-OPERACION-GRAL',
+      columns: ['ID-OPERACION-GRAL', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'DESCRIPCION', 'IMPORTE']
+    },
+
     /** Tabla RESUMEN-OPERATIVO: resumen operativo por fecha, hora, tipo y categoría. */
     RESUMEN_OPERATIVO: {
       sheet: 'RESUMEN-OPERATIVO',

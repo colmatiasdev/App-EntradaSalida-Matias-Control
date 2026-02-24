@@ -6,7 +6,7 @@
  * IMPORTANTE: SPREADSHEET_ID debe ser el mismo que en config.js. Este script debe estar
  * vinculado al mismo Google Sheet que usa la app (o pegar aquí el ID de ese Sheet).
  *
- * Tablas (hojas): CLIENTES, PRODUCTOS, ENERO..DICIEMBRE, RESUMEN-VENTAS, RESUMEN-OPERATIVO, COMPONENTE-COMBO.
+ * Tablas (hojas): CLIENTES, PRODUCTOS, ENERO..DICIEMBRE, RESUMEN-VENTAS, OPERACIONES-GENERALES, RESUMEN-OPERATIVO, COMPONENTE-COMBO.
  * Columnas según TABLAS más abajo (coincidir con src/Config/tables.js).
  */
 
@@ -50,6 +50,11 @@ var TABLAS = {
     sheet: 'RESUMEN-OPERATIVO',
     pk: 'ID-RESUMEN',
     columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'CATEGORIA', 'IMPORTE']
+  },
+  OPERACIONES_GENERALES: {
+    sheet: 'OPERACIONES-GENERALES',
+    pk: 'ID-OPERACION-GRAL',
+    columns: ['ID-OPERACION-GRAL', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'DESCRIPCION', 'IMPORTE']
   },
   COMPONENTE_COMBO: {
     sheet: 'COMPONENTE-COMBO',
