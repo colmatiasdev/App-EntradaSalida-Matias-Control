@@ -12,6 +12,13 @@
   var productos = [];
   var carrito = [];
 
+  function getBtnGuardar() {
+    return document.getElementById('nueva-venta-btn-guardar');
+  }
+  function getMsgGuardar() {
+    return document.getElementById('nueva-venta-guardar-msg');
+  }
+
   function claveEnFila(fila, columna) {
     if (fila[columna] !== undefined && fila[columna] !== null) return fila[columna];
     var norm = (columna || '').trim().toUpperCase();
@@ -226,8 +233,8 @@
     var tabla = document.getElementById('nueva-venta-tabla');
     var tbody = document.getElementById('nueva-venta-tabla-body');
     var totalEl = document.getElementById('nueva-venta-total');
-    var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
-    var msgGuardar = document.getElementById('nueva-venta-guardar-msg');
+    var btnGuardar = getBtnGuardar();
+    var msgGuardar = getMsgGuardar();
     if (msgGuardar) { msgGuardar.textContent = ''; msgGuardar.className = 'nueva-venta__guardar-msg'; }
     if (carrito.length === 0) {
       vacio.hidden = false;
@@ -335,8 +342,8 @@
         };
       })
     };
-    var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
-    var msgGuardar = document.getElementById('nueva-venta-guardar-msg');
+    var btnGuardar = getBtnGuardar();
+    var msgGuardar = getMsgGuardar();
     if (btnGuardar) {
       btnGuardar.disabled = true;
       btnGuardar.setAttribute('aria-busy', 'true');
@@ -392,7 +399,7 @@
   }
 
   function mostrarMensajeGuardar(texto, esError) {
-    var msg = document.getElementById('nueva-venta-guardar-msg');
+    var msg = getMsgGuardar();
     if (!msg) return;
     msg.textContent = texto;
     msg.className = 'nueva-venta__guardar-msg ' + (esError ? 'err' : 'ok');
@@ -425,7 +432,7 @@
     }
     aplicarClienteEnPantalla();
     document.getElementById('nueva-venta-categoria').addEventListener('change', pintarListado);
-    var btnGuardar = document.getElementById('nueva-venta-btn-guardar');
+    var btnGuardar = getBtnGuardar();
     if (btnGuardar) btnGuardar.addEventListener('click', guardarVenta);
     cargarProductos();
   }

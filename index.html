@@ -8,10 +8,10 @@
   <link rel="stylesheet" href="src/Footer/footer.css">
 </head>
 <body>
-  <header class="header">
-    <div class="header__logo">
+  <header class="header c-header">
+    <div class="header__logo c-header__info">
       <h1>Panificacion Colombres</h1>
-      <span class="header__subtitle">Sistema de Ventas</span>
+      <span class="header__subtitle c-header__sub">MÓDULO DE VENTAS</span>
     </div>
     <nav class="nav">
       <ul class="nav__menu">
@@ -35,30 +35,32 @@
   </header>
 
   <main class="main">
-    <section class="hero">
-      <h2 class="hero__title">Bienvenido al sistema de ventas</h2>
+    <section class="hero hub-hero a-in">
+      <h1 class="hero__title hub-title">
+        <em>Ventas</em>
+      </h1>
       <p class="hero__text">
-        Selecciona una opción del menú para comenzar: registrar una nueva venta o consultar las ventas por mes.
+        Selecciona una opción para comenzar: registrar una nueva venta o consultar el listado y resumen de ventas.
       </p>
-      <div class="hero__cards">
-        <a href="src/Ventas/Seleccionar-cliente/seleccionar-cliente.html" class="card">
+      <div class="hero__cards hub-grid">
+        <a href="src/Ventas/Seleccionar-cliente/seleccionar-cliente.html" class="card hub-card hub-card--cool">
           <span class="card__icon">🛒</span>
-          <h3 class="card__title">Nueva venta</h3>
+          <div class="hub-card__name card__title">Nueva Venta</div>
           <p class="card__text">Seleccionar cliente y registrar una nueva venta.</p>
         </a>
-        <a href="src/Ventas/Listado-Ventas/listado-ventas.html" class="card">
+        <a href="src/Ventas/Listado-Ventas/listado-ventas.html" class="card hub-card hub-card--urface">
           <span class="card__icon">📅</span>
-          <h3 class="card__title">Listado de ventas</h3>
+          <div class="hub-card__name card__title">Resumen de la Venta</div>
           <p class="card__text">Consultar y analizar ventas por período mensual.</p>
         </a>
-        <a href="src/Dashboard/Dashboard-Anual/dashboard-anual.html" class="card">
+        <a href="src/Dashboard/Dashboard-Anual/dashboard-anual.html" class="card hub-card">
           <span class="card__icon">📆</span>
-          <h3 class="card__title">Anual</h3>
+          <div class="hub-card__name card__title">Anual</div>
           <p class="card__text">Resumen anual por mes: totales y cantidad de ventas.</p>
         </a>
-        <a href="src/Dashboard/dashboard.html" class="card">
+        <a href="src/Dashboard/dashboard.html" class="card hub-card">
           <span class="card__icon">📊</span>
-          <h3 class="card__title">Dashboard</h3>
+          <div class="hub-card__name card__title">Dashboard</div>
           <p class="card__text">Resúmenes mensual y anual de ventas.</p>
         </a>
       </div>

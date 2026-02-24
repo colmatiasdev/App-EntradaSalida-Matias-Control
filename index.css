@@ -35,8 +35,9 @@ body {
   flex-direction: column;
 }
 
-/* Header y menú */
-.header {
+/* Header y menú (c-header para compatibilidad con hub) */
+.header,
+.c-header {
   background: var(--color-surface);
   box-shadow: var(--shadow);
   padding: 1rem 1.5rem;
@@ -45,6 +46,18 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
+}
+
+.c-header__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.c-header__sub {
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
 }
 
 .header__logo h1 {
@@ -100,10 +113,34 @@ body {
   width: 100%;
 }
 
-.hero__title {
+.hero__title,
+.hub-title {
   font-size: 1.5rem;
   margin-bottom: 0.5rem;
   color: var(--color-text);
+}
+
+.hub-hero.a-in .hub-title em {
+  font-style: normal;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.hub-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.hub-card {
+  background: var(--color-surface);
+}
+
+.hub-card__name {
+  font-size: 1.1rem;
+  margin-bottom: 0.35rem;
+  color: var(--color-primary);
+  font-weight: 600;
 }
 
 .hero__text {
