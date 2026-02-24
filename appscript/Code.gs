@@ -6,7 +6,7 @@
  * IMPORTANTE: SPREADSHEET_ID debe ser el mismo que en config.js. Este script debe estar
  * vinculado al mismo Google Sheet que usa la app (o pegar aquí el ID de ese Sheet).
  *
- * Tablas (hojas): CLIENTES, PRODUCTOS, ENERO..DICIEMBRE, RESUMEN-VENTAS, RESUMEN-OPERATIVO.
+ * Tablas (hojas): CLIENTES, PRODUCTOS, ENERO..DICIEMBRE, RESUMEN-VENTAS, RESUMEN-OPERATIVO, COMPONENTE-COMBO.
  * Columnas según TABLAS más abajo (coincidir con src/Config/tables.js).
  */
 
@@ -50,6 +50,10 @@ var TABLAS = {
     sheet: 'RESUMEN-OPERATIVO',
     pk: 'ID-RESUMEN',
     columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'CATEGORIA', 'IMPORTE']
+  },
+  COMPONENTE_COMBO: {
+    sheet: 'COMPONENTE-COMBO',
+    columns: ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
   }
 };
 
@@ -84,6 +88,7 @@ function doPost(e) {
       case 'resumenOperativoBaja':       return resumenOperativoBaja(params);
       case 'resumenOperativoModificacion': return resumenOperativoModificacion(params);
       case 'resumenOperativoLeer':       return resumenOperativoLeer(params);
+      case 'componenteComboLeer':        return componenteComboLeer(params);
       default:
         return respuestaJson({ ok: false, error: 'Acción no reconocida: ' + accion });
     }
@@ -601,6 +606,32 @@ function resumenOperativoLeer(params) {
   var id = params[def.pk] || params.id;
   if (id) {
     filas = filas.filter(function (f) { return String(f[def.pk]).trim() === String(id).trim(); });
+  }
+  return respuestaJson({ ok: true, datos: filas });
+}
+
+// --- COMPONENTE-COMBO (valores para combos: sucursal, tipo operación, categorías) ---
+
+function componenteComboLeer(params) {
+  var def = TABLAS.COMPONENTE_COMBO;
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: true, datos: [] });
+  var datos = sheet.getDataRange().getValues();
+  if (datos.length < 2) return respuestaJson({ ok: true, datos: [] });
+  var headers = datos[0];
+  var colNames = ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET'];
+  var indices = colNames.map(function (name) { return headers.indexOf(name); });
+  var filas = [];
+  for (var i = 1; i < datos.length; i++) {
+    var row = datos[i];
+    var obj = {};
+    colNames.forEach(function (name, idx) {
+      var j = indices[idx];
+      var val = (j !== -1 && row[j] !== undefined && row[j] !== null) ? String(row[j]).trim() : '';
+      obj[name] = val;
+    });
+    filas.push(obj);
   }
   return respuestaJson({ ok: true, datos: filas });
 }

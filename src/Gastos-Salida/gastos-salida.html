@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Gastos de Salida - Panificacion Colombres</title>
+  <link rel="stylesheet" href="../../index.css">
+  <link rel="stylesheet" href="../Footer/footer.css">
+  <link rel="stylesheet" href="gastos-salida.css">
+</head>
+<body>
+  <header class="header header--no-nav">
+    <div class="header__logo">
+      <h1>Panificacion Colombres</h1>
+      <span class="header__subtitle">Sistema de Ventas</span>
+    </div>
+    <a href="../../index.html" class="header__inicio">Inicio</a>
+    <nav class="nav" aria-hidden="true" hidden>
+      <ul class="nav__menu">
+        <li class="nav__item">
+          <a href="../Ventas/Nueva-venta/Nueva-venta.html" class="nav__link">Nueva venta</a>
+        </li>
+        <li class="nav__item">
+          <a href="../Ventas/Listado-Ventas/listado-ventas.html" class="nav__link">Listado de ventas</a>
+        </li>
+        <li class="nav__item">
+          <a href="gastos-salida.html" class="nav__link nav__link--active">Gastos de Salida</a>
+        </li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="main">
+    <div class="page-header">
+      <h1>Gastos de Salida</h1>
+    </div>
+
+    <section class="gastos-salida__intro">
+      <p class="gastos-salida__texto">En esta sección podés cargar y consultar los gastos de salida del negocio.</p>
+    </section>
+
+    <section class="gastos-salida__filtro">
+      <label for="gastos-salida-tipo-operacion" class="gastos-salida__label">Tipo de operación</label>
+      <select id="gastos-salida-tipo-operacion" class="gastos-salida__combo" aria-label="Tipo de operación">
+        <option value="">Cargando…</option>
+      </select>
+    </section>
+
+    <section class="gastos-salida__contenido" id="gastos-salida-contenido">
+      <p class="gastos-salida__mensaje" id="gastos-salida-mensaje">Seleccioná un tipo de operación. Próximamente podrás registrar y listar los gastos de salida.</p>
+    </section>
+  </main>
+
+  <div id="footer-container" data-footer-src="../Footer/footer.html"></div>
+
+  <script src="../Config/config.js"></script>
+  <script src="../../main.js"></script>
+  <script src="../Footer/footer.js"></script>
+  <script src="gastos-salida.js"></script>
+</body>
+</html>

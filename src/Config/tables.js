@@ -94,6 +94,12 @@
       sheet: 'RESUMEN-OPERATIVO',
       pk: 'ID-RESUMEN',
       columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'CATEGORIA', 'IMPORTE']
+    },
+
+    /** Tabla COMPONENTE-COMBO: valores para combos (sucursal, tipo operación, categorías). */
+    COMPONENTE_COMBO: {
+      sheet: 'COMPONENTE-COMBO',
+      columns: ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
     }
   };
 
