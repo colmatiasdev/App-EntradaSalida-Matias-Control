@@ -15,13 +15,13 @@
      * ID del Google Sheet. DEBE SER EL MISMO que en appscript/Code.gs (variable SPREADSHEET_ID).
      * Se obtiene de la URL de edición: .../spreadsheets/d/ESTE_ID/edit
      */
-    SPREADSHEET_ID: '1RHxRu86apW8ccrHy0AmhDy9oOqrQdDDzL3O2zjtiyqI',
+    SPREADSHEET_ID: '1FOjy3jePjs0u76-tVf7QdRiufVWGbdHZVtHJH9beePU',
 
     /**
      * URL del Web App de Google Apps Script (despliegue). ÚNICA fuente de datos de la app.
      * Copiar aquí la URL que da "Implementar" > "Aplicación web" en el proyecto Apps Script vinculado al Sheet anterior.
      */
-    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbzguxE6JGeQMAwxFC_kgaNBLbFyJx94wUtQxH7IXXzUl4Y21aB7nwcqGo4IerL_tA9z/exec',
+    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbyOgvvI9VA6dq9BG1PuRrKS-mWnT31Zb8qwK8ocn8ltmV9fNnV-_9EMqv_mBnNVjJBBBw/exec',
 
     /** Nombres de las hojas (igual que en Code.gs y tables.js). */
     HOJA_PRODUCTOS: 'PRODUCTOS',

@@ -11,7 +11,7 @@
  */
 
 /** ID del Google Sheet. DEBE coincidir con SPREADSHEET_ID en src/Config/config.js. */
-var SPREADSHEET_ID = '1RHxRu86apW8ccrHy0AmhDy9oOqrQdDDzL3O2zjtiyqI';
+var SPREADSHEET_ID = '1FOjy3jePjs0u76-tVf7QdRiufVWGbdHZVtHJH9beePU';
 
 /** Definición de tablas (hoja, PK, columnas). Coincidir con src/Config/tables.js */
 var TABLAS = {
