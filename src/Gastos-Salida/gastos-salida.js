@@ -155,7 +155,8 @@
       correspondeA: correspondeA,
       tipoOperacion: tipoOperacion,
       descripcion: descripcion,
-      importe: importeNum
+      importe: importeNum,
+      usuario: (window.APP_CONFIG && window.APP_CONFIG.USUARIO) || 'USR-MATIAS'
     };
 
     var btnGuardar = getBtnGuardar();

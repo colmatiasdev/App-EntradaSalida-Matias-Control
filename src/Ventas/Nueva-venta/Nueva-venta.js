@@ -9,7 +9,7 @@
   var NEGOCIO = window.APP_NEGOCIO;
   var STORAGE_KEY_CLIENTE = 'APP_CLIENTE_VENTA';
   /** Cliente por defecto cuando no hay uno seleccionado en sesión. */
-  var CLIENTE_DEFAULT = { 'NOMBRE-APELLIDO': 'MATIAS', 'TIPO-LISTA-PRECIO': 'DISTRIBUIDOR' };
+  var CLIENTE_DEFAULT = { 'NOMBRE-APELLIDO': 'SILVINA', 'TIPO-LISTA-PRECIO': 'COSTO' };
   var clienteSeleccionado = null;
   var productos = [];
   var carrito = [];

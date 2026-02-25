@@ -20,6 +20,13 @@
       columns: ['ID-PRODUCTO', 'COMERCIO-SUCURSAL', 'CATEGORIA', 'NOMBRE-PRODUCTO', 'PRECIO', 'HABILITADO']
     },
 
+    /** Tabla PRODUCTOS-MARKET: hoja "PRODUCTOS-MARKET". PK = ID-PRODUCTO (secuencial IDPROD-MK-1, IDPROD-MK-2, ...) */
+    PRODUCTOS_MARKET: {
+      sheet: 'PRODUCTOS-MARKET',
+      pk: 'ID-PRODUCTO',
+      columns: ['ID-PRODUCTO', 'COMERCIO-SUCURSAL', 'CATEGORIA', 'NOMBRE-PRODUCTO', 'PRESENTACION-CANTIDAD-UNIDAD-MEDIDA', 'PRESENTACION-UNIDAD-MEDIDA', 'COSTO', 'HABILITADO']
+    },
+
     /** Tablas de ventas por mes. PK = ID-VENTA (puede haber varias filas por venta). */
     ENERO: {
       sheet: 'ENERO',
@@ -93,7 +100,7 @@
     OPERACIONES_GENERALES: {
       sheet: 'OPERACIONES-GENERALES',
       pk: 'ID-OPERACION-GRAL',
-      columns: ['ID-OPERACION-GRAL', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'DESCRIPCION', 'IMPORTE']
+      columns: ['ID-OPERACION-GRAL', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'DESCRIPCION', 'IMPORTE', 'USUARIO']
     },
 
     /** Tabla RESUMEN-OPERATIVO: resumen operativo por fecha, hora, tipo y categoría. */
