@@ -333,8 +333,7 @@
     var nombreApellido = (cliente['NOMBRE-APELLIDO'] || '').trim();
     var tipoListaPrecio = (cliente['TIPO-LISTA-PRECIO'] || '').trim();
     var payload = {
-      accion: 'guardarVenta',
-      hoja: nombreHoja,
+      accion: 'ventaMarketAlta',
       idVenta: idVenta,
       fechaOperativa: fechaOp,
       hora: hora,
@@ -385,7 +384,7 @@
       .then(function (data) {
         var ok = data && (data.ok === true || data.success === true);
         if (ok) {
-          mostrarMensajeGuardar('Compra guardada. Redirigiendo al inicio…', false);
+          mostrarMensajeGuardar('Venta realizada. Redirigiendo al inicio…', false);
           setTimeout(function () {
             window.location.href = '../../../index.html';
           }, 1200);
@@ -398,7 +397,7 @@
         var msg = err && err.message ? err.message : String(err);
         var esCors = /failed to fetch|networkerror|cors|blocked|access-control/i.test(msg);
         if (esCors) {
-          mostrarMensajeGuardar('Compra enviada. Redirigiendo al inicio…', false);
+          mostrarMensajeGuardar('Venta enviada. Redirigiendo al inicio…', false);
           setTimeout(function () {
             window.location.href = '../../../index.html';
           }, 1200);

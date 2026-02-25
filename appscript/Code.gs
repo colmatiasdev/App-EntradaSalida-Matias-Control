@@ -64,6 +64,11 @@ var TABLAS = {
   COMPONENTE_COMBO: {
     sheet: 'COMPONENTE-COMBO',
     columns: ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
+  },
+  VENTAS_MARKET: {
+    sheet: 'VENTAS-MARKET',
+    pk: 'ID-VENTA',
+    columns: ['ID-VENTA', 'AÑO', 'FECHA_OPERATIVA', 'HORA', 'NOMBRE-APELLIDO', 'TIPO-LISTA-PRECIO', 'ID-PRODUCTO', 'CATEGORIA', 'PRODUCTO', 'CANTIDAD', 'PRECIO', 'MONTO', 'USUARIO']
   }
 };
 
@@ -91,6 +96,7 @@ function doPost(e) {
       case 'productoMarketLeer':       return productoMarketLeer(params);
       case 'ventaAlta':
       case 'guardarVenta':      return ventaAlta(params);
+      case 'ventaMarketAlta':   return ventaMarketAlta(params);
       case 'ventaBaja':         return ventaBaja(params);
       case 'ventaModificacion': return ventaModificacion(params);
       case 'ventaLeer':         return ventaLeer(params);
@@ -459,6 +465,48 @@ function ventaAlta(params) {
   var startRow = sheet.getLastRow() + 1;
   sheet.getRange(startRow, 1, filas.length, def.columns.length).setValues(filas);
   return respuestaJson({ ok: true, mensaje: 'Venta guardada.' });
+}
+
+function ventaMarketAlta(params) {
+  var def = TABLAS.VENTAS_MARKET;
+  var idVenta = params.idVenta || '';
+  var fechaOperativa = params.fechaOperativa || '';
+  var hora = params.hora || '';
+  var nombreApellido = params.nombreApellido || params['NOMBRE-APELLIDO'] || '';
+  var tipoListaPrecio = params.tipoListaPrecio || params['TIPO-LISTA-PRECIO'] || '';
+  var usuario = String(params.usuario || params.USUARIO || '').trim() || nombreApellido || 'USR-MATIAS';
+  var items = params.items || [];
+  if (!idVenta || !items.length) return respuestaJson({ ok: false, error: 'Falta idVenta o items.' });
+  var anio = new Date().getFullYear();
+  var ss = getSS();
+  var sheet = getHoja(ss, def.sheet, def.columns);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, def.columns.length).setValues([def.columns]);
+    sheet.getRange(1, 1, 1, def.columns.length).setFontWeight('bold');
+  }
+  var filas = [];
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    filas.push([
+      idVenta,
+      anio,
+      fechaOperativa,
+      hora,
+      nombreApellido,
+      tipoListaPrecio,
+      it.idProducto || '',
+      it.categoria || '',
+      it.producto || '',
+      it.cantidad !== undefined ? it.cantidad : 0,
+      it.precio !== undefined ? it.precio : 0,
+      it.monto !== undefined ? it.monto : 0,
+      usuario
+    ]);
+  }
+  if (filas.length === 0) return respuestaJson({ ok: true, mensaje: 'Sin ítems.' });
+  var startRow = sheet.getLastRow() + 1;
+  sheet.getRange(startRow, 1, filas.length, def.columns.length).setValues(filas);
+  return respuestaJson({ ok: true, mensaje: 'Venta guardada en VENTAS-MARKET.' });
 }
 
 function ventaBaja(params) {
