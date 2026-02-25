@@ -8,6 +8,8 @@
   var HOJA_PRODUCTOS = (window.APP_CONFIG && window.APP_CONFIG.HOJA_PRODUCTOS) || 'PRODUCTOS';
   var NEGOCIO = window.APP_NEGOCIO;
   var STORAGE_KEY_CLIENTE = 'APP_CLIENTE_VENTA';
+  /** Cliente por defecto cuando no hay uno seleccionado en sesión. */
+  var CLIENTE_DEFAULT = { 'NOMBRE-APELLIDO': 'MATIAS', 'TIPO-LISTA-PRECIO': 'DISTRIBUIDOR' };
   var clienteSeleccionado = null;
   var productos = [];
   var carrito = [];
@@ -297,8 +299,9 @@
     var ahora = new Date();
     var hora = ahora.getHours() + ':' + (ahora.getMinutes() < 10 ? '0' : '') + ahora.getMinutes();
     var idVenta = 'V-' + Date.now();
-    var nombreApellido = clienteSeleccionado ? (clienteSeleccionado['NOMBRE-APELLIDO'] || '').trim() : '';
-    var tipoListaPrecio = clienteSeleccionado ? (clienteSeleccionado['TIPO-LISTA-PRECIO'] || '').trim() : '';
+    var cliente = clienteSeleccionado || CLIENTE_DEFAULT;
+    var nombreApellido = (cliente['NOMBRE-APELLIDO'] || '').trim();
+    var tipoListaPrecio = (cliente['TIPO-LISTA-PRECIO'] || '').trim();
     var payload = {
       accion: 'guardarVenta',
       hoja: nombreHoja,
@@ -307,6 +310,7 @@
       hora: hora,
       nombreApellido: nombreApellido,
       tipoListaPrecio: tipoListaPrecio,
+      usuario: (window.APP_CONFIG && window.APP_CONFIG.USUARIO) || 'MATIAS',
       total: total,
       items: carrito.map(function (item) {
         return {
@@ -383,20 +387,22 @@
   }
 
   function aplicarClienteEnPantalla() {
+    var cliente = clienteSeleccionado || CLIENTE_DEFAULT;
     var bloqueCliente = document.getElementById('nueva-compra-cliente-info');
     var tipoEl = document.getElementById('nueva-compra-cliente-tipo');
     if (bloqueCliente) {
       bloqueCliente.classList.add('nueva-compra__cliente-info--visible');
       var nombreEl = bloqueCliente.querySelector('.nueva-compra__cliente-nombre');
-      if (nombreEl) nombreEl.textContent = clienteSeleccionado ? ((clienteSeleccionado['NOMBRE-APELLIDO'] || '').trim() || '(Sin nombre)') : 'Sin cliente';
+      if (nombreEl) nombreEl.textContent = (cliente['NOMBRE-APELLIDO'] || '').trim() || '(Sin nombre)';
     }
-    if (tipoEl) tipoEl.textContent = clienteSeleccionado ? ((clienteSeleccionado['TIPO-LISTA-PRECIO'] || '').trim() ? ' · ' + (clienteSeleccionado['TIPO-LISTA-PRECIO'] || '').trim() : '') : '';
+    if (tipoEl) tipoEl.textContent = (cliente['TIPO-LISTA-PRECIO'] || '').trim() ? ' · ' + (cliente['TIPO-LISTA-PRECIO'] || '').trim() : '';
   }
 
   function init() {
     try {
       var raw = sessionStorage.getItem(STORAGE_KEY_CLIENTE);
       if (raw) clienteSeleccionado = JSON.parse(raw);
+      else clienteSeleccionado = null;
     } catch (e) {
       clienteSeleccionado = null;
     }

@@ -90,6 +90,7 @@
       hora: hora,
       nombreApellido: nombreApellido,
       tipoListaPrecio: TIPO_LISTA_PRECIO,
+      usuario: (window.APP_CONFIG && window.APP_CONFIG.USUARIO) || 'MATIAS',
       items: [{
         idProducto: ID_PRODUCTO_GENERICO,
         categoria: categoria,
