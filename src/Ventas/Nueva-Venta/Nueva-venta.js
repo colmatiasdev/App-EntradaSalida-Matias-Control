@@ -417,9 +417,10 @@
       tipoListaPrecio: tipoListaPrecio,
       usuario: (window.APP_CONFIG && window.APP_CONFIG.USUARIO) || 'USR-MATIAS',
       total: total,
+      // Al presionar "Realizar venta", el valor de la variable subtotal de cada línea se guarda en la columna MONTO de VENTAS-MARKET.
       items: carrito.filter(function (item) { return item.cantidad > 0; }).map(function (item) {
-        var precioUnit = getPrecioUnitario(item.producto); // columna PRECIO = Precio Unitario
-        var subtotal = Math.round(precioUnit * item.cantidad * 100) / 100; // columna MONTO = Subtotal (Precio Unitario × Cantidad)
+        var precioUnit = getPrecioUnitario(item.producto);
+        var subtotal = Math.round(precioUnit * item.cantidad * 100) / 100;
         return {
           idProducto: item.producto[TABLA.pk],
           categoria: item.producto.CATEGORIA,
@@ -427,7 +428,7 @@
           cantidad: item.cantidad,
           presentacionUnidadMedida: (item.producto['PRESENTACION-UNIDAD-MEDIDA'] || '').toString().trim(),
           precio: precioUnit,
-          monto: subtotal
+          monto: subtotal  // columna MONTO = valor de la variable subtotal
         };
       })
     };
