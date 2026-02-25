@@ -1,11 +1,11 @@
 (function () {
   'use strict';
 
-  var TABLA = window.APP_TABLES && window.APP_TABLES.PRODUCTOS;
+  var TABLA = window.APP_TABLES && window.APP_TABLES.PRODUCTOS_MARKET;
   var TABLA_VENTAS = window.APP_TABLES && window.APP_TABLES.VENTAS;
   var APP_SCRIPT_URL = window.APP_CONFIG && window.APP_CONFIG.APP_SCRIPT_URL;
   var CORS_PROXY = window.APP_CONFIG && window.APP_CONFIG.CORS_PROXY;
-  var HOJA_PRODUCTOS = (window.APP_CONFIG && window.APP_CONFIG.HOJA_PRODUCTOS) || 'PRODUCTOS';
+  var HOJA_PRODUCTOS_MARKET = 'PRODUCTOS-MARKET';
   var NEGOCIO = window.APP_NEGOCIO;
   var STORAGE_KEY_CLIENTE = 'APP_CLIENTE_VENTA';
   /** Cliente por defecto cuando no hay uno seleccionado en sesión. */
@@ -30,6 +30,7 @@
     return undefined;
   }
 
+  /** Normaliza filas de PRODUCTOS-MARKET: COSTO se expone como PRECIO para el carrito y totales. */
   function normalizarProductos(filas) {
     if (!TABLA || !TABLA.columns || !filas.length) return [];
     var cols = TABLA.columns;
@@ -42,13 +43,15 @@
         var p = {};
         cols.forEach(function (c) {
           var val = claveEnFila(f, c);
-          if (c === 'PRECIO') {
+          if (c === 'COSTO' || c === 'PRECIO') {
             p[c] = Number(val) || 0;
           } else {
             p[c] = val !== undefined && val !== null ? String(val).trim() : '';
           }
         });
-        p.PRECIO = Number(claveEnFila(f, 'PRECIO')) || 0;
+        var costo = Number(claveEnFila(f, 'COSTO')) || 0;
+        p.PRECIO = costo;
+        if (p.COSTO === undefined) p.COSTO = costo;
         return p;
       });
   }
@@ -71,7 +74,7 @@
   function cargarProductos() {
     var mensaje = document.getElementById('nueva-compra-mensaje');
     if (!TABLA) {
-      mensaje.textContent = 'Falta configurar Tables (PRODUCTOS).';
+      mensaje.textContent = 'Falta configurar Tables (PRODUCTOS_MARKET).';
       return;
     }
 
@@ -82,12 +85,11 @@
       pintarListado();
     }
 
-    // Los productos se consumen solo desde la hoja PRODUCTOS vía Apps Script (productoLeer).
     if (!APP_SCRIPT_URL) {
-      mensaje.textContent = 'Configura APP_SCRIPT_URL en config.js. Los productos se cargan de la hoja "' + HOJA_PRODUCTOS + '" del Sheet.';
+      mensaje.textContent = 'Configura APP_SCRIPT_URL en config.js. Los productos se cargan de la hoja "' + HOJA_PRODUCTOS_MARKET + '".';
       return;
     }
-    var payload = { accion: 'productoLeer' };
+    var payload = { accion: 'productoMarketLeer' };
     var bodyForm = 'data=' + encodeURIComponent(JSON.stringify(payload));
     var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
     fetch(url, {
@@ -112,7 +114,7 @@
         }
       })
       .catch(function (err) {
-        mensaje.textContent = 'No se pudieron cargar los productos desde la hoja "' + HOJA_PRODUCTOS + '". Revisa APP_SCRIPT_URL y que el Sheet tenga la hoja "' + HOJA_PRODUCTOS + '".';
+        mensaje.textContent = 'No se pudieron cargar los productos desde la hoja "' + HOJA_PRODUCTOS_MARKET + '". Revisa APP_SCRIPT_URL y que el Sheet tenga la hoja "' + HOJA_PRODUCTOS_MARKET + '".';
       });
   }
 
