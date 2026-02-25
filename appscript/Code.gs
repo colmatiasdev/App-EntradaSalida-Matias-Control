@@ -322,7 +322,7 @@ function ventaAlta(params) {
   var hora = params.hora || '';
   var nombreApellido = params.nombreApellido || params['NOMBRE-APELLIDO'] || '';
   var tipoListaPrecio = params.tipoListaPrecio || params['TIPO-LISTA-PRECIO'] || '';
-  var usuario = params.usuario || params.USUARIO || nombreApellido || '';
+  var usuario = String(params.usuario || params.USUARIO || '').trim() || nombreApellido || 'USR-MATIAS';
   var items = params.items || [];
   if (!idVenta || !items.length) return respuestaJson({ ok: false, error: 'Falta idVenta o items.' });
   var anio = new Date().getFullYear();

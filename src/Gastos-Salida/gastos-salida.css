@@ -1,46 +1,47 @@
-/* Gastos de Salida */
-.header--no-nav .nav {
-  display: none !important;
+/* Gastos de Salida — paleta igual que listado/Nueva venta (azul + cian) */
+:root {
+  --azul-950: #060e2a;
+  --azul-900: #0d1f5c;
+  --azul-700: #1565c0;
+  --azul-600: #1976d2;
+  --azul-400: #29b6f6;
+  --cian: #00e5ff;
+  --azul-200: #b3e5fc;
+  --azul-50: #e1f5fe;
+  --bg: #f0f6ff;
+  --bg-card: #ffffff;
+  --texto: #060e2a;
+  --texto-2: #546e8a;
+  --borde: #cce0f5;
+  --s1: 0 2px 10px rgba(13, 31, 92, 0.1);
+  --r-s: 8px;
+  --r-l: 20px;
+  --t: 0.2s ease;
 }
 
-.header__inicio {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.5rem 1rem;
-  min-height: 44px;
-  box-sizing: border-box;
-  background: var(--color-primary);
-  color: #fff;
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.9rem;
-  border-radius: var(--radius, 8px);
-  transition: background 0.2s;
-}
-.header__inicio:hover {
-  background: var(--color-primary-dark, #9a1830);
-  color: #fff;
+.header--no-nav .nav {
+  display: none !important;
 }
 
 .gastos-salida__intro {
   margin-bottom: 1.25rem;
 }
 
-/* Formulario: card y estructura */
+/* Formulario: card y estructura (mismo diseño que listado-ventas / Nueva-venta) */
 .gastos-salida__formulario {
-  background: var(--color-surface);
-  border: 1px solid #e8e5e1;
-  border-radius: var(--radius, 8px);
+  background: var(--bg-card);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-l);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--s1);
 }
 
 .gastos-salida__form-title {
   margin: 0 0 1.25rem;
   font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--color-text);
+  font-weight: 700;
+  color: var(--azul-700);
 }
 
 .gastos-salida__form {
@@ -53,7 +54,6 @@
   margin-bottom: 1.5rem;
 }
 
-/* Cada campo: label arriba, control abajo (mejor en móvil) */
 .gastos-salida__field {
   display: flex;
   flex-direction: column;
@@ -61,36 +61,39 @@
 }
 
 .gastos-salida__label {
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--color-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--texto-2);
 }
 
-/* Controles: altura táctil mínima ~44px en móvil */
 .gastos-salida__combo,
 .gastos-salida__input {
   width: 100%;
   min-height: 44px;
   padding: 0.6rem 0.75rem;
   box-sizing: border-box;
-  border: 1px solid #ddd;
-  border-radius: var(--radius, 8px);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-s);
   font-size: 1rem;
-  background: var(--color-surface);
+  font-family: inherit;
+  background: var(--bg);
+  color: var(--texto);
+  transition: border-color var(--t);
 }
 
 .gastos-salida__combo:focus,
 .gastos-salida__input:focus {
   outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(180, 30, 55, 0.15);
+  border-color: var(--cian);
+  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.2);
 }
 
 .gastos-salida__input--numero {
   max-width: 10rem;
 }
 
-/* Botón Guardar: ancho completo en móvil, altura táctil */
 .gastos-salida__actions {
   margin-top: 0.5rem;
 }
@@ -101,23 +104,27 @@
   min-height: 48px;
   padding: 0.75rem 1.25rem;
   box-sizing: border-box;
-  background: var(--color-primary);
+  background: var(--azul-700);
   color: #fff;
   border: none;
-  border-radius: var(--radius, 8px);
+  border-radius: var(--r-s);
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
+  font-family: inherit;
   cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
+  transition: background var(--t), transform 0.1s, box-shadow var(--t);
   -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 2px 8px rgba(21, 101, 192, 0.3);
 }
 
 .gastos-salida__btn-guardar:hover:not(:disabled) {
-  background: var(--color-primary-dark, #9a1830);
+  background: var(--azul-600);
+  box-shadow: 0 4px 14px rgba(21, 101, 192, 0.4);
+  transform: translateY(-1px);
 }
 
 .gastos-salida__btn-guardar:active:not(:disabled) {
-  transform: scale(0.98);
+  transform: translateY(0);
 }
 
 .gastos-salida__btn-guardar:disabled {
@@ -125,35 +132,34 @@
   cursor: not-allowed;
 }
 
-/* Mensajes */
 .gastos-salida__guardar-msg {
   margin-top: 0.75rem;
   font-size: 0.95rem;
 }
 
 .gastos-salida__guardar-msg.ok {
-  color: var(--color-success, #0a6b0a);
+  color: #0a6b0a;
 }
 
 .gastos-salida__guardar-msg.err {
-  color: var(--color-error, #b91c1c);
+  color: #b91c1c;
 }
 
 .gastos-salida__texto {
-  color: var(--color-text-muted);
+  color: var(--texto-2);
   font-size: 0.95rem;
 }
 
 .gastos-salida__contenido {
-  background: var(--color-surface);
-  border: 1px solid #e8e5e1;
-  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-s);
   padding: 1.25rem;
   min-height: 120px;
 }
 
 .gastos-salida__mensaje {
-  color: var(--color-text-muted);
+  color: var(--texto-2);
   font-size: 0.95rem;
   margin: 0;
 }

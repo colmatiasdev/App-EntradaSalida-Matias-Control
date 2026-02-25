@@ -116,6 +116,11 @@
     msg.className = 'gastos-salida__guardar-msg ' + (esError ? 'err' : 'ok');
   }
 
+  /** Oculta la leyenda de guardado al interactuar con los campos (mejor UX). */
+  function ocultarMensajeGuardar() {
+    mostrarMensajeGuardar('', false);
+  }
+
   function guardar() {
     if (!APP_SCRIPT_URL) {
       mostrarMensajeGuardar('Configura APP_SCRIPT_URL en config.js', true);
@@ -265,6 +270,17 @@
         guardar();
       });
     }
+    // Ocultar leyenda de guardado al enfocar o escribir en los campos
+    var idsCampos = ['gastos-salida-tipo-operacion', 'gastos-salida-descripcion', 'gastos-salida-importe'];
+    var eventos = ['focus', 'input', 'change'];
+    idsCampos.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) {
+        eventos.forEach(function (ev) {
+          el.addEventListener(ev, ocultarMensajeGuardar);
+        });
+      }
+    });
   }
 
   if (document.readyState === 'loading') {

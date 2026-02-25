@@ -340,7 +340,7 @@
       hora: hora,
       nombreApellido: nombreApellido,
       tipoListaPrecio: tipoListaPrecio,
-      usuario: (window.APP_CONFIG && window.APP_CONFIG.USUARIO) || 'MATIAS',
+      usuario: (window.APP_CONFIG && window.APP_CONFIG.USUARIO) || 'USR-MATIAS',
       total: total,
       items: carrito.map(function (item) {
         return {
