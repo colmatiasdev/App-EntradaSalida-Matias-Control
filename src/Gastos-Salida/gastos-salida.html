@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1f5c">
   <title>Gastos de Salida - 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -18,7 +19,7 @@
     <div class="header__inner">
       <a href="../../index.html" class="logo">
         <div class="logo__ring">
-          <img src="../../src/img/Logo2.png" alt="2H Market" class="logo__img">
+          <img src="../img/Logo3.png" alt="2H Market" class="logo__img">
         </div>
         <div class="logo__texto">
           <span class="logo__nombre"><span>2H</span> Market</span>
@@ -28,7 +29,7 @@
       <div class="header__sep"></div>
       <nav class="nav">
         <ul class="nav__menu" id="main-nav">
-          <li><a href="../../index.html" class="nav__link">Inicio</a></li>
+          <li><a href="../../index.html" class="nav__link">🏠 Inicio</a></li>
         </ul>
       </nav>
     </div>
@@ -80,5 +81,17 @@
   <script src="../../main.js"></script>
   <script src="../Footer/footer.js"></script>
   <script src="gastos-salida.js"></script>
+  <script>
+    (function () {
+      var path = window.location.pathname.toLowerCase();
+      document.querySelectorAll(".nav__link").forEach(function (l) {
+        l.classList.remove("nav__link--active");
+        var href = (l.getAttribute("href") || "").toLowerCase();
+        var key = href.split("/").pop().replace(".html", "");
+        if (key === "index" && (path.endsWith("index.html") || path.endsWith("/") || path === "")) l.classList.add("nav__link--active");
+        else if (key && key !== "index" && path.indexOf(key) !== -1) l.classList.add("nav__link--active");
+      });
+    })();
+  </script>
 </body>
 </html>

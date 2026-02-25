@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Nueva compra - 2H Market</title>
+  <meta name="theme-color" content="#0d1f5c">
+  <title>Nueva Compra — 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../../index.css">
   <link rel="stylesheet" href="../../Header/header.css">
-  <link rel="stylesheet" href="../../Main/main-panel.css">
-  <link rel="stylesheet" href="../../Footer/footer.css">
   <link rel="stylesheet" href="Nueva-venta.css">
 </head>
-<body class="main-panel-page">
+<body>
+
   <header class="header">
     <div class="header__stripe"></div>
     <div class="header__inner">
       <a href="../../../index.html" class="logo">
         <div class="logo__ring">
-          <img src="../../../src/img/Logo2.png" alt="2H Market" class="logo__img">
+          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
         </div>
         <div class="logo__texto">
           <span class="logo__nombre"><span>2H</span> Market</span>
@@ -26,18 +25,19 @@
         </div>
       </a>
       <div class="header__sep"></div>
+      <span class="header__page" aria-current="page">🛒 Nueva Compra</span>
       <nav class="nav">
         <ul class="nav__menu" id="main-nav">
-          <li><a href="../../../index.html" class="nav__link">Inicio</a></li>
+          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
         </ul>
       </nav>
     </div>
   </header>
 
   <main class="main">
-    <section class="hub-hero">
+    <section class="hub-hero a-in">
       <div class="hub-hero__eyebrow">🛒 2H Market</div>
-      <h1 class="hub-title">Nueva compra</h1>
+      <h1 class="hub-title">Nueva Compra</h1>
       <div class="nueva-compra__cliente-info" id="nueva-compra-cliente-info">
         <span class="nueva-compra__cliente-label">Compra para:</span>
         <strong class="nueva-compra__cliente-nombre">—</strong>
@@ -45,21 +45,21 @@
       </div>
     </section>
 
-    <section class="nueva-compra__listado hub-section">
+    <section class="nueva-compra__listado hub-section a-in-2">
       <h2 class="nueva-compra__titulo">Productos</h2>
       <p class="nueva-compra__mensaje" id="nueva-compra-mensaje">Cargando productos…</p>
       <div class="nueva-compra__filtro">
         <label for="nueva-compra-buscar" class="nueva-compra__filtro-label">Buscar</label>
-        <input type="search" id="nueva-compra-buscar" class="nueva-compra__buscar-input" placeholder="Escribí nombre o categoría…" autocomplete="off">
+        <input type="search" id="nueva-compra-buscar" class="nueva-compra__buscar-input" placeholder="🔍 Escribí nombre o categoría…" autocomplete="off">
         <button type="button" id="nueva-compra-limpiar-busqueda" class="nueva-compra__btn-limpiar">Limpiar</button>
       </div>
       <div class="nueva-compra__productos-wrapper" id="nueva-compra-productos"></div>
     </section>
 
-    <section class="nueva-compra__resumen hub-section">
+    <section class="nueva-compra__resumen hub-section a-in-3">
       <h2 class="nueva-compra__titulo">Resumen de la compra</h2>
       <div class="nueva-compra__resumen-content" id="nueva-compra-resumen-content">
-        <p class="nueva-compra__resumen-vacio" id="nueva-compra-resumen-vacio">No hay productos en la compra. Selecciona productos arriba.</p>
+        <p class="nueva-compra__resumen-vacio" id="nueva-compra-resumen-vacio">No hay productos en la compra. Seleccioná productos arriba.</p>
         <table class="nueva-compra__tabla" id="nueva-compra-tabla" hidden>
           <thead>
             <tr>
@@ -74,13 +74,13 @@
           <tfoot>
             <tr class="nueva-compra__total-row">
               <td colspan="3"><strong>Total compra</strong></td>
-              <td class="nueva-compra__th-num" id="nueva-compra-total">0</td>
+              <td class="nueva-compra__th-num" id="nueva-compra-total" style="color:var(--azul-700)">$0</td>
               <td></td>
             </tr>
           </tfoot>
         </table>
         <div class="nueva-compra__guardar">
-          <button type="button" class="nueva-compra__btn-guardar" id="nueva-compra-btn-guardar" disabled>Guardar compra</button>
+          <button type="button" class="nueva-compra__btn-guardar" id="nueva-compra-btn-guardar" disabled>💾 Guardar compra</button>
           <span class="nueva-compra__guardar-msg" id="nueva-compra-guardar-msg"></span>
         </div>
       </div>
@@ -95,5 +95,17 @@
   <script src="../../../main.js"></script>
   <script src="../../Footer/footer.js"></script>
   <script src="Nueva-venta.js"></script>
+  <script>
+    (function () {
+      var path = window.location.pathname.toLowerCase();
+      document.querySelectorAll(".nav__link").forEach(function (l) {
+        l.classList.remove("nav__link--active");
+        var href = (l.getAttribute("href") || "").toLowerCase();
+        var key = href.split("/").pop().replace(".html", "");
+        if (key === "index" && (path.endsWith("index.html") || path.endsWith("/") || path === "")) l.classList.add("nav__link--active");
+        else if (key && key !== "index" && path.indexOf(key) !== -1) l.classList.add("nav__link--active");
+      });
+    })();
+  </script>
 </body>
 </html>

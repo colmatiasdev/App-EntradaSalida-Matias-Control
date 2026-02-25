@@ -1,35 +1,40 @@
-/* Cabecera unificada 2H Market — variables y estilos */
+/* Cabecera unificada 2H Market — estilo template (azul-950 + cian) */
 :root {
-  --azul-900: #0d1f3c;
+  --azul-950: #060e2a;
+  --azul-900: #0d1f5c;
+  --azul-800: #1a3a8f;
   --azul-700: #1565c0;
-  --azul-400: #42a5f5;
-  --azul-200: #bbdefb;
-  --verde: #6be040;
-  --verde-d: #4caf50;
+  --azul-400: #29b6f6;
+  --cian: #00e5ff;
+  --cian-d: #00acc1;
+  --azul-200: #b3e5fc;
+  --azul-50: #e1f5fe;
+  --grad-header: linear-gradient(135deg, var(--azul-950) 0%, var(--azul-900) 60%, var(--azul-800) 100%);
+  --grad-ring: linear-gradient(135deg, var(--cian), var(--azul-400), var(--azul-700));
   --r-s: 8px;
-  --t: 0.25s ease;
-  --ts: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --t: 0.2s ease;
+  --ts: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   --font-display: "Syne", Georgia, serif;
 }
 
 .header {
-  background: var(--azul-900);
+  background: var(--grad-header);
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 4px 24px rgba(13, 31, 60, 0.4);
+  box-shadow: 0 4px 28px rgba(6, 14, 42, 0.55);
 }
 
 .header__stripe {
-  height: 3px;
-  background: linear-gradient(90deg, var(--azul-700) 0%, var(--azul-400) 50%, var(--verde) 100%);
+  height: 2px;
+  background: linear-gradient(90deg, var(--azul-700) 0%, var(--cian) 50%, var(--azul-400) 100%);
 }
 
 .header__inner {
   display: flex;
   align-items: center;
-  gap: 1.25rem;
-  padding: 0.9rem 2rem;
+  gap: 0.75rem;
+  padding: 0.45rem 1rem;
   max-width: 1280px;
   margin: 0 auto;
   width: 100%;
@@ -38,15 +43,15 @@
 .logo {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
   flex-shrink: 0;
   text-decoration: none;
 }
 
 .logo__ring {
   position: relative;
-  width: 50px;
-  height: 50px;
+  width: 36px;
+  height: 36px;
   flex-shrink: 0;
 }
 
@@ -55,34 +60,35 @@
   position: absolute;
   inset: -2px;
   border-radius: 50%;
-  background: linear-gradient(135deg, var(--verde), var(--azul-400));
-  opacity: 0.9;
+  background: var(--grad-ring);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
 }
 
 .logo__img {
   position: relative;
   z-index: 1;
-  width: 50px;
-  height: 50px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid var(--azul-900);
-  transition: transform var(--ts);
+  border: 1.5px solid rgba(0, 229, 255, 0.25);
+  transition: transform var(--ts), box-shadow var(--ts);
 }
 
 .logo:hover .logo__img {
   transform: scale(1.1) rotate(8deg);
+  box-shadow: 0 0 18px rgba(0, 229, 255, 0.65);
 }
 
 .logo__texto {
   display: flex;
   flex-direction: column;
-  gap: 0.05rem;
+  gap: 0.06rem;
 }
 
 .logo__nombre {
   font-family: var(--font-display);
-  font-size: 1.4rem;
+  font-size: 1.05rem;
   font-weight: 800;
   color: #fff;
   letter-spacing: -0.02em;
@@ -90,28 +96,42 @@
 }
 
 .logo__nombre span {
-  color: var(--verde);
+  color: var(--cian);
+  text-shadow: 0 0 8px rgba(0, 229, 255, 0.6);
 }
 
 .logo__sub {
-  font-size: 0.62rem;
+  font-size: 0.55rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   color: var(--azul-200);
   font-weight: 600;
-  opacity: 0.8;
+  opacity: 0.85;
 }
 
 .logo__sub strong {
-  color: var(--verde);
+  color: var(--cian);
   opacity: 1;
 }
 
 .header__sep {
   width: 1px;
-  height: 38px;
+  height: 26px;
   background: rgba(255, 255, 255, 0.12);
   flex-shrink: 0;
+}
+
+.header__page {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--cian);
+  background: rgba(0, 229, 255, 0.14);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  border-radius: var(--r-s);
+  white-space: nowrap;
 }
 
 .nav {
@@ -130,80 +150,85 @@
 .nav__link {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  min-height: 42px;
-  color: rgba(255, 255, 255, 0.75);
+  gap: 0.35rem;
+  padding: 0.35rem 0.85rem;
+  min-height: 32px;
+  color: rgba(255, 255, 255, 0.72);
   text-decoration: none;
   border-radius: var(--r-s);
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 0.8125rem;
   transition: all var(--t);
-  border: 1.5px solid transparent;
+  border: 1px solid transparent;
   white-space: nowrap;
 }
 
 .nav__link:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(0, 229, 255, 0.1);
+  color: var(--cian);
+  border-color: rgba(0, 229, 255, 0.25);
 }
 
 .nav__link--active {
-  background: var(--verde);
-  color: var(--azul-900);
-  border-color: var(--verde-d);
+  background: rgba(0, 229, 255, 0.14);
+  color: var(--cian);
+  border-color: rgba(0, 229, 255, 0.45);
   font-weight: 700;
-  box-shadow: 0 2px 10px rgba(107, 224, 64, 0.35);
+  box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
 }
 
 .nav__link--active:hover {
-  background: #7deb50;
-  color: var(--azul-900);
+  background: rgba(0, 229, 255, 0.22);
+  color: var(--cian);
 }
 
 @media (max-width: 768px) {
   .header__inner {
-    padding: 0.7rem 1.1rem;
+    padding: 0.4rem 0.85rem;
     flex-wrap: wrap;
-    gap: 0.65rem;
+    gap: 0.5rem;
   }
   .logo__nombre {
-    font-size: 1.15rem;
+    font-size: 0.95rem;
   }
   .logo__ring,
   .logo__img {
-    width: 42px;
-    height: 42px;
+    width: 32px;
+    height: 32px;
+  }
+  .logo__ring::before {
+    inset: -1.5px;
   }
   .header__sep {
     display: none;
+  }
+  .header__page {
+    order: 2;
+    font-size: 0.75rem;
+    padding: 0.25rem 0.6rem;
   }
   .nav {
     order: 3;
     width: 100%;
     justify-content: flex-start;
   }
-  .nav__menu {
-    gap: 0.3rem;
-  }
   .nav__link {
-    font-size: 0.8rem;
-    padding: 0.5rem 0.85rem;
-    min-height: 40px;
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
+    min-height: 28px;
   }
 }
 
 @media (max-width: 480px) {
   .header__inner {
-    padding: 0.6rem 0.9rem;
+    padding: 0.35rem 0.7rem;
   }
   .logo__ring,
   .logo__img {
-    width: 36px;
-    height: 36px;
+    width: 28px;
+    height: 28px;
   }
   .logo__nombre {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 }
