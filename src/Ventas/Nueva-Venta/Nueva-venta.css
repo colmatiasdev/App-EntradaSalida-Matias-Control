@@ -235,9 +235,39 @@ body::before {
   background: linear-gradient(90deg, var(--borde), transparent);
 }
 
+.nueva-venta__loading-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.nueva-venta__loading-wrap--hidden {
+  display: none;
+}
+
+.nueva-venta__loading-wrap.is-loading .nueva-venta__spinner {
+  display: inline-block;
+}
+
+.nueva-venta__spinner {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--azul-200);
+  border-top-color: var(--azul-700);
+  border-radius: 50%;
+  animation: nueva-venta__spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes nueva-venta__spin {
+  to { transform: rotate(360deg); }
+}
+
 .nueva-venta__mensaje {
   color: var(--texto-2);
-  margin-bottom: 0.75rem;
+  margin: 0;
   font-size: 0.9rem;
   padding: 0.6rem 0.9rem;
   background: var(--azul-50);
@@ -363,6 +393,14 @@ body::before {
   font-size: 0.8rem;
   color: var(--texto-2);
   margin-top: 0.15rem;
+}
+
+.nueva-venta__item-descripcion {
+  flex: 1 1 100%;
+  font-size: 0.78rem;
+  color: var(--texto-2);
+  margin-top: 0.2rem;
+  line-height: 1.35;
 }
 
 .nueva-venta__item-precio {

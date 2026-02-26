@@ -91,7 +91,11 @@
 
   function cargarProductos() {
     var mensaje = document.getElementById('nueva-venta-mensaje');
+    var loadingWrap = document.getElementById('nueva-venta-loading-wrap');
     if (!TABLA) {
+      if (loadingWrap) {
+        loadingWrap.classList.remove('is-loading', 'nueva-venta__loading-wrap--hidden');
+      }
       mensaje.textContent = 'Falta configurar Tables (PRODUCTOS_MARKET).';
       return;
     }
@@ -99,14 +103,26 @@
     function aplicarProductosYFiltro(filas) {
       productos = normalizarProductos(filas);
       aplicarPreciosSegunCliente();
+      if (loadingWrap) {
+        loadingWrap.classList.remove('is-loading');
+        loadingWrap.classList.add('nueva-venta__loading-wrap--hidden');
+      }
       mensaje.textContent = '';
       pintarListado();
     }
 
     if (!APP_SCRIPT_URL) {
+      if (loadingWrap) {
+        loadingWrap.classList.remove('is-loading', 'nueva-venta__loading-wrap--hidden');
+      }
       mensaje.textContent = 'Configura APP_SCRIPT_URL en config.js. Los productos se cargan de la hoja "' + HOJA_PRODUCTOS + '".';
       return;
     }
+    if (loadingWrap) {
+      loadingWrap.classList.remove('nueva-venta__loading-wrap--hidden');
+      loadingWrap.classList.add('is-loading');
+    }
+    mensaje.textContent = 'Cargando productos…';
     var payload = { accion: 'productoMarketLeer' };
     var bodyForm = 'data=' + encodeURIComponent(JSON.stringify(payload));
     var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
@@ -132,6 +148,9 @@
         }
       })
       .catch(function (err) {
+        if (loadingWrap) {
+          loadingWrap.classList.remove('is-loading', 'nueva-venta__loading-wrap--hidden');
+        }
         mensaje.textContent = 'No se pudieron cargar los productos desde la hoja "' + HOJA_PRODUCTOS + '". Revisa APP_SCRIPT_URL y que el Sheet tenga la hoja "' + HOJA_PRODUCTOS + '".';
       });
   }
@@ -173,6 +192,7 @@
         var presentacionCant = (p['PRESENTACION-CANTIDAD-UNIDAD-MEDIDA'] || '').toString().trim();
         var presentacionUd = (p['PRESENTACION-UNIDAD-MEDIDA'] || '').toString().trim();
         var presentacionTexto = [presentacionCant, presentacionUd].filter(Boolean).join(' ') || '';
+        var descripcion = (p['DESCRIPCION'] || '').toString().trim();
         var precio = getPrecioParaCliente(p);
         var idProd = (p[TABLA.pk] || '').toString().trim();
         var qtyEnCarrito = getCantidadEnCarrito(idProd);
@@ -183,6 +203,7 @@
         li.innerHTML =
           '<span class="nueva-venta__item-nombre">' + escapeHtml(nombre) + '</span>' +
           (presentacionTexto ? '<span class="nueva-venta__item-presentacion">' + escapeHtml(presentacionTexto) + '</span>' : '') +
+          (descripcion ? '<span class="nueva-venta__item-descripcion">' + escapeHtml(descripcion) + '</span>' : '') +
           '<span class="nueva-venta__item-precio">' + formatearPrecio(precio) + '</span>' +
           '<button type="button" class="' + claseBoton + '" data-id="' + escapeHtml(idProd) + '">' + escapeHtml(textoBoton) + '</button>';
         li.querySelector('.nueva-venta__btn-add').addEventListener('click', function () {

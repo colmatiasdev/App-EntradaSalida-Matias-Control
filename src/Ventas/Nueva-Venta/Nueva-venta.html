@@ -50,7 +50,10 @@
         <h2 class="nueva-venta__titulo">Productos Market</h2>
         <a href="../../Productos/Productos.html" class="nueva-venta__btn-nuevo-producto" title="Ir al módulo Productos">➕ AGREGAR NUEVO PRODUCTO</a>
       </div>
-      <p class="nueva-venta__mensaje" id="nueva-venta-mensaje">Cargando productos…</p>
+      <div class="nueva-venta__loading-wrap is-loading" id="nueva-venta-loading-wrap">
+        <span class="nueva-venta__spinner" id="nueva-venta-spinner" aria-hidden="true"></span>
+        <p class="nueva-venta__mensaje" id="nueva-venta-mensaje">Cargando productos…</p>
+      </div>
       <div class="nueva-venta__filtro">
         <label for="nueva-venta-buscar" class="nueva-venta__filtro-label">Buscar</label>
         <input type="search" id="nueva-venta-buscar" class="nueva-venta__buscar-input" placeholder="🔍 Escribí nombre o categoría…" autocomplete="off">
