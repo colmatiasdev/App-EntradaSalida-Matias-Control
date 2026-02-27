@@ -1,6 +1,40 @@
 /* Crear resumen venta diaria — formulario */
 .crear-resumen-page .crear-resumen__form-section {
   margin-top: 0;
+  position: relative;
+}
+
+.crear-resumen__loading-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  z-index: 10;
+  border-radius: var(--r-l);
+}
+
+.crear-resumen__loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--borde);
+  border-top-color: var(--azul-700);
+  border-radius: 50%;
+  animation: crear-resumen-spin 0.8s linear infinite;
+}
+
+.crear-resumen__loading-text {
+  margin: 0;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--texto);
+}
+
+@keyframes crear-resumen-spin {
+  to { transform: rotate(360deg); }
 }
 
 .crear-resumen__form-section .hub-section__title {

@@ -254,7 +254,9 @@
         }
 
         var btn = document.getElementById('btn-guardar');
+        var loadingEl = document.getElementById('crear-resumen-loading');
         if (btn) btn.disabled = true;
+        if (loadingEl) loadingEl.hidden = false;
         setFormMsg('Guardando…');
 
         var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
@@ -269,6 +271,7 @@
           importe: importe
         }).then(function (data) {
           if (btn) btn.disabled = false;
+          if (loadingEl) loadingEl.hidden = true;
           if (data && data.ok) {
             setFormMsg('Guardado correctamente. Redirigiendo al resumen…', false);
             setTimeout(function () {
@@ -279,6 +282,7 @@
           }
         }).catch(function (err) {
           if (btn) btn.disabled = false;
+          if (loadingEl) loadingEl.hidden = true;
           setFormMsg('Error: ' + (err && err.message ? err.message : String(err)), true);
         });
       });

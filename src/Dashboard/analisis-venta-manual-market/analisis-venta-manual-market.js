@@ -495,6 +495,10 @@
     var el = document.getElementById('nav-status');
     if (el) el.textContent = msg;
   }
+  function setLoading(loading) {
+    var overlay = document.getElementById('dash-loading-overlay');
+    if (overlay) overlay.hidden = !loading;
+  }
 
   function cargarDatos() {
     if (!periodStart || !periodEnd) return;
@@ -502,8 +506,10 @@
     var hasta = toKey(periodEnd);
     setStatus('Cargando…');
     setNavStatus('Cargando…');
+    setLoading(true);
     requestRango(desde, hasta).then(function (data) {
       if (!data || !data.ok) {
+        setLoading(false);
         setStatus((data && data.error) || 'Error al cargar.', true);
         setNavStatus('Error');
         datosActual = [];
@@ -528,7 +534,7 @@
         return requestRango(toKey(prevWeek), toKey(prevEnd)).then(function (prevData) {
           datosAnterior = (prevData && prevData.ok && prevData.datos) ? prevData.datos : [];
           return reqMesAnt;
-        }).then(function () { pintarTodo(); }).catch(function () { datosAnterior = []; pintarTodo(); });
+        }).then(function () { setLoading(false); pintarTodo(); }).catch(function () { datosAnterior = []; setLoading(false); pintarTodo(); });
       }
       if (tipoAnalisis === 'mensual') {
         var prevMonth = addMonths(periodStart, -1);
@@ -536,14 +542,15 @@
         return requestRango(toKey(prevMonth), toKey(prevEnd)).then(function (prevData) {
           datosAnterior = (prevData && prevData.ok && prevData.datos) ? prevData.datos : [];
           return reqMesAnt;
-        }).then(function () { pintarTodo(); }).catch(function () { datosAnterior = []; pintarTodo(); });
+        }).then(function () { setLoading(false); pintarTodo(); }).catch(function () { datosAnterior = []; setLoading(false); pintarTodo(); });
       }
       var prevYear = addYears(periodStart, -1);
       return requestRango(toKey(prevYear), toKey(endOfYear(prevYear))).then(function (prevData) {
         datosAnterior = (prevData && prevData.ok && prevData.datos) ? prevData.datos : [];
         return reqMesAnt;
-      }).then(function () { pintarTodo(); }).catch(function () { datosAnterior = []; pintarTodo(); });
+      }).then(function () { setLoading(false); pintarTodo(); }).catch(function () { datosAnterior = []; setLoading(false); pintarTodo(); });
     }).catch(function (err) {
+      setLoading(false);
       setStatus('Error: ' + (err && err.message ? err.message : 'red'), true);
       setNavStatus('Error');
       datosActual = [];
