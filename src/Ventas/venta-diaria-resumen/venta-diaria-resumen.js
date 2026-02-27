@@ -61,8 +61,6 @@
 
   function setCargando(cargando) {
     setMsg(cargando ? 'Cargando datos…' : 'Listo');
-    var overlay = document.getElementById('venta-diaria-loading');
-    if (overlay) overlay.hidden = !cargando;
   }
 
   function pintarCabecera() {

@@ -883,6 +883,11 @@ function resumenVentaLeer(params) {
   return respuestaJson({ ok: true, fecha: fechaStr, datos: datos });
 }
 
+function normalizarNombreColumna(s) {
+  if (s === undefined || s === null) return '';
+  return String(s).trim().replace(/\s+/g, '_').toUpperCase();
+}
+
 function resumenVentaLeerRango(params) {
   var def = TABLAS.RESUMEN_VENTA;
   var fechaDesde = normalizarFechaOperativa(params.fechaDesde || params.fecha_desde || '');
@@ -896,17 +901,23 @@ function resumenVentaLeerRango(params) {
   if (datos.length < 2) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
   var rawHeaders = datos[0];
   var headers = rawHeaders.map(function (h) { return (h !== undefined && h !== null) ? String(h).trim() : ''; });
+  var headersNorm = headers.map(function (h) { return normalizarNombreColumna(h); });
   var colFecha = -1;
-  for (var ci = 0; ci < headers.length; ci++) {
-    if (headers[ci].toUpperCase() === 'FECHA_OPERATIVA') { colFecha = ci; break; }
+  for (var ci = 0; ci < headersNorm.length; ci++) {
+    if (headersNorm[ci] === 'FECHA_OPERATIVA') { colFecha = ci; break; }
   }
   if (colFecha === -1) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
   var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
   var colNames = ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-VENTAS', 'IMPORTE'];
-  var colIndices = colNames.map(function (name) {
-    var nameUpper = name.toUpperCase();
-    for (var j = 0; j < headers.length; j++) {
-      if (String(headers[j]).toUpperCase() === nameUpper) return j;
+  var colIndices = colNames.map(function (name, idx) {
+    var nameNorm = normalizarNombreColumna(name);
+    for (var j = 0; j < headersNorm.length; j++) {
+      if (headersNorm[j] === nameNorm) return j;
+    }
+    if (name === 'CANTIDAD-VENTAS') {
+      for (var k = 0; k < headersNorm.length; k++) {
+        if (headersNorm[k] === 'CANTIDAD_OPERACIONES' || headersNorm[k] === 'CANTIDAD-OPERACIONES') return k;
+      }
     }
     return -1;
   });
@@ -997,7 +1008,10 @@ function leerHojaYFiltrarPorFecha(ss, nombreHoja, columnas, fechaYyyyMmDd) {
   var datos = sheet.getDataRange().getValues();
   if (datos.length < 2) return [];
   var headers = datos[0];
-  var colFecha = headers.indexOf('FECHA_OPERATIVA');
+  var colFecha = -1;
+  for (var h = 0; h < headers.length; h++) {
+    if (normalizarNombreColumna(headers[h]) === 'FECHA_OPERATIVA') { colFecha = h; break; }
+  }
   if (colFecha === -1) return [];
   var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
   var filas = [];
