@@ -143,7 +143,7 @@
     vacioEl.hidden = true;
     wrapEl.hidden = false;
 
-    theadEl.innerHTML = '<tr><th>HORA</th><th>NOMBRE-APELLIDO</th><th>PRODUCTO</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
+    theadEl.innerHTML = '<tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORIA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
     tbodyEl.innerHTML = '';
     var total = 0;
     datos.forEach(function (r) {
@@ -151,8 +151,8 @@
       if (!isNaN(monto)) total += monto;
       tbodyEl.innerHTML +=
         '<tr><td>' + escapeHtml(String(r.HORA || '—')) + '</td>' +
-        '<td>' + escapeHtml(String(r['NOMBRE-APELLIDO'] || '')) + '</td>' +
         '<td>' + escapeHtml(String(r.PRODUCTO || '')) + '</td>' +
+        '<td>' + escapeHtml(String(r.CATEGORIA || '')) + '</td>' +
         '<td class="td-num">' + escapeHtml(String(r.CANTIDAD != null ? r.CANTIDAD : '')) + '</td>' +
         '<td class="td-num">' + formatImporte(monto || 0) + '</td>' +
         celdaUsuario(r) + '</tr>';
@@ -176,7 +176,7 @@
     vacioEl.hidden = true;
     wrapEl.hidden = false;
 
-    theadEl.innerHTML = '<tr><th>HORA</th><th>NOMBRE-APELLIDO</th><th>PRODUCTO</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
+    theadEl.innerHTML = '<tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORIA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
     tbodyEl.innerHTML = '';
     var total = 0;
     datos.forEach(function (r) {
@@ -184,8 +184,8 @@
       if (!isNaN(monto)) total += monto;
       tbodyEl.innerHTML +=
         '<tr><td>' + escapeHtml(String(r.HORA || '—')) + '</td>' +
-        '<td>' + escapeHtml(String(r['NOMBRE-APELLIDO'] || '')) + '</td>' +
         '<td>' + escapeHtml(String(r.PRODUCTO || '')) + '</td>' +
+        '<td>' + escapeHtml(String(r.CATEGORIA || '')) + '</td>' +
         '<td class="td-num">' + escapeHtml(String(r.CANTIDAD != null ? r.CANTIDAD : '')) + '</td>' +
         '<td class="td-num">' + formatImporte(monto || 0) + '</td>' +
         celdaUsuario(r) + '</tr>';
