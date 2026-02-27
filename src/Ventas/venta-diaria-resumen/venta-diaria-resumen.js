@@ -94,7 +94,7 @@
     var totalCantidad = 0;
     var totalImporte = 0;
     datos.forEach(function (r) {
-      var cant = parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+      var cant = parseInt(r['CANTIDAD-VENTAS'], 10) || 0;
       var imp = parseFloat(r.IMPORTE) || 0;
       if (!isNaN(cant)) totalCantidad += cant;
       if (!isNaN(imp)) totalImporte += imp;
@@ -104,7 +104,7 @@
         '<td>' + esc(String(r.TURNO || '')) + '</td>' +
         '<td>' + esc(String(r['TIPO-OPERACION'] || '')) + '</td>' +
         '<td>' + esc(String(r.CATEGORIA || '')) + '</td>' +
-        '<td class="td-num">' + esc(String(r['CANTIDAD-OPERACIONES'] != null ? r['CANTIDAD-OPERACIONES'] : '')) + '</td>' +
+        '<td class="td-num">' + esc(String(r['CANTIDAD-VENTAS'] != null ? r['CANTIDAD-VENTAS'] : '')) + '</td>' +
         '<td class="td-num">' + fi(imp) + '</td></tr>';
     });
     tfootEl.innerHTML = '<tr><td colspan="5"><strong>Total</strong></td><td class="td-num">' + totalCantidad + '</td><td class="td-num td-total">' + fi(totalImporte) + '</td></tr>';

@@ -58,6 +58,7 @@
           <span class="dash-nav__badge" id="nav-badge-actual" hidden>ACTUAL</span>
         </div>
       </div>
+      <button type="button" class="dash-nav__arrow" id="btn-next" aria-label="Período siguiente">›</button>
       <button type="button" class="dash-nav__btn-now" id="btn-periodo-actual">📌 <span id="btn-periodo-actual-text">Semana actual</span></button>
       <div class="dash-nav__status" id="nav-status"></div>
     </div>
@@ -124,15 +125,24 @@
       <div class="dash-dist-grid">
         <div class="dash-dist-block">
           <h3 class="dash-dist-block__title">Por tipo de operación</h3>
-          <div class="dash-dist-list" id="dist-tipo"></div>
+          <div class="dash-dist-block__content">
+            <div class="dash-dist-pie" id="dist-tipo-pie" aria-hidden="true"></div>
+            <div class="dash-dist-list" id="dist-tipo"></div>
+          </div>
         </div>
         <div class="dash-dist-block">
           <h3 class="dash-dist-block__title">Por turno</h3>
-          <div class="dash-dist-list" id="dist-turno"></div>
+          <div class="dash-dist-block__content">
+            <div class="dash-dist-pie" id="dist-turno-pie" aria-hidden="true"></div>
+            <div class="dash-dist-list" id="dist-turno"></div>
+          </div>
         </div>
         <div class="dash-dist-block">
           <h3 class="dash-dist-block__title">Por categoría</h3>
-          <div class="dash-dist-list" id="dist-categoria"></div>
+          <div class="dash-dist-block__content">
+            <div class="dash-dist-pie" id="dist-categoria-pie" aria-hidden="true"></div>
+            <div class="dash-dist-list" id="dist-categoria"></div>
+          </div>
         </div>
       </div>
     </section>
@@ -156,6 +166,25 @@
 
     <p class="dash-status-msg" id="dash-status-msg" role="status">Seleccioná un período.</p>
   </main>
+
+  <div class="dash-modal-overlay" id="modal-dia-overlay" hidden aria-hidden="true">
+    <div class="dash-modal" id="modal-dia" role="dialog" aria-labelledby="modal-dia-title">
+      <div class="dash-modal__head">
+        <h2 class="dash-modal__title" id="modal-dia-title">Detalle del día</h2>
+        <button type="button" class="dash-modal__close" id="modal-dia-close" aria-label="Cerrar">×</button>
+      </div>
+      <div class="dash-modal__body">
+        <div class="dash-modal__kpis" id="modal-dia-kpis"></div>
+        <div class="dash-modal__table-wrap">
+          <table class="dash-modal__table" id="modal-dia-tabla">
+            <thead id="modal-dia-thead"></thead>
+            <tbody id="modal-dia-tbody"></tbody>
+          </table>
+        </div>
+        <p class="dash-modal__empty" id="modal-dia-empty" hidden>No hay operaciones para este día.</p>
+      </div>
+    </div>
+  </div>
 
   <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
 

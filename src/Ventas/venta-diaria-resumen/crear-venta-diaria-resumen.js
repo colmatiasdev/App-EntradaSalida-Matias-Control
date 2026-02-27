@@ -119,7 +119,7 @@
     var turno = (document.getElementById('turno') && document.getElementById('turno').value) || '';
     var tipoOperacion = (document.getElementById('tipo-operacion') && document.getElementById('tipo-operacion').value) || '';
     var categoria = (document.getElementById('categoria') && document.getElementById('categoria').value) || '';
-    var cantidadEl = document.getElementById('cantidad-operaciones');
+    var cantidadEl = document.getElementById('cantidad-ventas');
     var importeEl = document.getElementById('importe');
     var fechaOperativa = (inputFecha && inputFecha.value) || fechaActual;
     if (!fechaOperativa) return false;
@@ -142,7 +142,7 @@
   var CANTIDAD_MAX = 9999;
 
   function normalizarCantidadOperacionesInput() {
-    var el = document.getElementById('cantidad-operaciones');
+    var el = document.getElementById('cantidad-ventas');
     if (!el) return;
     var val = parseInt(String(el.value).replace(/\D/g, ''), 10);
     if (isNaN(val) || val < 1) val = 1;
@@ -187,7 +187,7 @@
 
     var turnoEl = document.getElementById('turno');
     var tipoOpEl = document.getElementById('tipo-operacion');
-    var cantidadEl = document.getElementById('cantidad-operaciones');
+    var cantidadEl = document.getElementById('cantidad-ventas');
     var importeEl = document.getElementById('importe');
     if (turnoEl) turnoEl.addEventListener('change', actualizarBotonGuardar);
     if (tipoOpEl) tipoOpEl.addEventListener('change', actualizarBotonGuardar);
@@ -213,13 +213,13 @@
         var turno = (document.getElementById('turno') && document.getElementById('turno').value) || '';
         var tipoOperacion = (document.getElementById('tipo-operacion') && document.getElementById('tipo-operacion').value) || '';
         var categoria = (document.getElementById('categoria') && document.getElementById('categoria').value) || '';
-        var cantidadEl = document.getElementById('cantidad-operaciones');
+        var cantidadEl = document.getElementById('cantidad-ventas');
         var importeEl = document.getElementById('importe');
         var valorCantidad = cantidadEl ? parseInt(cantidadEl.value, 10) : NaN;
         var valorImporte = importeEl ? parseFloat(String(importeEl.value).replace(',', '.')) : NaN;
         if (isNaN(valorCantidad)) valorCantidad = 1;
         if (isNaN(valorImporte)) valorImporte = 0;
-        var cantidadOperaciones = Math.max(1, Math.min(9999, Math.floor(valorCantidad)));
+        var cantidadVentas = Math.max(1, Math.min(9999, Math.floor(valorCantidad)));
         var importe = Math.max(0, valorImporte);
 
         var fechaOperativa = (inputFecha && inputFecha.value) || fechaActual;
@@ -240,7 +240,7 @@
           return;
         }
         if (cantidadEl && (cantidadEl.value === '' || isNaN(parseInt(cantidadEl.value, 10)) || parseInt(cantidadEl.value, 10) < 1 || parseInt(cantidadEl.value, 10) > 9999)) {
-          setFormMsg('Cantidad de operaciones: número entero mayor a 0 (entre 1 y 9999).', true);
+          setFormMsg('Cantidad de ventas: número entero mayor a 0 (entre 1 y 9999).', true);
           return;
         }
         if (importeEl && (importeEl.value === '' || isNaN(parseFloat(importeEl.value)) || parseFloat(importeEl.value) <= 0)) {
@@ -265,7 +265,7 @@
           turno: turno,
           tipoOperacion: tipoOperacion,
           categoria: categoria,
-          cantidadOperaciones: cantidadOperaciones,
+          cantidadVentas: cantidadVentas,
           importe: importe
         }).then(function (data) {
           if (btn) btn.disabled = false;

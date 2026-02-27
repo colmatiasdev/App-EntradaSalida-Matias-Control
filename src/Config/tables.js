@@ -114,7 +114,7 @@
     RESUMEN_VENTA: {
       sheet: 'RESUMEN-VENTA',
       pk: 'ID-RESUMEN',
-      columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-OPERACIONES', 'IMPORTE']
+      columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-VENTAS', 'IMPORTE']
     },
 
     /** Tabla COMPONENTE-COMBO: valores para combos (tipo operación venta diaria, tipo operación, categorías panadería/market). */

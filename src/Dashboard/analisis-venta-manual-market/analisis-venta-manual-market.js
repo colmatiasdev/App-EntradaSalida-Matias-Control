@@ -130,57 +130,71 @@
     });
   }
 
+  function parseNum(val) {
+    if (val === undefined || val === null || val === '') return 0;
+    if (typeof val === 'number' && !isNaN(val)) return val;
+    var s = String(val).trim().replace(',', '.');
+    var n = parseFloat(s);
+    return isNaN(n) ? 0 : n;
+  }
+  function parseIntSafe(val) {
+    if (val === undefined || val === null || val === '') return 0;
+    if (typeof val === 'number' && !isNaN(val)) return Math.floor(val);
+    var s = String(val).trim().replace(',', '.');
+    var n = parseInt(s, 10);
+    return isNaN(n) ? 0 : n;
+  }
   function agregarPorDia(datos) {
     var porDia = {};
-    datos.forEach(function (r) {
-      var f = r.FECHA_OPERATIVA || '';
+    (datos || []).forEach(function (r) {
+      var f = (r.FECHA_OPERATIVA != null ? String(r.FECHA_OPERATIVA) : '').trim();
       if (!f) return;
       if (!porDia[f]) porDia[f] = { importe: 0, cantidad: 0, ventas: 0 };
-      porDia[f].importe += parseFloat(r.IMPORTE) || 0;
-      porDia[f].cantidad += parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+      porDia[f].importe += parseNum(r.IMPORTE);
+      porDia[f].cantidad += parseIntSafe(r['CANTIDAD-VENTAS']);
       porDia[f].ventas += 1;
     });
     return porDia;
   }
   function agregarPorTipo(datos) {
     var out = {};
-    datos.forEach(function (r) {
+    (datos || []).forEach(function (r) {
       var t = (r['TIPO-OPERACION'] || '').trim() || '—';
       if (!out[t]) out[t] = { importe: 0, cantidad: 0 };
-      out[t].importe += parseFloat(r.IMPORTE) || 0;
-      out[t].cantidad += parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+      out[t].importe += parseNum(r.IMPORTE);
+      out[t].cantidad += parseIntSafe(r['CANTIDAD-VENTAS']);
     });
     return out;
   }
   function agregarPorTurno(datos) {
     var out = {};
-    datos.forEach(function (r) {
+    (datos || []).forEach(function (r) {
       var t = (r.TURNO || '').trim() || '—';
       if (!out[t]) out[t] = { importe: 0, cantidad: 0 };
-      out[t].importe += parseFloat(r.IMPORTE) || 0;
-      out[t].cantidad += parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+      out[t].importe += parseNum(r.IMPORTE);
+      out[t].cantidad += parseIntSafe(r['CANTIDAD-VENTAS']);
     });
     return out;
   }
   function agregarPorCategoria(datos) {
     var out = {};
-    datos.forEach(function (r) {
+    (datos || []).forEach(function (r) {
       var c = (r.CATEGORIA || '').trim() || '—';
       if (!out[c]) out[c] = { importe: 0, cantidad: 0 };
-      out[c].importe += parseFloat(r.IMPORTE) || 0;
-      out[c].cantidad += parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+      out[c].importe += parseNum(r.IMPORTE);
+      out[c].cantidad += parseIntSafe(r['CANTIDAD-VENTAS']);
     });
     return out;
   }
   function agregarPorMes(datos) {
     var out = {};
     for (var m = 1; m <= 12; m++) out[m] = { importe: 0, cantidad: 0 };
-    datos.forEach(function (r) {
-      var f = (r.FECHA_OPERATIVA || '').substring(0, 7);
+    (datos || []).forEach(function (r) {
+      var f = (r.FECHA_OPERATIVA != null ? String(r.FECHA_OPERATIVA) : '').substring(0, 7);
       var mes = parseInt(f.split('-')[1], 10);
       if (mes >= 1 && mes <= 12) {
-        out[mes].importe += parseFloat(r.IMPORTE) || 0;
-        out[mes].cantidad += parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+        out[mes].importe += parseNum(r.IMPORTE);
+        out[mes].cantidad += parseIntSafe(r['CANTIDAD-VENTAS']);
       }
     });
     return out;
@@ -188,12 +202,12 @@
 
   function totalImporte(datos) {
     var t = 0;
-    datos.forEach(function (r) { t += parseFloat(r.IMPORTE) || 0; });
+    (datos || []).forEach(function (r) { t += parseNum(r.IMPORTE); });
     return t;
   }
   function totalCantidad(datos) {
     var t = 0;
-    datos.forEach(function (r) { t += parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0; });
+    (datos || []).forEach(function (r) { t += parseIntSafe(r['CANTIDAD-VENTAS']); });
     return t;
   }
   function mejorDia(datos) {
@@ -257,7 +271,7 @@
       var key = toKey(d);
       var info = porDia[key] || { importe: 0, ventas: 0 };
       var esHoy = key === hoyKeyStr;
-      html += '<div class="dash-day' + (esHoy ? ' dash-day--hoy' : '') + (info.ventas === 0 ? ' dash-day--sin' : '') + '">';
+      html += '<div class="dash-day dash-day--clickable' + (esHoy ? ' dash-day--hoy' : '') + (info.ventas === 0 ? ' dash-day--sin' : '') + '" data-fecha="' + esc(key) + '" role="button" tabindex="0">';
       if (esHoy) html += '<span class="dash-day__badge">HOY</span>';
       html += '<div class="dash-day__dia">' + esc(DIA_ABREV[d.getDay()]) + '</div>';
       html += '<div class="dash-day__fecha">' + d.getDate() + '</div>';
@@ -309,7 +323,8 @@
         var info = porDia[key] || { importe: 0 };
         var pct = (info.importe / maxImp) * 100;
         var esHoy = key === hoyKeyStr;
-        html += '<div class="dash-chart-bar-wrap"><div class="dash-chart-bar" style="height:' + Math.max(4, pct) + '%"' + (esHoy ? ' class="dash-chart-bar--hoy"' : '') + '">' + (esHoy ? '<span class="dash-chart-bar__hoy">HOY</span>' : '') + '</div><div class="dash-chart-bar-wrap__label">' + esc(DIA_ABREV[d.getDay()]) + '</div><div class="dash-chart-bar-wrap__value">' + (info.importe > 0 ? fmtMoneda(info.importe) : '—') + '</div></div>';
+        var barHeight = maxImp > 0 ? Math.max(4, pct) : 0;
+        html += '<div class="dash-chart-bar-wrap"><div class="dash-chart-bar-container"><div class="dash-chart-bar" style="height:' + barHeight + '%"' + (esHoy ? ' class="dash-chart-bar--hoy"' : '') + '">' + (esHoy ? '<span class="dash-chart-bar__hoy">HOY</span>' : '') + '</div></div><div class="dash-chart-bar-wrap__label">' + esc(DIA_ABREV[d.getDay()]) + '</div><div class="dash-chart-bar-wrap__value">' + (info.importe > 0 ? fmtMoneda(info.importe) : '—') + '</div></div>';
       }
     } else if (tipoAnalisis === 'mensual') {
       var daysInMonth = (endOfMonth(periodStart).getDate());
@@ -320,7 +335,8 @@
         var info = porDia[key] || { importe: 0 };
         var pct = (info.importe / maxImp) * 100;
         var esHoy = key === hoyKeyStr;
-        html += '<div class="dash-chart-bar-wrap"><div class="dash-chart-bar" style="height:' + Math.max(4, pct) + '%"' + (esHoy ? ' class="dash-chart-bar--hoy"' : '') + '">' + (esHoy ? '<span class="dash-chart-bar__hoy">HOY</span>' : '') + '</div><div class="dash-chart-bar-wrap__label">' + j + '</div><div class="dash-chart-bar-wrap__value">' + (info.importe > 0 ? fmtMoneda(info.importe) : '—') + '</div></div>';
+        var barHeight = maxImp > 0 ? Math.max(4, pct) : 0;
+        html += '<div class="dash-chart-bar-wrap"><div class="dash-chart-bar-container"><div class="dash-chart-bar" style="height:' + barHeight + '%"' + (esHoy ? ' class="dash-chart-bar--hoy"' : '') + '">' + (esHoy ? '<span class="dash-chart-bar__hoy">HOY</span>' : '') + '</div></div><div class="dash-chart-bar-wrap__label">' + j + '</div><div class="dash-chart-bar-wrap__value">' + (info.importe > 0 ? fmtMoneda(info.importe) : '—') + '</div></div>';
       }
     } else {
       var porMes = agregarPorMes(datosActual);
@@ -335,20 +351,53 @@
     cont.innerHTML = html;
   }
 
+  var PIE_COLORS = ['#c62828', '#e57373', '#d84315', '#ff8f00', '#2e7d32', '#1565c0', '#6a1b9a', '#00838f'];
+  function pintarTorta(obj, totalImp, pieId) {
+    var pieEl = document.getElementById(pieId);
+    if (!pieEl) return;
+    var keys = Object.keys(obj).sort();
+    if (keys.length === 0 || totalImp <= 0) {
+      pieEl.style.background = 'conic-gradient(#eee 0deg 360deg)';
+      pieEl.title = 'Sin datos';
+      return;
+    }
+    var parts = [];
+    var acum = 0;
+    keys.forEach(function (k, i) {
+      var pct = (obj[k].importe / totalImp) * 100;
+      if (pct <= 0) return;
+      var start = acum;
+      acum += pct;
+      parts.push(PIE_COLORS[i % PIE_COLORS.length] + ' ' + start + '% ' + acum + '%');
+    });
+    if (parts.length === 0) {
+      pieEl.style.background = 'conic-gradient(#eee 0deg 360deg)';
+      return;
+    }
+    pieEl.style.background = 'conic-gradient(' + parts.join(', ') + ')';
+    pieEl.title = keys.map(function (k) {
+      var pct = totalImp > 0 ? ((obj[k].importe / totalImp) * 100).toFixed(0) : 0;
+      return k + ': ' + pct + '%';
+    }).join(' · ');
+  }
   function pintarDistribucion() {
     var porTipo = agregarPorTipo(datosActual);
     var porTurno = agregarPorTurno(datosActual);
     var porCat = agregarPorCategoria(datosActual);
     var totalImp = totalImporte(datosActual);
+    pintarTorta(porTipo, totalImp, 'dist-tipo-pie');
+    pintarTorta(porTurno, totalImp, 'dist-turno-pie');
+    pintarTorta(porCat, totalImp, 'dist-categoria-pie');
     function listar(obj, id) {
       var cont = document.getElementById(id);
       if (!cont) return;
       var keys = Object.keys(obj).sort();
       if (keys.length === 0) { cont.innerHTML = '<p class="dash-dist-item">Sin datos</p>'; return; }
-      cont.innerHTML = keys.map(function (k) {
+      cont.innerHTML = keys.map(function (k, idx) {
         var imp = obj[k].importe;
         var pct = totalImp > 0 ? ((imp / totalImp) * 100).toFixed(0) : 0;
-        return '<div class="dash-dist-item"><span class="dash-dist-item__label">' + esc(k) + '</span><span class="dash-dist-item__value">' + fmtMoneda(imp) + ' (' + pct + '%)</span></div>';
+        var color = PIE_COLORS[idx % PIE_COLORS.length];
+        return '<div class="dash-dist-item"><span class="dash-dist-item__dot" style="background:' + color + '"></span><span class="dash-dist-item__label">' + esc(k) + '</span><span class="dash-dist-item__value">' + fmtMoneda(imp) + ' (' + pct + '%)</span></div>';
       }).join('');
     }
     listar(porTipo, 'dist-tipo');
@@ -462,7 +511,7 @@
         pintarTodo();
         return;
       }
-      datosActual = data.datos || [];
+      datosActual = Array.isArray(data.datos) ? data.datos : [];
       var diasConVentas = 0;
       var porDia = agregarPorDia(datosActual);
       for (var k in porDia) { if (porDia[k].ventas > 0) diasConVentas++; }
@@ -499,6 +548,7 @@
       setNavStatus('Error');
       datosActual = [];
       datosAnterior = [];
+      datosMesAnterior = [];
       pintarTodo();
     });
   }
@@ -517,21 +567,65 @@
     pintarTablaResumen();
   }
 
-  function navPrev() {
-    if (!periodStart || !periodEnd) return;
-    if (tipoAnalisis === 'semanal') {
-      periodStart = addWeeks(periodStart, -1);
-      periodEnd = addDays(periodStart, 6);
-    } else if (tipoAnalisis === 'mensual') {
-      periodStart = addMonths(periodStart, -1);
-      periodEnd = endOfMonth(periodStart);
+  function abrirModalDia(fechaKey) {
+    var filas = (datosActual || []).filter(function (r) {
+      var f = (r.FECHA_OPERATIVA != null ? String(r.FECHA_OPERATIVA) : '').trim().substring(0, 10);
+      return f === fechaKey;
+    });
+    var overlay = document.getElementById('modal-dia-overlay');
+    var titleEl = document.getElementById('modal-dia-title');
+    var kpisEl = document.getElementById('modal-dia-kpis');
+    var theadEl = document.getElementById('modal-dia-thead');
+    var tbodyEl = document.getElementById('modal-dia-tbody');
+    var emptyEl = document.getElementById('modal-dia-empty');
+    if (!overlay || !titleEl) return;
+    var d = fromKey(fechaKey);
+    var tituloStr = d ? (DIA_ABREV[d.getDay()] + ' ' + d.getDate() + ' ' + MES_NOMBRE[d.getMonth()] + ' ' + d.getFullYear()) : fechaKey;
+    titleEl.textContent = 'Detalle del día — ' + tituloStr;
+    var totalImp = 0;
+    var totalCant = 0;
+    filas.forEach(function (r) {
+      totalImp += parseNum(r.IMPORTE);
+      totalCant += parseIntSafe(r['CANTIDAD-VENTAS']);
+    });
+    var ticketProm = filas.length > 0 ? totalImp / filas.length : 0;
+    kpisEl.innerHTML = '<div class="dash-modal-kpi"><span class="dash-modal-kpi__label">Facturación</span><span class="dash-modal-kpi__value">' + fmtMoneda(totalImp) + '</span></div>' +
+      '<div class="dash-modal-kpi"><span class="dash-modal-kpi__label">Operaciones</span><span class="dash-modal-kpi__value">' + filas.length + '</span></div>' +
+      '<div class="dash-modal-kpi"><span class="dash-modal-kpi__label">Unidades</span><span class="dash-modal-kpi__value">' + totalCant + '</span></div>' +
+      '<div class="dash-modal-kpi"><span class="dash-modal-kpi__label">Ticket promedio</span><span class="dash-modal-kpi__value">' + fmtMoneda(ticketProm) + '</span></div>';
+    if (filas.length === 0) {
+      theadEl.innerHTML = '';
+      tbodyEl.innerHTML = '';
+      if (emptyEl) { emptyEl.hidden = false; }
+      if (document.querySelector('.dash-modal__table-wrap')) document.querySelector('.dash-modal__table-wrap').hidden = true;
     } else {
-      periodStart = addYears(periodStart, -1);
-      periodEnd = endOfYear(periodStart);
+      if (emptyEl) emptyEl.hidden = true;
+      var wrap = document.querySelector('.dash-modal__table-wrap');
+      if (wrap) wrap.hidden = false;
+      theadEl.innerHTML = '<tr><th>Hora</th><th>Turno</th><th>Tipo</th><th>Categoría</th><th>Cant.</th><th>Importe</th></tr>';
+      tbodyEl.innerHTML = filas.map(function (r) {
+        return '<tr><td>' + esc(r.HORA || '—') + '</td><td>' + esc(r.TURNO || '—') + '</td><td>' + esc(r['TIPO-OPERACION'] || '—') + '</td><td>' + esc(r.CATEGORIA || '—') + '</td><td>' + esc(String(parseIntSafe(r['CANTIDAD-VENTAS']))) + '</td><td>' + fmtMoneda(parseNum(r.IMPORTE)) + '</td></tr>';
+      }).join('');
     }
-    cargarDatos();
+    overlay.hidden = false;
+    overlay.setAttribute('aria-hidden', 'false');
+    setTimeout(function () {
+      if (btnClose) btnClose.focus();
+    }, 50);
   }
-  function navNext() {
+  function cerrarModalDia() {
+    var overlay = document.getElementById('modal-dia-overlay');
+    if (overlay) {
+      overlay.hidden = true;
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+  function isModalDiaAbierto() {
+    var overlay = document.getElementById('modal-dia-overlay');
+    return overlay && !overlay.hidden;
+  }
+
+  function navPrev() {
     if (!periodStart || !periodEnd) return;
     if (tipoAnalisis === 'semanal') {
       periodStart = addWeeks(periodStart, 1);
@@ -556,6 +650,38 @@
     document.getElementById('btn-prev').addEventListener('click', navPrev);
     document.getElementById('btn-next').addEventListener('click', navNext);
     document.getElementById('btn-periodo-actual').addEventListener('click', function () { setPeriodFromTipo(); cargarDatos(); });
+    var dashDays = document.getElementById('dash-days');
+    if (dashDays) {
+      dashDays.addEventListener('click', function (e) {
+        var card = e.target.closest('.dash-day--clickable');
+        if (card && card.dataset.fecha) abrirModalDia(card.dataset.fecha);
+      });
+      dashDays.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var card = e.target.closest('.dash-day--clickable');
+        if (card && card.dataset.fecha) { e.preventDefault(); abrirModalDia(card.dataset.fecha); }
+      });
+    }
+    var btnClose = document.getElementById('modal-dia-close');
+    var overlayModal = document.getElementById('modal-dia-overlay');
+    var modalDia = document.getElementById('modal-dia');
+    if (btnClose) btnClose.addEventListener('click', cerrarModalDia);
+    if (overlayModal) {
+      overlayModal.addEventListener('click', function (e) {
+        if (e.target === overlayModal) cerrarModalDia();
+      });
+    }
+    if (modalDia) {
+      modalDia.addEventListener('click', function (e) {
+        e.stopPropagation();
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && isModalDiaAbierto()) {
+        e.preventDefault();
+        cerrarModalDia();
+      }
+    });
     cargarDatos();
   }
 

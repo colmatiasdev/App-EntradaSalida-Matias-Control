@@ -59,7 +59,7 @@ var TABLAS = {
   RESUMEN_VENTA: {
     sheet: 'RESUMEN-VENTA',
     pk: 'ID-RESUMEN',
-    columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-OPERACIONES', 'IMPORTE']
+    columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-VENTAS', 'IMPORTE']
   },
   OPERACIONES_GENERALES: {
     sheet: 'OPERACIONES-GENERALES',
@@ -855,7 +855,7 @@ function resumenVentaAlta(params) {
   }
   var idResumen = dato['ID-RESUMEN'] || params.idResumen || '';
   if (!idResumen) idResumen = siguienteIdResumenVenta(sheet, def);
-  var cantidadOperaciones = (params.cantidadOperaciones !== undefined && params.cantidadOperaciones !== null && params.cantidadOperaciones !== '') ? Number(params.cantidadOperaciones) : 0;
+  var cantidadVentas = (params.cantidadVentas !== undefined && params.cantidadVentas !== null && params.cantidadVentas !== '') ? Number(params.cantidadVentas) : 0;
   var importe = (params.importe !== undefined && params.importe !== null && params.importe !== '') ? Number(params.importe) : 0;
   var obj = {
     'ID-RESUMEN': idResumen,
@@ -864,7 +864,7 @@ function resumenVentaAlta(params) {
     'TURNO': dato['TURNO'] !== undefined ? dato['TURNO'] : (params.turno || ''),
     'TIPO-OPERACION': dato['TIPO-OPERACION'] !== undefined ? dato['TIPO-OPERACION'] : (params.tipoOperacion || ''),
     'CATEGORIA': dato['CATEGORIA'] !== undefined ? dato['CATEGORIA'] : (params.categoria || ''),
-    'CANTIDAD-OPERACIONES': cantidadOperaciones,
+    'CANTIDAD-VENTAS': cantidadVentas,
     'IMPORTE': importe
   };
   var fila = objetoAFila(def, obj);
@@ -894,21 +894,45 @@ function resumenVentaLeerRango(params) {
   if (!sheet) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
   var datos = sheet.getDataRange().getValues();
   if (datos.length < 2) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
-  var headers = datos[0];
-  var colFecha = headers.indexOf('FECHA_OPERATIVA');
+  var rawHeaders = datos[0];
+  var headers = rawHeaders.map(function (h) { return (h !== undefined && h !== null) ? String(h).trim() : ''; });
+  var colFecha = -1;
+  for (var ci = 0; ci < headers.length; ci++) {
+    if (headers[ci].toUpperCase() === 'FECHA_OPERATIVA') { colFecha = ci; break; }
+  }
   if (colFecha === -1) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
   var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+  var colNames = ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-VENTAS', 'IMPORTE'];
+  var colIndices = colNames.map(function (name) {
+    var nameUpper = name.toUpperCase();
+    for (var j = 0; j < headers.length; j++) {
+      if (String(headers[j]).toUpperCase() === nameUpper) return j;
+    }
+    return -1;
+  });
+  function numVal(v) {
+    if (v === undefined || v === null || v === '') return '';
+    if (typeof v === 'number' && !isNaN(v)) return v;
+    var s = String(v).trim().replace(',', '.');
+    var n = parseFloat(s);
+    return isNaN(n) ? v : n;
+  }
   var filas = [];
   for (var i = 1; i < datos.length; i++) {
     var fechaVal = datos[i][colFecha];
     var fechaStr = normalizarFechaOperativa(fechaVal, tz);
-    if (fechaStr < fechaDesde || fechaStr > fechaHasta) continue;
+    if (!fechaStr || fechaStr.length !== 10 || fechaStr < fechaDesde || fechaStr > fechaHasta) continue;
     var obj = {};
-    for (var c = 0; c < headers.length; c++) {
-      var v = c < datos[i].length ? datos[i][c] : '';
-      if (v instanceof Date && headers[c] === 'HORA') v = Utilities.formatDate(v, tz, 'HH:mm');
-      else if (v instanceof Date && headers[c] === 'FECHA_OPERATIVA') v = Utilities.formatDate(v, tz, 'yyyy-MM-dd');
-      obj[headers[c]] = (v !== undefined && v !== null) ? v : '';
+    for (var c = 0; c < colNames.length; c++) {
+      var j = colIndices[c];
+      if (j === -1) { obj[colNames[c]] = ''; continue; }
+      var v = j < datos[i].length ? datos[i][j] : '';
+      if (v instanceof Date) {
+        if (colNames[c] === 'HORA') v = Utilities.formatDate(v, tz, 'HH:mm');
+        else if (colNames[c] === 'FECHA_OPERATIVA') v = Utilities.formatDate(v, tz, 'yyyy-MM-dd');
+      }
+      if (colNames[c] === 'IMPORTE' || colNames[c] === 'CANTIDAD-VENTAS') v = numVal(v);
+      obj[colNames[c]] = (v !== undefined && v !== null) ? v : '';
     }
     filas.push(obj);
   }
@@ -951,8 +975,19 @@ function normalizarFechaOperativa(val, tz) {
     tz = tz || Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
     return Utilities.formatDate(val, tz, 'yyyy-MM-dd');
   }
+  if (typeof val === 'number' && !isNaN(val)) {
+    try {
+      var d = new Date(val);
+      if (!isNaN(d.getTime())) {
+        tz = tz || Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+        return Utilities.formatDate(d, tz, 'yyyy-MM-dd');
+      }
+    } catch (e) {}
+  }
   var s = String(val).trim();
   if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
+  var ddmmyyyy = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+  if (ddmmyyyy) return ddmmyyyy[3] + '-' + ('0' + ddmmyyyy[2]).slice(-2) + '-' + ('0' + ddmmyyyy[1]).slice(-2);
   return s;
 }
 
