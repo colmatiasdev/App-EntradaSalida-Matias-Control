@@ -110,6 +110,7 @@ function doPost(e) {
       case 'resumenOperativoLeer':       return resumenOperativoLeer(params);
       case 'componenteComboLeer':        return componenteComboLeer(params);
       case 'operacionesGralAlta':        return operacionesGralAlta(params);
+      case 'cierreOperacionesDiaLeer':   return cierreOperacionesDiaLeer(params);
       default:
         return respuestaJson({ ok: false, error: 'Acción no reconocida: ' + accion });
     }
@@ -842,6 +843,72 @@ function componenteComboLeer(params) {
     filas.push(obj);
   }
   return respuestaJson({ ok: true, datos: filas });
+}
+
+// --- CIERRE OPERACIONES DÍA (Compras Panadería + Ventas Market + Gastos Salida por fecha) ---
+
+var NOMBRES_HOJAS_MES = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+
+function normalizarFechaOperativa(val, tz) {
+  if (val === undefined || val === null || val === '') return '';
+  if (val instanceof Date) {
+    tz = tz || Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+    return Utilities.formatDate(val, tz, 'yyyy-MM-dd');
+  }
+  var s = String(val).trim();
+  if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.substring(0, 10);
+  return s;
+}
+
+function leerHojaYFiltrarPorFecha(ss, nombreHoja, columnas, fechaYyyyMmDd) {
+  var sheet = ss.getSheetByName(nombreHoja);
+  if (!sheet) return [];
+  var datos = sheet.getDataRange().getValues();
+  if (datos.length < 2) return [];
+  var headers = datos[0];
+  var colFecha = headers.indexOf('FECHA_OPERATIVA');
+  if (colFecha === -1) return [];
+  var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+  var filas = [];
+  for (var i = 1; i < datos.length; i++) {
+    var fechaVal = datos[i][colFecha];
+    var fechaStr = normalizarFechaOperativa(fechaVal, tz);
+    if (fechaStr !== fechaYyyyMmDd) continue;
+    var obj = {};
+    for (var c = 0; c < headers.length; c++) {
+      var v = c < datos[i].length ? datos[i][c] : '';
+      if (v instanceof Date && headers[c] === 'HORA') v = Utilities.formatDate(v, tz, 'HH:mm');
+      else if (v instanceof Date && headers[c] === 'FECHA_OPERATIVA') v = Utilities.formatDate(v, tz, 'yyyy-MM-dd');
+      obj[headers[c]] = (v !== undefined && v !== null) ? v : '';
+    }
+    filas.push(obj);
+  }
+  return filas;
+}
+
+function cierreOperacionesDiaLeer(params) {
+  var fechaParam = params.fecha || params.fechaOperativa || '';
+  if (!fechaParam) return respuestaJson({ ok: false, error: 'Falta fecha (YYYY-MM-DD).' });
+  var fechaStr = normalizarFechaOperativa(fechaParam);
+  if (fechaStr.length !== 10) return respuestaJson({ ok: false, error: 'Fecha inválida. Usar YYYY-MM-DD.' });
+  var partes = fechaStr.split('-');
+  var anio = parseInt(partes[0], 10);
+  var mes = parseInt(partes[1], 10);
+  if (isNaN(mes) || mes < 1 || mes > 12) return respuestaJson({ ok: false, error: 'Mes inválido.' });
+  var nombreHojaMes = NOMBRES_HOJAS_MES[mes - 1];
+  var ss = getSS();
+  var comprasPanaderia = leerHojaYFiltrarPorFecha(ss, nombreHojaMes, TABLAS[nombreHojaMes] ? TABLAS[nombreHojaMes].columns : COLUMNAS_VENTAS, fechaStr);
+  var defMarket = TABLAS.VENTAS_MARKET;
+  var ventasMarket = leerHojaYFiltrarPorFecha(ss, defMarket.sheet, defMarket.columns, fechaStr);
+  var defOpGral = TABLAS.OPERACIONES_GENERALES;
+  var gastosSalida = leerHojaYFiltrarPorFecha(ss, defOpGral.sheet, defOpGral.columns, fechaStr);
+  return respuestaJson({
+    ok: true,
+    fecha: fechaStr,
+    comprasPanaderia: comprasPanaderia,
+    ventasMarket: ventasMarket,
+    gastosSalida: gastosSalida
+  });
 }
 
 function respuestaJson(obj) {

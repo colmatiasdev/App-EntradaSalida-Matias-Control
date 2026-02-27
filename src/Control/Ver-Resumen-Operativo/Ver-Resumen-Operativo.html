@@ -3,84 +3,88 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0d1f5c">
-  <title>Ver Resumen Operativo — 2H Market</title>
+  <meta name="theme-color" content="#f5f7ff">
+  <title>Resumen Operativo — 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../Header/header.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="Ver-Resumen-Operativo.css">
 </head>
-<body class="ver-resumen-operativo-page">
+<body>
 
+  <!-- ═══ HEADER ═══ -->
   <header class="header">
     <div class="header__stripe"></div>
     <div class="header__inner">
       <a href="../../../index.html" class="logo">
-        <div class="logo__ring">
-          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
-        </div>
-        <div class="logo__texto">
-          <span class="logo__nombre"><span>2H</span> Market</span>
-          <span class="logo__sub">Control de <strong>MATIAS</strong></span>
+        <div class="logo__mark">2H</div>
+        <div class="logo__info">
+          <span class="logo__name">2H Market</span>
+          <span class="logo__sub">Control de <b>MATIAS</b></span>
         </div>
       </a>
-      <div class="header__sep"></div>
-      <span class="header__page" aria-current="page">📋 Ver Resumen Operativo</span>
-      <nav class="nav">
-        <ul class="nav__menu" id="main-nav">
-          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
-        </ul>
-      </nav>
+      <div class="header__divider"></div>
+      <span class="header__badge">📋 Resumen Operativo</span>
     </div>
   </header>
 
+  <!-- ═══ MAIN ═══ -->
   <main class="main">
+
+    <!-- Hero -->
     <section class="hero">
-      <div class="hero__eyebrow">📋 Control</div>
-      <h1 class="hero__title">Ver Resumen Operativo</h1>
-      <p class="hero__text">Consultá el resumen operativo del negocio.</p>
+      <div class="hero__label">Control diario</div>
+      <h1 class="hero__title">RESUMEN<br><span>OPERATIVO</span></h1>
+      <p class="hero__sub">Movimientos agrupados por fecha operativa.</p>
     </section>
 
-    <section class="hub-section">
+    <!-- Demo notice (oculto cuando hay datos reales) -->
+    <div class="demo-notice" id="demo-notice" hidden>
+      <span class="demo-notice__icon">ℹ️</span>
+      <span><strong>Demo standalone</strong> — datos de ejemplo precargados. Conectá tu <code>APP_SCRIPT_URL</code> para datos reales.</span>
+    </div>
+
+    <!-- Week card -->
+    <div class="week-card">
       <div class="week-header">
-        <div class="week-nav">
-          <button type="button" class="week-nav__btn" id="btn-prev" aria-label="Semana anterior">‹</button>
-          <button type="button" class="week-nav__btn" id="btn-next" aria-label="Semana siguiente">›</button>
-        </div>
-        <div class="week-range">
-          <span class="week-range__text" id="range-text">—</span>
-          <span class="week-meta" id="week-meta">—</span>
-          <span class="badge-actual" id="badge-actual" hidden>ACTUAL</span>
-        </div>
-        <div class="week-actions">
-          <button type="button" class="btn-actual" id="btn-actual" aria-label="Ir a semana actual">📌 Semana actual</button>
-          <span class="status-indicator" id="status-indicator">
-            <span class="status-dot"></span>
-            <span id="status-text">Semana cargada</span>
-          </span>
-        </div>
-      </div>
-
-      <p class="mensaje" id="mensaje">Cargando resumen…</p>
-
-      <div class="cards-wrap" aria-label="Días de la semana">
-        <div class="cards" id="cards"></div>
-      </div>
-
-      <div class="detalle" id="detalle">
-        <h3 class="detalle__titulo" id="detalle-titulo">Detalle del día</h3>
-        <p class="detalle__vacio" id="detalle-vacio">Seleccioná un día en la semana para ver los datos filtrados por fecha operativa.</p>
-        <div class="detalle-tabla-wrap" id="detalle-wrap" hidden>
-          <div class="detalle-scroll">
-            <table class="detalle-tabla">
-              <thead id="detalle-thead"></thead>
-              <tbody id="detalle-tbody"></tbody>
-              <tfoot id="detalle-tfoot"></tfoot>
-            </table>
+        <button class="nav-btn" id="btn-prev" type="button" aria-label="Semana anterior">‹</button>
+        <div class="week-info">
+          <div class="week-range" id="range-text">—</div>
+          <div class="week-meta">
+            <span class="week-num" id="week-num">—</span>
+            <span class="badge-now" id="badge-now" hidden>ACTUAL</span>
           </div>
         </div>
+        <button class="btn-now" id="btn-actual" type="button">📌 Hoy</button>
+        <button class="nav-btn" id="btn-next" type="button" aria-label="Semana siguiente">›</button>
       </div>
-    </section>
+
+      <div class="status-row">
+        <p class="status-msg" id="status-msg">Cargando…</p>
+        <span class="status-pill" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Cargado</span>
+        </span>
+      </div>
+
+      <div class="days-scroll" aria-label="Días de la semana">
+        <div class="days-grid" id="days-grid"></div>
+      </div>
+    </div>
+
+    <!-- Detail card -->
+    <div class="detail-card" id="detail-card">
+      <div class="detail-header">
+        <h2 class="detail-title" id="detail-title">DETALLE</h2>
+        <span class="detail-total-pill" id="detail-total-pill" hidden></span>
+      </div>
+      <div class="detail-empty" id="detail-empty">
+        <span class="detail-empty__icon">📅</span>
+        Seleccioná un día para ver los movimientos.
+      </div>
+      <div id="detail-body"></div>
+      <div class="detail-footer" id="detail-footer" hidden></div>
+    </div>
+
   </main>
 
   <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
@@ -91,17 +95,5 @@
   <script src="../../../main.js"></script>
   <script src="../../Footer/footer.js"></script>
   <script src="Ver-Resumen-Operativo.js"></script>
-  <script>
-    (function () {
-      var path = window.location.pathname.toLowerCase();
-      document.querySelectorAll(".nav__link").forEach(function (l) {
-        l.classList.remove("nav__link--active");
-        var href = (l.getAttribute("href") || "").toLowerCase();
-        var key = href.split("/").pop().replace(".html", "");
-        if (key === "index" && (path.endsWith("index.html") || path.endsWith("/") || path === "")) l.classList.add("nav__link--active");
-        else if (key && key !== "index" && path.indexOf(key) !== -1) l.classList.add("nav__link--active");
-      });
-    })();
-  </script>
 </body>
 </html>

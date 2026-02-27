@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7ff">
+  <title>Cierre operaciones del día — 2H Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="cierre-operaciones-dia.css">
+</head>
+<body>
+
+  <header class="header">
+    <div class="header__stripe"></div>
+    <div class="header__inner">
+      <a href="../../../index.html" class="logo">
+        <div class="logo__mark">2H</div>
+        <div class="logo__info">
+          <span class="logo__name">2H Market</span>
+          <span class="logo__sub">Control de <b>MATIAS</b></span>
+        </div>
+      </a>
+      <div class="header__divider"></div>
+      <span class="header__badge">📋 Cierre del día</span>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <div class="hero__label">Cierre diario</div>
+      <h1 class="hero__title">CIERRE<br><span>OPERACIONES</span></h1>
+      <p class="hero__sub">Resumen de compras panadería, ventas market y gastos de salida por fecha operativa.</p>
+    </section>
+
+    <div class="day-card">
+      <div class="day-header">
+        <button class="nav-btn" id="btn-prev" type="button" aria-label="Día anterior">‹</button>
+        <div class="day-info">
+          <div class="day-label" id="day-label">—</div>
+          <div class="day-meta">
+            <span class="day-date" id="day-date">—</span>
+            <span class="badge-hoy" id="badge-hoy" hidden>HOY</span>
+          </div>
+        </div>
+        <button class="btn-hoy" id="btn-hoy" type="button">📌 Hoy</button>
+        <button class="nav-btn" id="btn-next" type="button" aria-label="Día siguiente">›</button>
+      </div>
+      <div class="status-row">
+        <p class="status-msg" id="status-msg">Seleccioná un día.</p>
+        <span class="status-pill" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Listo</span>
+        </span>
+      </div>
+    </div>
+
+    <div class="resumen-wrap" id="resumen-wrap">
+      <section class="bloque bloque-compras" id="bloque-compras">
+        <h2 class="bloque__titulo">Compras Panadería <span class="bloque__mes" id="mes-compras"></span></h2>
+        <p class="bloque__vacio" id="compras-vacio">Sin registros para este día.</p>
+        <div class="bloque__tabla-wrap" id="compras-wrap" hidden>
+          <div class="bloque__scroll">
+            <table class="bloque-tabla" id="tabla-compras">
+              <thead id="compras-thead"></thead>
+              <tbody id="compras-tbody"></tbody>
+              <tfoot id="compras-tfoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bloque bloque-ventas" id="bloque-ventas">
+        <h2 class="bloque__titulo">Ventas Market</h2>
+        <p class="bloque__vacio" id="ventas-vacio">Sin registros para este día.</p>
+        <div class="bloque__tabla-wrap" id="ventas-wrap" hidden>
+          <div class="bloque__scroll">
+            <table class="bloque-tabla" id="tabla-ventas">
+              <thead id="ventas-thead"></thead>
+              <tbody id="ventas-tbody"></tbody>
+              <tfoot id="ventas-tfoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bloque bloque-gastos" id="bloque-gastos">
+        <h2 class="bloque__titulo">Gastos de Salida</h2>
+        <p class="bloque__vacio" id="gastos-vacio">Sin registros para este día.</p>
+        <div class="bloque__tabla-wrap" id="gastos-wrap" hidden>
+          <div class="bloque__scroll">
+            <table class="bloque-tabla" id="tabla-gastos">
+              <thead id="gastos-thead"></thead>
+              <tbody id="gastos-tbody"></tbody>
+              <tfoot id="gastos-tfoot"></tfoot>
+            </table>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+
+  <script src="../../Config/config.js"></script>
+  <script src="../../Config/tables.js"></script>
+  <script src="../../Config/negocio.js"></script>
+  <script src="../../../main.js"></script>
+  <script src="../../Footer/footer.js"></script>
+  <script src="cierre-operaciones-dia.js"></script>
+</body>
+</html>

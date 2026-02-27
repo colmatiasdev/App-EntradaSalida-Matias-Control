@@ -35,19 +35,15 @@
     return null;
   }
 
-  /** Convierte #hex en un tono muy claro para fondo (mezcla con blanco). */
-  function colorFondoSuave(hex) {
-    if (!hex || hex.indexOf('#') !== 0) return '#f5f5f5';
+  /** Convierte #hex en rgba(r,g,b,a). */
+  function rgba(hex, a) {
+    if (!hex || hex.indexOf('#') !== 0) return 'rgba(0,0,0,' + a + ')';
     var h = hex.slice(1);
     if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
     var r = parseInt(h.slice(0, 2), 16);
     var g = parseInt(h.slice(2, 4), 16);
     var b = parseInt(h.slice(4, 6), 16);
-    var mix = 0.92;
-    r = Math.round(r * (1 - mix) + 255 * mix);
-    g = Math.round(g * (1 - mix) + 255 * mix);
-    b = Math.round(b * (1 - mix) + 255 * mix);
-    return '#' + (r < 16 ? '0' : '') + r.toString(16) + (g < 16 ? '0' : '') + g.toString(16) + (b < 16 ? '0' : '') + b.toString(16);
+    return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
   }
 
   function normalizarFila(obj, headers) {
@@ -193,22 +189,24 @@
   }
 
   function mostrarMensaje(texto, esError) {
-    var el = document.getElementById('mensaje');
+    var el = document.getElementById('status-msg');
     if (el) {
       el.textContent = texto;
-      el.style.color = esError ? '#c62828' : '';
+      el.classList.toggle('error', !!esError);
     }
   }
 
   function setCargando(cargando) {
-    var el = document.getElementById('status-indicator');
+    var el = document.getElementById('status-pill');
+    var txt = document.getElementById('status-text');
     if (el) el.classList.toggle('loading', cargando);
+    if (txt) txt.textContent = cargando ? 'Cargando…' : 'Cargado';
   }
 
   function pintarCabeceraSemana(lunes) {
     var rangeEl = document.getElementById('range-text');
-    var metaEl = document.getElementById('week-meta');
-    var badgeEl = document.getElementById('badge-actual');
+    var metaEl = document.getElementById('week-num');
+    var badgeEl = document.getElementById('badge-now');
     if (!rangeEl || !metaEl) return;
     var hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -220,56 +218,59 @@
   }
 
   function pintarTarjetas(lunes, porFecha) {
-    var container = document.getElementById('cards');
-    if (!container) return;
+    var grid = document.getElementById('days-grid');
+    if (!grid) return;
     var siete = getSieteDias(lunes);
-    container.innerHTML = '';
+    grid.innerHTML = '';
     siete.forEach(function (dia) {
       var info = porFecha[dia.key] || { total: 0, cantidad: 0 };
-      var card = document.createElement('div');
+      var tile = document.createElement('div');
       var esSelected = dia.key === selectedDayKey;
-      card.className = 'day-card' +
-        (dia.esHoy ? ' hoy' : '') +
+      tile.className = 'day-tile' +
+        (dia.esHoy ? ' is-today' : '') +
         (esSelected ? ' selected' : '');
-      card.setAttribute('data-fecha', dia.key);
-      var resumen = info.cantidad === 0 ? 'Sin datos' : (info.cantidad === 1 ? '1 operación' : info.cantidad + ' operaciones');
-      var importeStr = info.cantidad === 0 ? '—' : formatImporte(info.total);
-      card.innerHTML =
-        (dia.esHoy ? '<span class="hoy-badge">HOY</span>' : '') +
-        '<span class="card-dia">' + dia.labelDia + '</span>' +
-        '<span class="card-num">' + dia.labelNum + '</span>' +
-        '<span class="card-resumen">' + resumen + '</span>' +
-        '<span class="card-importe">' + importeStr + '</span>';
-      card.addEventListener('click', function () {
-        selectedDayKey = dia.key;
-        renderWeek();
-        pintarDetalleDia(selectedDayKey);
-        var det = document.getElementById('detalle');
-        if (det) setTimeout(function () { det.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
-      });
-      container.appendChild(card);
+      tile.setAttribute('data-key', dia.key);
+      var ops = info.cantidad === 0 ? 'Sin datos' : (info.cantidad === 1 ? '1 op' : info.cantidad + ' ops');
+      var amtClass = info.cantidad === 0 ? ' empty' : '';
+      var amt = info.cantidad === 0 ? '—' : formatImporte(info.total);
+      tile.innerHTML =
+        (dia.esHoy ? '<span class="today-tag">HOY</span>' : '') +
+        '<span class="tile-dow">' + escapeHtml(dia.labelDia) + '</span>' +
+        '<span class="tile-day">' + dia.labelNum + '</span>' +
+        '<span class="tile-ops">' + escapeHtml(ops) + '</span>' +
+        '<span class="tile-amount' + amtClass + '">' + escapeHtml(amt) + '</span>';
+      (function (el, key) {
+        el.addEventListener('click', function () {
+          selectedDayKey = key;
+          renderWeek();
+          pintarDetalleDia(selectedDayKey);
+          var dc = document.getElementById('detail-card');
+          if (dc) setTimeout(function () { dc.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 80);
+        });
+      })(tile, dia.key);
+      grid.appendChild(tile);
     });
   }
 
-  /** Pinta la tabla de detalle del día: filas de RESUMEN-OPERATIVO filtradas por FECHA_OPERATIVA. */
+  /** Pinta el detalle del día con estructura template: group-block, op-row, detail-footer (solo Diferencia). */
   function pintarDetalleDia(fechaKeyVal) {
-    var tituloEl = document.getElementById('detalle-titulo');
-    var vacioEl = document.getElementById('detalle-vacio');
-    var wrapEl = document.getElementById('detalle-wrap');
-    var theadEl = document.getElementById('detalle-thead');
-    var tbodyEl = document.getElementById('detalle-tbody');
-    var tfootEl = document.getElementById('detalle-tfoot');
-    if (!tituloEl || !vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
+    var titleEl = document.getElementById('detail-title');
+    var pillEl = document.getElementById('detail-total-pill');
+    var emptyEl = document.getElementById('detail-empty');
+    var bodyEl = document.getElementById('detail-body');
+    var footerEl = document.getElementById('detail-footer');
+    if (!titleEl || !emptyEl || !bodyEl || !footerEl) return;
 
     var key = (fechaKeyVal !== undefined && fechaKeyVal !== null) ? String(fechaKeyVal).trim() : '';
-    if (key && /^\d{4}-\d{4}$/.test(key)) {
-      key = key.substring(0, 6) + '-' + key.substring(6);
-    }
+    if (key && /^\d{4}-\d{4}$/.test(key)) key = key.substring(0, 6) + '-' + key.substring(6);
+
     if (!key) {
-      tituloEl.textContent = 'Detalle del día';
-      vacioEl.hidden = false;
-      vacioEl.textContent = 'Seleccioná un día en la semana para ver los datos filtrados por fecha operativa.';
-      wrapEl.hidden = true;
+      titleEl.textContent = 'DETALLE';
+      emptyEl.hidden = false;
+      emptyEl.innerHTML = '<span class="detail-empty__icon">📅</span>Seleccioná un día para ver los movimientos.';
+      bodyEl.innerHTML = '';
+      footerEl.hidden = true;
+      if (pillEl) pillEl.hidden = true;
       return;
     }
 
@@ -281,80 +282,64 @@
     });
 
     var d = new Date(key + 'T12:00:00');
-    var labelDia = isNaN(d.getTime()) ? key : d.getDate() + ' ' + MESES_ABREV[d.getMonth()] + ' ' + d.getFullYear();
-    tituloEl.textContent = 'Detalle del día — ' + labelDia;
+    var labelDia = isNaN(d.getTime()) ? key : DIAS_ABREV[(d.getDay() + 6) % 7] + ' ' + d.getDate() + ' ' + MESES_ABREV[d.getMonth()];
+    titleEl.textContent = labelDia.toUpperCase();
 
     if (filas.length === 0) {
-      vacioEl.hidden = false;
-      vacioEl.textContent = 'Sin registros para esta fecha.';
-      wrapEl.hidden = true;
+      emptyEl.hidden = false;
+      emptyEl.innerHTML = '<span class="detail-empty__icon">🗓️</span>Sin registros para esta fecha.';
+      bodyEl.innerHTML = '';
+      footerEl.hidden = true;
+      if (pillEl) pillEl.hidden = true;
       return;
     }
 
-    vacioEl.hidden = true;
-    wrapEl.hidden = false;
+    emptyEl.hidden = true;
+    if (pillEl) { pillEl.hidden = false; pillEl.textContent = formatImporte(totalImporte); }
 
     var grupos = [];
     var mapCorresponde = {};
     filas.forEach(function (r) {
-      var clave = String(r['CORRESPONDE-A'] !== undefined && r['CORRESPONDE-A'] !== null ? r['CORRESPONDE-A'] : '').trim() || '—';
-      if (!mapCorresponde[clave]) {
-        mapCorresponde[clave] = [];
-        grupos.push(clave);
-      }
-      mapCorresponde[clave].push(r);
+      var ca = String(r['CORRESPONDE-A'] != null ? r['CORRESPONDE-A'] : '').trim() || '—';
+      if (!mapCorresponde[ca]) { mapCorresponde[ca] = []; grupos.push(ca); }
+      mapCorresponde[ca].push(r);
     });
 
     var subtotalesPorGrupo = {};
-    theadEl.innerHTML = '<tr><th>HORA</th><th>TIPO-OPERACION</th><th>CATEGORIA</th><th class="th-num">IMPORTE</th></tr>';
-    tbodyEl.innerHTML = '';
-    grupos.forEach(function (correspondeA) {
-      var grupoFilas = mapCorresponde[correspondeA];
-      var subtotalGrupo = 0;
-      grupoFilas.forEach(function (r) {
-        var n = parseFloat(r.IMPORTE);
-        if (!isNaN(n)) subtotalGrupo += n;
+    var html = '';
+    grupos.forEach(function (ca) {
+      var rows = mapCorresponde[ca];
+      var sub = 0;
+      rows.forEach(function (r) { var n = parseFloat(r.IMPORTE); if (!isNaN(n)) sub += n; });
+      subtotalesPorGrupo[ca] = sub;
+      var c = getColorForCorrespondeA(ca) || '#2563eb';
+      var bgHeader = rgba(c, 0.05);
+      var pillBg = rgba(c, 0.12);
+      html += '<div class="group-block">';
+      html += '<div class="group-header" style="background:' + bgHeader + ';">';
+      html += '<span class="group-name"><span class="group-dot" style="background:' + c + ';"></span><span style="color:' + c + ';">' + escapeHtml(ca) + '</span></span>';
+      html += '<span class="group-subtotal" style="background:' + pillBg + ';color:' + c + ';">' + formatImporte(sub) + '</span></div>';
+      rows.forEach(function (r) {
+        html += '<div class="op-row">';
+        html += '<span class="op-time">' + escapeHtml(formatHora(r.HORA)) + '</span>';
+        html += '<div class="op-info"><div class="op-type">' + escapeHtml(r['TIPO-OPERACION']) + '</div><div class="op-cat">' + escapeHtml(r.CATEGORIA) + '</div></div>';
+        html += '<span class="op-amount">' + formatImporte(parseFloat(r.IMPORTE) || 0) + '</span></div>';
       });
-      subtotalesPorGrupo[correspondeA] = subtotalGrupo;
-      var userColor = getColorForCorrespondeA(correspondeA);
-      var groupStyle = '';
-      var subtotalStyle = '';
-      if (userColor) {
-        var bgSuave = colorFondoSuave(userColor);
-        groupStyle = ' background:' + bgSuave + '; color:' + userColor + ';';
-        subtotalStyle = ' background:' + bgSuave + '; color:' + userColor + ';';
-      }
-      var trHeader = document.createElement('tr');
-      trHeader.className = 'grupo';
-      trHeader.innerHTML = '<td colspan="4" class="grupo-titulo"' + (groupStyle ? ' style="' + groupStyle + '"' : '') + '>' + escapeHtml(correspondeA) + '</td>';
-      tbodyEl.appendChild(trHeader);
-      grupoFilas.forEach(function (r) {
-        var tr = document.createElement('tr');
-        tr.innerHTML =
-          '<td>' + escapeHtml(formatHora(r.HORA)) + '</td>' +
-          '<td>' + escapeHtml(r['TIPO-OPERACION']) + '</td>' +
-          '<td>' + escapeHtml(r.CATEGORIA) + '</td>' +
-          '<td class="td-num">' + escapeHtml(formatImporte(parseFloat(r.IMPORTE) || 0)) + '</td>';
-        tbodyEl.appendChild(tr);
-      });
-      var trSubtotal = document.createElement('tr');
-      trSubtotal.className = 'subtotal';
-      trSubtotal.innerHTML =
-        '<td colspan="3" class="subtotal-label"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>Subtotal ' + escapeHtml(correspondeA) + '</td>' +
-        '<td class="td-num subtotal-valor"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>' + formatImporte(subtotalGrupo) + '</td>';
-      tbodyEl.appendChild(trSubtotal);
+      html += '</div>';
     });
+    bodyEl.innerHTML = html;
 
-    var tfootRows = '';
+    var fHtml = '';
     if (grupos.length >= 2) {
       var nombreA = grupos[0];
       var nombreB = grupos[1];
       var diferencia = (subtotalesPorGrupo[nombreB] || 0) - (subtotalesPorGrupo[nombreA] || 0);
-      var claseDiferencia = diferencia >= 0 ? 'dif-positivo' : 'dif-negativo';
-      tfootRows += '<tr class="diferencia"><td colspan="3" class="dif-label">Diferencia ' + escapeHtml(nombreB) + ' − ' + escapeHtml(nombreA) + '</td><td class="td-num ' + claseDiferencia + '">' + formatImporte(diferencia) + '</td></tr>';
+      fHtml += '<div class="footer-row">';
+      fHtml += '<span class="footer-row__label">Diferencia ' + escapeHtml(nombreB) + ' − ' + escapeHtml(nombreA) + '</span>';
+      fHtml += '<span class="footer-row__value ' + (diferencia >= 0 ? 'val-pos' : 'val-neg') + '">' + formatImporte(diferencia) + '</span></div>';
     }
-    tfootRows += '<tr><td colspan="3">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
-    tfootEl.innerHTML = tfootRows;
+    footerEl.innerHTML = fHtml;
+    footerEl.hidden = fHtml === '';
   }
 
   function escapeHtml(s) {
@@ -373,6 +358,8 @@
   }
 
   function cargarDatos() {
+    var demoEl = document.getElementById('demo-notice');
+    if (demoEl) demoEl.hidden = !!APP_SCRIPT_URL;
     if (!APP_SCRIPT_URL) {
       mostrarMensaje('No está configurada APP_SCRIPT_URL en config.js.', true);
       setCargando(false);
