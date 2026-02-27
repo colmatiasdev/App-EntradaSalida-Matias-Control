@@ -432,6 +432,47 @@ body.ver-resumen-operativo-page::before {
   border-bottom: 1px solid var(--borde);
 }
 
+.ver-resumen-operativo-detalle-tabla tbody tr.ver-resumen-operativo-detalle-grupo:hover {
+  background: transparent;
+}
+
+.ver-resumen-operativo-detalle-grupo__titulo {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--azul-700);
+  background: var(--azul-50);
+  border-bottom: 1px solid var(--azul-200);
+  padding: 0.5rem 0.75rem !important;
+}
+
+.ver-resumen-operativo-detalle-tabla tbody tr.ver-resumen-operativo-detalle-grupo + tr td {
+  border-top: none;
+}
+
+.ver-resumen-operativo-detalle-tabla tbody tr.ver-resumen-operativo-detalle-subtotal:hover {
+  background: transparent;
+}
+
+.ver-resumen-operativo-detalle-tabla tbody tr.ver-resumen-operativo-detalle-subtotal td {
+  border-top: 2px solid var(--azul-200);
+  border-bottom: 1px solid var(--azul-200);
+}
+
+.ver-resumen-operativo-detalle-subtotal__label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--azul-700);
+  background: var(--azul-50);
+  padding: 0.55rem 0.75rem !important;
+}
+
+.ver-resumen-operativo-detalle-subtotal__valor {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--azul-700);
+  background: var(--azul-50);
+}
+
 .ver-resumen-operativo-detalle-tabla tbody tr:hover {
   background: var(--azul-50);
 }
@@ -442,10 +483,12 @@ body.ver-resumen-operativo-page::before {
 }
 
 .ver-resumen-operativo-detalle-tabla tfoot td {
-  padding: 0.7rem 0.75rem;
-  font-weight: 700;
-  background: rgba(21, 101, 192, 0.06);
-  border-top: 2px solid var(--azul-200);
+  padding: 0.75rem 0.75rem;
+  font-weight: 800;
+  font-size: 0.95rem;
+  background: #f0f2f5;
+  color: var(--texto);
+  border-top: 2px solid #d0d4dc;
 }
 
 .ver-resumen-operativo-detalle-tabla tfoot .td-total {

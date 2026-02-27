@@ -21,6 +21,35 @@
   var selectedDayKey = ''; // Fecha operativa seleccionada (YYYY-MM-DD) para el detalle
   var cargaInicial = true;
 
+  /** Devuelve el color del usuario (APP_CONFIG.USUARIO_ETIQUETAS) para CORRESPONDE-A, o null si no hay. */
+  function getColorForCorrespondeA(correspondeA) {
+    var etiquetas = APP_CONFIG && APP_CONFIG.USUARIO_ETIQUETAS;
+    if (!etiquetas || !correspondeA) return null;
+    var key = 'USR-' + String(correspondeA).toUpperCase().trim().replace(/\s+/g, '-');
+    var info = etiquetas[key];
+    if (info && info.color) return info.color;
+    var nameLower = String(correspondeA).toLowerCase().trim();
+    for (var k in etiquetas) {
+      if (etiquetas[k].etiqueta && etiquetas[k].etiqueta.toLowerCase() === nameLower && etiquetas[k].color) return etiquetas[k].color;
+    }
+    return null;
+  }
+
+  /** Convierte #hex en un tono muy claro para fondo (mezcla con blanco). */
+  function colorFondoSuave(hex) {
+    if (!hex || hex.indexOf('#') !== 0) return '#f5f5f5';
+    var h = hex.slice(1);
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    var r = parseInt(h.slice(0, 2), 16);
+    var g = parseInt(h.slice(2, 4), 16);
+    var b = parseInt(h.slice(4, 6), 16);
+    var mix = 0.92;
+    r = Math.round(r * (1 - mix) + 255 * mix);
+    g = Math.round(g * (1 - mix) + 255 * mix);
+    b = Math.round(b * (1 - mix) + 255 * mix);
+    return '#' + (r < 16 ? '0' : '') + r.toString(16) + (g < 16 ? '0' : '') + g.toString(16) + (b < 16 ? '0' : '') + b.toString(16);
+  }
+
   function normalizarFila(obj, headers) {
     var out = {};
     var keys = Object.keys(obj || {});
@@ -263,19 +292,55 @@
     vacioEl.hidden = true;
     wrapEl.hidden = false;
 
-    theadEl.innerHTML = '<tr><th>HORA</th><th>CORRESPONDE-A</th><th>TIPO-OPERACION</th><th>CATEGORIA</th><th class="th-num">IMPORTE</th></tr>';
-    tbodyEl.innerHTML = '';
+    var grupos = [];
+    var mapCorresponde = {};
     filas.forEach(function (r) {
-      var tr = document.createElement('tr');
-      tr.innerHTML =
-        '<td>' + escapeHtml(formatHora(r.HORA)) + '</td>' +
-        '<td>' + escapeHtml(r['CORRESPONDE-A']) + '</td>' +
-        '<td>' + escapeHtml(r['TIPO-OPERACION']) + '</td>' +
-        '<td>' + escapeHtml(r.CATEGORIA) + '</td>' +
-        '<td class="td-num">' + escapeHtml(formatImporte(parseFloat(r.IMPORTE) || 0)) + '</td>';
-      tbodyEl.appendChild(tr);
+      var clave = String(r['CORRESPONDE-A'] !== undefined && r['CORRESPONDE-A'] !== null ? r['CORRESPONDE-A'] : '').trim() || '—';
+      if (!mapCorresponde[clave]) {
+        mapCorresponde[clave] = [];
+        grupos.push(clave);
+      }
+      mapCorresponde[clave].push(r);
     });
-    tfootEl.innerHTML = '<tr><td colspan="4">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
+
+    theadEl.innerHTML = '<tr><th>HORA</th><th>TIPO-OPERACION</th><th>CATEGORIA</th><th class="th-num">IMPORTE</th></tr>';
+    tbodyEl.innerHTML = '';
+    grupos.forEach(function (correspondeA) {
+      var grupoFilas = mapCorresponde[correspondeA];
+      var subtotalGrupo = 0;
+      grupoFilas.forEach(function (r) {
+        var n = parseFloat(r.IMPORTE);
+        if (!isNaN(n)) subtotalGrupo += n;
+      });
+      var userColor = getColorForCorrespondeA(correspondeA);
+      var groupStyle = '';
+      var subtotalStyle = '';
+      if (userColor) {
+        var bgSuave = colorFondoSuave(userColor);
+        groupStyle = ' background:' + bgSuave + '; color:' + userColor + ';';
+        subtotalStyle = ' background:' + bgSuave + '; color:' + userColor + ';';
+      }
+      var trHeader = document.createElement('tr');
+      trHeader.className = 'ver-resumen-operativo-detalle-grupo' + (userColor ? ' ver-resumen-operativo-detalle-grupo--usuario' : '');
+      trHeader.innerHTML = '<td colspan="4" class="ver-resumen-operativo-detalle-grupo__titulo"' + (groupStyle ? ' style="' + groupStyle + '"' : '') + '>' + escapeHtml(correspondeA) + '</td>';
+      tbodyEl.appendChild(trHeader);
+      grupoFilas.forEach(function (r) {
+        var tr = document.createElement('tr');
+        tr.innerHTML =
+          '<td>' + escapeHtml(formatHora(r.HORA)) + '</td>' +
+          '<td>' + escapeHtml(r['TIPO-OPERACION']) + '</td>' +
+          '<td>' + escapeHtml(r.CATEGORIA) + '</td>' +
+          '<td class="td-num">' + escapeHtml(formatImporte(parseFloat(r.IMPORTE) || 0)) + '</td>';
+        tbodyEl.appendChild(tr);
+      });
+      var trSubtotal = document.createElement('tr');
+      trSubtotal.className = 'ver-resumen-operativo-detalle-subtotal' + (userColor ? ' ver-resumen-operativo-detalle-subtotal--usuario' : '');
+      trSubtotal.innerHTML =
+        '<td colspan="3" class="ver-resumen-operativo-detalle-subtotal__label"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>Subtotal ' + escapeHtml(correspondeA) + '</td>' +
+        '<td class="td-num ver-resumen-operativo-detalle-subtotal__valor"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>' + formatImporte(subtotalGrupo) + '</td>';
+      tbodyEl.appendChild(trSubtotal);
+    });
+    tfootEl.innerHTML = '<tr><td colspan="3">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
   }
 
   function escapeHtml(s) {
