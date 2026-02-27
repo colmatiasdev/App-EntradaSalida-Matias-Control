@@ -45,6 +45,11 @@
     return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
   }
 
+  function horaActual() {
+    var d = new Date();
+    return pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
   function setDayMsg(txt) {
     var e = document.getElementById('status-day');
     if (e) e.textContent = txt;
@@ -203,14 +208,19 @@
       form.addEventListener('submit', function (ev) {
         ev.preventDefault();
         var inputFecha = document.getElementById('fecha-operativa');
-        var hora = (document.getElementById('hora') && document.getElementById('hora').value) || '';
+        var horaEl = document.getElementById('hora');
+        var hora = (horaEl && horaEl.value && String(horaEl.value).trim()) ? String(horaEl.value).trim() : horaActual();
         var turno = (document.getElementById('turno') && document.getElementById('turno').value) || '';
         var tipoOperacion = (document.getElementById('tipo-operacion') && document.getElementById('tipo-operacion').value) || '';
         var categoria = (document.getElementById('categoria') && document.getElementById('categoria').value) || '';
         var cantidadEl = document.getElementById('cantidad-operaciones');
         var importeEl = document.getElementById('importe');
-        var cantidadOperaciones = cantidadEl ? (parseInt(cantidadEl.value, 10) || 0) : 0;
-        var importe = importeEl ? (parseFloat(importeEl.value) || 0) : 0;
+        var valorCantidad = cantidadEl ? parseInt(cantidadEl.value, 10) : NaN;
+        var valorImporte = importeEl ? parseFloat(String(importeEl.value).replace(',', '.')) : NaN;
+        if (isNaN(valorCantidad)) valorCantidad = 1;
+        if (isNaN(valorImporte)) valorImporte = 0;
+        var cantidadOperaciones = Math.max(1, Math.min(9999, Math.floor(valorCantidad)));
+        var importe = Math.max(0, valorImporte);
 
         var fechaOperativa = (inputFecha && inputFecha.value) || fechaActual;
         if (!fechaOperativa) {

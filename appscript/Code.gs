@@ -853,6 +853,8 @@ function resumenVentaAlta(params) {
   }
   var idResumen = dato['ID-RESUMEN'] || params.idResumen || '';
   if (!idResumen) idResumen = siguienteIdResumenVenta(sheet, def);
+  var cantidadOperaciones = (params.cantidadOperaciones !== undefined && params.cantidadOperaciones !== null && params.cantidadOperaciones !== '') ? Number(params.cantidadOperaciones) : 0;
+  var importe = (params.importe !== undefined && params.importe !== null && params.importe !== '') ? Number(params.importe) : 0;
   var obj = {
     'ID-RESUMEN': idResumen,
     'FECHA_OPERATIVA': dato['FECHA_OPERATIVA'] !== undefined ? dato['FECHA_OPERATIVA'] : (params.fechaOperativa || ''),
@@ -860,8 +862,8 @@ function resumenVentaAlta(params) {
     'TURNO': dato['TURNO'] !== undefined ? dato['TURNO'] : (params.turno || ''),
     'TIPO-OPERACION': dato['TIPO-OPERACION'] !== undefined ? dato['TIPO-OPERACION'] : (params.tipoOperacion || ''),
     'CATEGORIA': dato['CATEGORIA'] !== undefined ? dato['CATEGORIA'] : (params.categoria || ''),
-    'CANTIDAD-OPERACIONES': dato['CANTIDAD-OPERACIONES'] !== undefined ? dato['CANTIDAD-OPERACIONES'] : (params.cantidadOperaciones !== undefined ? params.cantidadOperaciones : 0),
-    'IMPORTE': dato['IMPORTE'] !== undefined ? dato['IMPORTE'] : (params.importe !== undefined ? params.importe : 0)
+    'CANTIDAD-OPERACIONES': cantidadOperaciones,
+    'IMPORTE': importe
   };
   var fila = objetoAFila(def, obj);
   sheet.appendRow(fila);
