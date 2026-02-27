@@ -91,10 +91,13 @@
 
     theadEl.innerHTML = '<tr><th>ID</th><th>HORA</th><th>TURNO</th><th>TIPO-OPERACION</th><th>CATEGORÍA</th><th class="th-num">CANT.</th><th class="th-num">IMPORTE</th></tr>';
     tbodyEl.innerHTML = '';
-    var total = 0;
+    var totalCantidad = 0;
+    var totalImporte = 0;
     datos.forEach(function (r) {
-      var imp = parseFloat(r.IMPORTE);
-      if (!isNaN(imp)) total += imp;
+      var cant = parseInt(r['CANTIDAD-OPERACIONES'], 10) || 0;
+      var imp = parseFloat(r.IMPORTE) || 0;
+      if (!isNaN(cant)) totalCantidad += cant;
+      if (!isNaN(imp)) totalImporte += imp;
       tbodyEl.innerHTML +=
         '<tr><td>' + esc(String(r['ID-RESUMEN'] || '—')) + '</td>' +
         '<td>' + esc(String(r.HORA || '—')) + '</td>' +
@@ -102,9 +105,9 @@
         '<td>' + esc(String(r['TIPO-OPERACION'] || '')) + '</td>' +
         '<td>' + esc(String(r.CATEGORIA || '')) + '</td>' +
         '<td class="td-num">' + esc(String(r['CANTIDAD-OPERACIONES'] != null ? r['CANTIDAD-OPERACIONES'] : '')) + '</td>' +
-        '<td class="td-num">' + fi(imp || 0) + '</td></tr>';
+        '<td class="td-num">' + fi(imp) + '</td></tr>';
     });
-    tfootEl.innerHTML = '<tr><td colspan="6"><strong>Total</strong></td><td class="td-num td-total">' + fi(total) + '</td></tr>';
+    tfootEl.innerHTML = '<tr><td colspan="5"><strong>Total</strong></td><td class="td-num">' + totalCantidad + '</td><td class="td-num td-total">' + fi(totalImporte) + '</td></tr>';
   }
 
   function cargarDatos() {
