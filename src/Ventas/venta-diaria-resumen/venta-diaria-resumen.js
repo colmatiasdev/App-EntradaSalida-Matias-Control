@@ -1,6 +1,6 @@
 /**
- * Resumen venta diaria — 2H Market
- * Selector de día y listado de ventas Market para esa fecha (vía cierreOperacionesDiaLeer).
+ * Resumen de Venta Market — 2H Market
+ * Selector de día y listado de la tabla RESUMEN-VENTA para esa fecha (resumenVentaLeer).
  */
 (function () {
   'use strict';
@@ -51,28 +51,6 @@
     return d.innerHTML;
   }
 
-  function estiloUsuario(usuario) {
-    var etiquetas = APP_CONFIG && APP_CONFIG.USUARIO_ETIQUETAS;
-    if (!etiquetas || !usuario) return null;
-    var key = String(usuario).trim().toUpperCase().replace(/\s+/g, '-');
-    if (key.indexOf('USR-') !== 0 && key.length > 0) key = 'USR-' + key;
-    var info = etiquetas[key];
-    if (info && (info.color || info.etiqueta)) return { color: info.color || null, etiqueta: info.etiqueta || null };
-    var nombreLower = String(usuario).toLowerCase().trim();
-    for (var k in etiquetas) {
-      var e = etiquetas[k];
-      if (e && e.etiqueta && String(e.etiqueta).toLowerCase() === nombreLower) return { color: e.color || null, etiqueta: e.etiqueta || null };
-    }
-    return null;
-  }
-  function celdaUsuario(r) {
-    var val = r.USUARIO != null ? String(r.USUARIO).trim() : '';
-    var estilo = estiloUsuario(val);
-    var texto = (estilo && estilo.etiqueta) ? estilo.etiqueta : (val || '—');
-    var style = (estilo && estilo.color) ? ' style="color:' + esc(estilo.color) + ';font-weight:600;"' : '';
-    return '<td class="td-usuario"' + style + '>' + esc(texto) + '</td>';
-  }
-
   function setMsg(txt, err) {
     var e = document.getElementById('status-msg');
     if (e) {
@@ -111,21 +89,22 @@
     vacioEl.hidden = true;
     wrapEl.hidden = false;
 
-    theadEl.innerHTML = '<tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORÍA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
+    theadEl.innerHTML = '<tr><th>ID</th><th>HORA</th><th>TURNO</th><th>TIPO-OPERACION</th><th>CATEGORÍA</th><th class="th-num">CANT.</th><th class="th-num">IMPORTE</th></tr>';
     tbodyEl.innerHTML = '';
     var total = 0;
     datos.forEach(function (r) {
-      var monto = parseFloat(r.MONTO);
-      if (!isNaN(monto)) total += monto;
+      var imp = parseFloat(r.IMPORTE);
+      if (!isNaN(imp)) total += imp;
       tbodyEl.innerHTML +=
-        '<tr><td>' + esc(String(r.HORA || '—')) + '</td>' +
-        '<td>' + esc(String(r.PRODUCTO || '')) + '</td>' +
+        '<tr><td>' + esc(String(r['ID-RESUMEN'] || '—')) + '</td>' +
+        '<td>' + esc(String(r.HORA || '—')) + '</td>' +
+        '<td>' + esc(String(r.TURNO || '')) + '</td>' +
+        '<td>' + esc(String(r['TIPO-OPERACION'] || '')) + '</td>' +
         '<td>' + esc(String(r.CATEGORIA || '')) + '</td>' +
-        '<td class="td-num">' + esc(String(r.CANTIDAD != null ? r.CANTIDAD : '')) + '</td>' +
-        '<td class="td-num">' + fi(monto || 0) + '</td>' +
-        celdaUsuario(r) + '</tr>';
+        '<td class="td-num">' + esc(String(r['CANTIDAD-OPERACIONES'] != null ? r['CANTIDAD-OPERACIONES'] : '')) + '</td>' +
+        '<td class="td-num">' + fi(imp || 0) + '</td></tr>';
     });
-    tfootEl.innerHTML = '<tr><td colspan="5"><strong>Total Ventas Market</strong></td><td class="td-num td-total">' + fi(total) + '</td></tr>';
+    tfootEl.innerHTML = '<tr><td colspan="6"><strong>Total</strong></td><td class="td-num td-total">' + fi(total) + '</td></tr>';
   }
 
   function cargarDatos() {
@@ -135,7 +114,7 @@
       return;
     }
 
-    setMsg('Cargando ventas del ' + fmtNum(fechaActual) + '…');
+    setMsg('Cargando resumen del ' + fmtNum(fechaActual) + '…');
     setCargando(true);
 
     var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
@@ -143,7 +122,7 @@
       method: 'POST',
       mode: 'cors',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'data=' + encodeURIComponent(JSON.stringify({ accion: 'cierreOperacionesDiaLeer', fecha: fechaActual }))
+      body: 'data=' + encodeURIComponent(JSON.stringify({ accion: 'resumenVentaLeer', fecha: fechaActual }))
     })
       .then(function (res) {
         if (!res.ok) throw new Error('HTTP ' + res.status);
@@ -160,8 +139,8 @@
           pintarTabla([]);
           return;
         }
-        setMsg('Ventas del ' + fmtNum(data.fecha || fechaActual) + ' cargadas.');
-        pintarTabla(data.ventasMarket || []);
+        setMsg('Resumen del ' + fmtNum(data.fecha || fechaActual) + ' cargado.');
+        pintarTabla(data.datos || []);
       })
       .catch(function (err) {
         setCargando(false);

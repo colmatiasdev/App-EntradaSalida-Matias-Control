@@ -270,12 +270,10 @@
         }).then(function (data) {
           if (btn) btn.disabled = false;
           if (data && data.ok) {
-            setFormMsg('Guardado correctamente en RESUMEN-VENTA.' + (data.idResumen ? ' ID: ' + data.idResumen : ''), false);
-            form.reset();
-            document.getElementById('fecha-operativa').value = fechaOperativa;
-            if (cantidadEl) cantidadEl.value = 1;
-            if (importeEl) importeEl.value = '';
-            actualizarBotonGuardar();
+            setFormMsg('Guardado correctamente. Redirigiendo al resumen…', false);
+            setTimeout(function () {
+              window.location.href = 'venta-diaria-resumen.html';
+            }, 1200);
           } else {
             setFormMsg((data && (data.error || data.mensaje)) || 'Error al guardar.', true);
           }

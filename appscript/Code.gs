@@ -117,6 +117,7 @@ function doPost(e) {
       case 'operacionesGralAlta':        return operacionesGralAlta(params);
       case 'cierreOperacionesDiaLeer':   return cierreOperacionesDiaLeer(params);
       case 'resumenVentaAlta':           return resumenVentaAlta(params);
+      case 'resumenVentaLeer':           return resumenVentaLeer(params);
       default:
         return respuestaJson({ ok: false, error: 'Acción no reconocida: ' + accion });
     }
@@ -868,6 +869,17 @@ function resumenVentaAlta(params) {
   var fila = objetoAFila(def, obj);
   sheet.appendRow(fila);
   return respuestaJson({ ok: true, mensaje: 'Resumen venta guardado.', idResumen: idResumen });
+}
+
+function resumenVentaLeer(params) {
+  var def = TABLAS.RESUMEN_VENTA;
+  var fechaParam = params.fecha || params.fechaOperativa || '';
+  if (!fechaParam) return respuestaJson({ ok: false, error: 'Falta fecha (YYYY-MM-DD).' });
+  var fechaStr = normalizarFechaOperativa(fechaParam);
+  if (fechaStr.length !== 10) return respuestaJson({ ok: false, error: 'Fecha inválida. Usar YYYY-MM-DD.' });
+  var ss = getSS();
+  var datos = leerHojaYFiltrarPorFecha(ss, def.sheet, def.columns, fechaStr);
+  return respuestaJson({ ok: true, fecha: fechaStr, datos: datos });
 }
 
 // --- COMPONENTE-COMBO (valores para combos: sucursal, tipo operación, categorías) ---
