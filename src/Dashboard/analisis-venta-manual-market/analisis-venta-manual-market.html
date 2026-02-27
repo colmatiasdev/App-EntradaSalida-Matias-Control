@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1f5c">
+  <title>Análisis venta manual Market — 2H Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../Header/header.css">
+  <link rel="stylesheet" href="../../Main/main-panel.css">
+  <link rel="stylesheet" href="../../Footer/footer.css">
+  <link rel="stylesheet" href="analisis-venta-manual-market.css">
+</head>
+<body class="main-panel-page analisis-venta-manual-page">
+
+  <header class="header">
+    <div class="header__stripe"></div>
+    <div class="header__inner">
+      <a href="../../../index.html" class="logo">
+        <div class="logo__ring">
+          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
+        </div>
+        <div class="logo__texto">
+          <span class="logo__nombre"><span>2H</span> Market</span>
+          <span class="logo__sub">Control de <strong>MATIAS</strong></span>
+        </div>
+      </a>
+      <div class="header__sep"></div>
+      <span class="header__page" aria-current="page">📊 Análisis venta manual Market</span>
+      <nav class="nav">
+        <ul class="nav__menu" id="main-nav">
+          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <h1 class="dash-title"><span class="dash-title__main">Dashboard</span> <span class="dash-title__tipo" id="dash-tipo-label">semanal</span></h1>
+
+    <div class="dash-segment" role="tablist" aria-label="Tipo de análisis">
+      <span class="dash-segment__label">TIPO DE ANÁLISIS</span>
+      <div class="dash-segment__options">
+        <button type="button" class="dash-segment__btn active" data-tipo="semanal" id="btn-semanal">Semanal</button>
+        <button type="button" class="dash-segment__btn" data-tipo="mensual" id="btn-mensual">Mensual</button>
+        <button type="button" class="dash-segment__btn" data-tipo="anual" id="btn-anual">Anual</button>
+      </div>
+    </div>
+
+    <div class="dash-nav">
+      <button type="button" class="dash-nav__arrow" id="btn-prev" aria-label="Período anterior">‹</button>
+      <div class="dash-nav__center">
+        <div class="dash-nav__range" id="nav-range">—</div>
+        <div class="dash-nav__meta">
+          <span class="dash-nav__period" id="nav-period">—</span>
+          <span class="dash-nav__badge" id="nav-badge-actual" hidden>ACTUAL</span>
+        </div>
+      </div>
+      <button type="button" class="dash-nav__btn-now" id="btn-periodo-actual">📌 <span id="btn-periodo-actual-text">Semana actual</span></button>
+      <div class="dash-nav__status" id="nav-status"></div>
+    </div>
+
+    <div class="dash-days" id="dash-days"></div>
+
+    <div class="dash-kpis" id="dash-kpis">
+      <div class="dash-kpi dash-kpi--primary" id="kpi-facturacion">
+        <span class="dash-kpi__icon">💰</span>
+        <span class="dash-kpi__label" id="kpi-fact-label">FACTURACIÓN SEMANA</span>
+        <span class="dash-kpi__value" id="kpi-fact-value">$ 0</span>
+        <span class="dash-kpi__sub" id="kpi-fact-sub">0 días con actividad</span>
+      </div>
+      <div class="dash-kpi">
+        <span class="dash-kpi__icon">📅</span>
+        <span class="dash-kpi__label">MEJOR DÍA</span>
+        <span class="dash-kpi__value" id="kpi-mejor-value">$ 0</span>
+        <span class="dash-kpi__sub" id="kpi-mejor-sub">—</span>
+      </div>
+      <div class="dash-kpi">
+        <span class="dash-kpi__icon">📄</span>
+        <span class="dash-kpi__label">TOTAL VENTAS</span>
+        <span class="dash-kpi__value" id="kpi-ventas-value">0</span>
+        <span class="dash-kpi__sub">ventas totales</span>
+      </div>
+      <div class="dash-kpi">
+        <span class="dash-kpi__icon">📦</span>
+        <span class="dash-kpi__label">UNIDADES</span>
+        <span class="dash-kpi__value" id="kpi-unidades-value">0</span>
+        <span class="dash-kpi__sub">unidades despachadas</span>
+      </div>
+      <div class="dash-kpi">
+        <span class="dash-kpi__icon">⚡</span>
+        <span class="dash-kpi__label">TICKET PROMEDIO</span>
+        <span class="dash-kpi__value" id="kpi-ticket-value">$ 0</span>
+        <span class="dash-kpi__sub">por venta promedio</span>
+      </div>
+    </div>
+
+    <section class="dash-chart-section">
+      <h2 class="dash-chart-section__title">FACTURACIÓN DIARIA</h2>
+      <p class="dash-chart-section__sub" id="chart-subtitle">Rendimiento por día</p>
+      <p class="dash-chart-legend">La barra marcada "HOY" es el día actual.</p>
+      <div class="dash-chart" id="chart-bars"></div>
+    </section>
+
+    <section class="dash-growth" id="section-growth">
+      <h2 class="dash-section-title">CRECIMIENTO</h2>
+      <div class="dash-growth__grid">
+        <div class="dash-growth__card">
+          <span class="dash-growth__label">vs semana ant.</span>
+          <span class="dash-growth__value" id="growth-semana">—</span>
+        </div>
+        <div class="dash-growth__card">
+          <span class="dash-growth__label">vs mes ant.</span>
+          <span class="dash-growth__value" id="growth-mes">—</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="dash-distribucion" id="section-distribucion">
+      <h2 class="dash-section-title">DISTRIBUCIÓN</h2>
+      <p class="dash-section-desc">Por tipo de operación, turnos y categoría.</p>
+      <div class="dash-dist-grid">
+        <div class="dash-dist-block">
+          <h3 class="dash-dist-block__title">Por tipo de operación</h3>
+          <div class="dash-dist-list" id="dist-tipo"></div>
+        </div>
+        <div class="dash-dist-block">
+          <h3 class="dash-dist-block__title">Por turno</h3>
+          <div class="dash-dist-list" id="dist-turno"></div>
+        </div>
+        <div class="dash-dist-block">
+          <h3 class="dash-dist-block__title">Por categoría</h3>
+          <div class="dash-dist-list" id="dist-categoria"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dash-comparativa" id="section-comparativa">
+      <h2 class="dash-section-title">COMPARATIVA FACTURACIÓN POR MES</h2>
+      <p class="dash-section-desc">Composición mensual (vista anual).</p>
+      <div class="dash-comparativa-chart" id="comparativa-meses"></div>
+    </section>
+
+    <section class="dash-resumen" id="section-resumen">
+      <h2 class="dash-section-title" id="resumen-title">RESUMEN DIARIO DE LA SEMANA</h2>
+      <p class="dash-section-desc" id="resumen-desc">Detalle por día.</p>
+      <div class="dash-resumen-table-wrap">
+        <table class="dash-resumen-table" id="tabla-resumen">
+          <thead id="tabla-resumen-thead"></thead>
+          <tbody id="tabla-resumen-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <p class="dash-status-msg" id="dash-status-msg" role="status">Seleccioná un período.</p>
+  </main>
+
+  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+
+  <script src="../../Config/config.js"></script>
+  <script src="../../Config/tables.js"></script>
+  <script src="../../Config/negocio.js"></script>
+  <script src="../../../main.js"></script>
+  <script src="../../Footer/footer.js"></script>
+  <script src="analisis-venta-manual-market.js"></script>
+</body>
+</html>

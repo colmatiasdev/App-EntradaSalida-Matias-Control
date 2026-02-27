@@ -118,6 +118,7 @@ function doPost(e) {
       case 'cierreOperacionesDiaLeer':   return cierreOperacionesDiaLeer(params);
       case 'resumenVentaAlta':           return resumenVentaAlta(params);
       case 'resumenVentaLeer':           return resumenVentaLeer(params);
+      case 'resumenVentaLeerRango':      return resumenVentaLeerRango(params);
       default:
         return respuestaJson({ ok: false, error: 'Acción no reconocida: ' + accion });
     }
@@ -880,6 +881,38 @@ function resumenVentaLeer(params) {
   var ss = getSS();
   var datos = leerHojaYFiltrarPorFecha(ss, def.sheet, def.columns, fechaStr);
   return respuestaJson({ ok: true, fecha: fechaStr, datos: datos });
+}
+
+function resumenVentaLeerRango(params) {
+  var def = TABLAS.RESUMEN_VENTA;
+  var fechaDesde = normalizarFechaOperativa(params.fechaDesde || params.fecha_desde || '');
+  var fechaHasta = normalizarFechaOperativa(params.fechaHasta || params.fecha_hasta || '');
+  if (fechaDesde.length !== 10 || fechaHasta.length !== 10) return respuestaJson({ ok: false, error: 'Faltan fechaDesde y fechaHasta (YYYY-MM-DD).' });
+  if (fechaDesde > fechaHasta) return respuestaJson({ ok: false, error: 'fechaDesde debe ser menor o igual a fechaHasta.' });
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
+  var datos = sheet.getDataRange().getValues();
+  if (datos.length < 2) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
+  var headers = datos[0];
+  var colFecha = headers.indexOf('FECHA_OPERATIVA');
+  if (colFecha === -1) return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: [] });
+  var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+  var filas = [];
+  for (var i = 1; i < datos.length; i++) {
+    var fechaVal = datos[i][colFecha];
+    var fechaStr = normalizarFechaOperativa(fechaVal, tz);
+    if (fechaStr < fechaDesde || fechaStr > fechaHasta) continue;
+    var obj = {};
+    for (var c = 0; c < headers.length; c++) {
+      var v = c < datos[i].length ? datos[i][c] : '';
+      if (v instanceof Date && headers[c] === 'HORA') v = Utilities.formatDate(v, tz, 'HH:mm');
+      else if (v instanceof Date && headers[c] === 'FECHA_OPERATIVA') v = Utilities.formatDate(v, tz, 'yyyy-MM-dd');
+      obj[headers[c]] = (v !== undefined && v !== null) ? v : '';
+    }
+    filas.push(obj);
+  }
+  return respuestaJson({ ok: true, fechaDesde: fechaDesde, fechaHasta: fechaHasta, datos: filas });
 }
 
 // --- COMPONENTE-COMBO (valores para combos: sucursal, tipo operación, categorías) ---
