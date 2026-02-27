@@ -244,11 +244,50 @@ body.ver-resumen-operativo-page::before {
   margin-bottom: 1rem;
 }
 
-/* — Tarjetas por día (LUN–DOM) — */
+/* — Tarjetas por día (LUN–DOM) — siempre en una sola línea, scroll horizontal en móvil */
+.ver-resumen-operativo-cards-wrap {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  margin: 0 -0.25rem;
+  padding: 0.25rem 0 0.5rem;
+  border-radius: var(--r-s);
+}
+
+.ver-resumen-operativo-cards-wrap::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ver-resumen-operativo-cards-wrap::-webkit-scrollbar-thumb {
+  background: var(--borde);
+  border-radius: 3px;
+}
+
+.ver-resumen-operativo-cards-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--texto-2);
+}
+
 .ver-resumen-operativo-cards {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 0.75rem;
+  min-width: 0;
+}
+
+@media (max-width: 900px) {
+  .ver-resumen-operativo-cards {
+    min-width: 560px;
+    grid-template-columns: repeat(7, minmax(72px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .ver-resumen-operativo-cards {
+    min-width: 490px;
+    grid-template-columns: repeat(7, minmax(64px, 1fr));
+    gap: 0.5rem;
+  }
 }
 
 .ver-resumen-operativo-card {
@@ -257,6 +296,7 @@ body.ver-resumen-operativo-page::before {
   border-radius: var(--r);
   padding: 0.9rem 0.65rem;
   min-height: 100px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 0.35rem;
@@ -413,17 +453,7 @@ body.ver-resumen-operativo-page::before {
   color: var(--azul-700);
 }
 
-@media (max-width: 900px) {
-  .ver-resumen-operativo-cards {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
 @media (max-width: 600px) {
-  .ver-resumen-operativo-cards {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
   .ver-resumen-operativo-week-header {
     flex-direction: column;
     align-items: flex-start;
@@ -432,10 +462,45 @@ body.ver-resumen-operativo-page::before {
   .ver-resumen-operativo-week-actions {
     margin-left: 0;
   }
+
+  .ver-resumen-operativo-card {
+    min-height: 88px;
+    padding: 0.65rem 0.5rem;
+  }
+
+  .ver-resumen-operativo-card__num {
+    font-size: 1rem;
+  }
+
+  .ver-resumen-operativo-card__dia {
+    font-size: 0.65rem;
+  }
+
+  .ver-resumen-operativo-card__resumen,
+  .ver-resumen-operativo-card__importe {
+    font-size: 0.7rem;
+  }
 }
 
 @media (max-width: 768px) {
   .ver-resumen-operativo-page .main {
     padding: 1.75rem 1.1rem;
   }
+}
+
+/* FOOTER (estilo minimalista, igual que Listado Compras) */
+#footer-container .footer {
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+#footer-container .footer__text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #424242;
+  font-weight: 400;
 }

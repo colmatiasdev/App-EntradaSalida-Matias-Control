@@ -41,12 +41,14 @@
     return out;
   }
 
-  /** FECHA_OPERATIVA → YYYY-MM-DD. Acepta Date, ISO string o texto DD/MM/YYYY. */
+  /** FECHA_OPERATIVA → YYYY-MM-DD. Acepta "YYYY-MM-DD", ISO string, o DD/MM/YYYY (sin cambiar por zona horaria). */
   function fechaKey(val) {
     if (val === undefined || val === null || val === '') return '';
+    var s = String(val).trim();
+    if (/^\d{4}-\d{2}-\d{2}(T|$|\s)/.test(s)) return s.substring(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
     var d = new Date(val);
     if (isNaN(d.getTime())) {
-      var s = String(val).trim();
       var parts = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
       if (parts) {
         d = new Date(parseInt(parts[3], 10), parseInt(parts[2], 10) - 1, parseInt(parts[1], 10));
@@ -135,7 +137,7 @@
     for (var i = 0; i < 7; i++) {
       var d = new Date(lunes);
       d.setDate(d.getDate() + i);
-      var key = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2);
+      var key = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2);
       result.push({
         date: d,
         key: key,
@@ -229,6 +231,9 @@
     if (!tituloEl || !vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
 
     var key = (fechaKeyVal !== undefined && fechaKeyVal !== null) ? String(fechaKeyVal).trim() : '';
+    if (key && /^\d{4}-\d{4}$/.test(key)) {
+      key = key.substring(0, 6) + '-' + key.substring(6);
+    }
     if (!key) {
       tituloEl.textContent = 'Detalle del día';
       vacioEl.hidden = false;

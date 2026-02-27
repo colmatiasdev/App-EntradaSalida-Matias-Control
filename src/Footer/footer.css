@@ -1,16 +1,25 @@
-/* Módulo Footer - estilos de la sección footer */
+/* Footer compartido: estilo minimalista como en Listado Compras */
 .footer {
-  background: var(--color-surface);
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
   padding: 0.75rem 1.5rem;
   text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+.footer__text {
+  margin: 0;
   font-size: 0.85rem;
-  color: var(--color-text-muted);
-  border-top: 1px solid #eee;
+  color: #424242;
+  font-weight: 400;
 }
 
 @media (max-width: 768px) {
   .footer {
     padding: 0.65rem 1rem;
+  }
+  .footer__text {
     font-size: 0.8rem;
   }
 }

@@ -568,37 +568,21 @@ body::before {
   font-weight: 600;
 }
 
-/* FOOTER */
+/* FOOTER (estilo minimalista, igual que Listado Compras) */
 .footer {
-  background: var(--azul-900);
-  color: rgba(255, 255, 255, 0.5);
+  background: #fff;
+  border-top: 1px solid #e0e0e0;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
   position: relative;
   z-index: 1;
 }
 
-.footer__stripe {
-  height: 3px;
-  background: linear-gradient(90deg, var(--azul-700), var(--azul-400), var(--verde));
-}
-
-.footer__inner {
-  padding: 1.1rem 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  max-width: 1280px;
-  margin: 0 auto;
-  flex-wrap: wrap;
-  font-size: 0.78rem;
-}
-
-.footer__logo {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  object-fit: cover;
-  opacity: 0.75;
+.footer__text {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #424242;
+  font-weight: 400;
 }
 
 /* ANIMACIONES */

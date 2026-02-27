@@ -753,22 +753,32 @@ function resumenOperativoModificacion(params) {
 function resumenOperativoLeer(params) {
   var def = TABLAS.RESUMEN_OPERATIVO;
   var ss = getSS();
-  var sheet = ss.getSheetByName(def.sheet);
-  if (!sheet) return respuestaJson({ ok: true, datos: [] });
+  var sheet = ss.getSheetByName(def.sheet) || ss.getSheetByName('RESUMEN OPERATIVO');
+  if (!sheet) {
+    return respuestaJson({ ok: false, error: 'No existe la hoja RESUMEN-OPERATIVO. Revisá que la pestaña del Sheet se llame exactamente así.' });
+  }
   var datos = sheet.getDataRange().getValues();
   if (datos.length < 2) return respuestaJson({ ok: true, datos: [] });
   var headers = datos[0];
   var colCount = Math.min(headers.length, def.columns.length);
+  var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
   var filas = [];
   for (var i = 1; i < datos.length; i++) {
     var obj = {};
     for (var c = 0; c < headers.length; c++) {
-      var val = datos[i][c];
-      var key = (c < colCount) ? def.columns[c] : headers[c];
-      obj[key] = (val !== undefined && val !== null) ? val : '';
+      var val = c < datos[i].length ? datos[i][c] : '';
+      if (val === undefined || val === null) val = '';
+      var key = (c < colCount) ? def.columns[c] : (headers[c] || '');
+      if (key) obj[key] = val;
     }
     for (var k = 0; k < def.columns.length; k++) {
       if (obj[def.columns[k]] === undefined) obj[def.columns[k]] = '';
+    }
+    if (obj.FECHA_OPERATIVA && obj.FECHA_OPERATIVA instanceof Date) {
+      obj.FECHA_OPERATIVA = Utilities.formatDate(obj.FECHA_OPERATIVA, tz, 'yyyy-MM-dd');
+    }
+    if (obj.HORA && obj.HORA instanceof Date) {
+      obj.HORA = Utilities.formatDate(obj.HORA, tz, 'HH:mm');
     }
     filas.push(obj);
   }

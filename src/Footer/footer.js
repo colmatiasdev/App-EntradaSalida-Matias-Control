@@ -11,6 +11,6 @@
       container.innerHTML = html;
     })
     .catch(function () {
-      container.innerHTML = '<footer class="footer"><p>&copy; 2H Market - Compras</p></footer>';
+      container.innerHTML = '<footer class="footer"><p class="footer__text">© 2H Market — Sistema de Control de MATIAS</p></footer>';
     });
 })();
