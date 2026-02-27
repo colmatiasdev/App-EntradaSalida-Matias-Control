@@ -284,13 +284,13 @@
 
   function pintarKPIs() {
     var totalImp = totalImporte(datosActual);
-    var totalCant = totalCantidad(datosActual);
-    var countVentas = datosActual.length;
+    var totalVentas = totalCantidad(datosActual);
+    var totalOperaciones = datosActual.length;
     var mejor = mejorDia(datosActual);
     var diasConActividad = 0;
     var porDia = agregarPorDia(datosActual);
     for (var k in porDia) { if (porDia[k].ventas > 0) diasConActividad++; }
-    var ticketPromedio = countVentas > 0 ? totalImp / countVentas : 0;
+    var ticketPromedio = totalVentas > 0 ? totalImp / totalVentas : 0;
 
     var factLabel = document.getElementById('kpi-fact-label');
     if (factLabel) factLabel.textContent = tipoAnalisis === 'semanal' ? 'FACTURACIÓN SEMANA' : tipoAnalisis === 'mensual' ? 'FACTURACIÓN MES' : 'FACTURACIÓN AÑO';
@@ -298,8 +298,8 @@
     setText('kpi-fact-sub', diasConActividad + ' días con actividad');
     setText('kpi-mejor-value', fmtMoneda(mejor.importe));
     setText('kpi-mejor-sub', mejor.label);
-    setText('kpi-ventas-value', countVentas);
-    setText('kpi-unidades-value', totalCant);
+    setText('kpi-ventas-value', totalOperaciones);
+    setText('kpi-unidades-value', totalVentas);
     setText('kpi-ticket-value', fmtMoneda(ticketPromedio));
   }
   function setText(id, text) {
@@ -317,6 +317,7 @@
     var hoyKeyStr = toKey(hoy());
     var html = '';
     if (tipoAnalisis === 'semanal') {
+      cont.classList.remove('dash-chart--mensual');
       for (var i = 0; i < 7; i++) {
         var d = addDays(periodStart, i);
         var key = toKey(d);
@@ -327,18 +328,55 @@
         html += '<div class="dash-chart-bar-wrap"><div class="dash-chart-bar-container"><div class="dash-chart-bar" style="height:' + barHeight + '%"' + (esHoy ? ' class="dash-chart-bar--hoy"' : '') + '">' + (esHoy ? '<span class="dash-chart-bar__hoy">HOY</span>' : '') + '</div></div><div class="dash-chart-bar-wrap__label">' + esc(DIA_ABREV[d.getDay()]) + '</div><div class="dash-chart-bar-wrap__value">' + (info.importe > 0 ? fmtMoneda(info.importe) : '—') + '</div></div>';
       }
     } else if (tipoAnalisis === 'mensual') {
-      var daysInMonth = (endOfMonth(periodStart).getDate());
-      var step = Math.max(1, Math.floor(daysInMonth / 7));
-      for (var j = 1; j <= daysInMonth; j += step) {
-        var d = new Date(periodStart.getFullYear(), periodStart.getMonth(), j);
+      var daysInMonth = endOfMonth(periodStart).getDate();
+      cont.classList.add('dash-chart--mensual', 'dash-chart--line');
+      var padX = 2;
+      var padYTop = 8;
+      var padYBottom = 15;
+      var w = Math.max(1, daysInMonth - 1);
+      var rangeY = 100 - padYTop - padYBottom;
+      var points = [];
+      var areaPoints = [];
+      for (var j = 0; j < daysInMonth; j++) {
+        var d = new Date(periodStart.getFullYear(), periodStart.getMonth(), j + 1);
         var key = toKey(d);
         var info = porDia[key] || { importe: 0 };
-        var pct = (info.importe / maxImp) * 100;
-        var esHoy = key === hoyKeyStr;
-        var barHeight = maxImp > 0 ? Math.max(4, pct) : 0;
-        html += '<div class="dash-chart-bar-wrap"><div class="dash-chart-bar-container"><div class="dash-chart-bar" style="height:' + barHeight + '%"' + (esHoy ? ' class="dash-chart-bar--hoy"' : '') + '">' + (esHoy ? '<span class="dash-chart-bar__hoy">HOY</span>' : '') + '</div></div><div class="dash-chart-bar-wrap__label">' + j + '</div><div class="dash-chart-bar-wrap__value">' + (info.importe > 0 ? fmtMoneda(info.importe) : '—') + '</div></div>';
+        var pct = maxImp > 0 ? (info.importe / maxImp) : 0;
+        var x = padX + (j / Math.max(1, daysInMonth - 1)) * (100 - 2 * padX);
+        var y = 100 - padYBottom - pct * rangeY;
+        points.push(x.toFixed(2) + ',' + y.toFixed(2));
+        areaPoints.push(x.toFixed(2) + ',' + y.toFixed(2));
       }
+      var areaStr = areaPoints.join(' ') + ' ' + (100 - padX) + ',100 ' + padX + ',100';
+      var lineStr = points.join(' ');
+      html = '<div class="dash-line-chart-wrap"><svg class="dash-line-chart-svg" viewBox="0 0 100 100" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="dash-line-gradient" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#c62828" stop-opacity="0.3"/><stop offset="1" stop-color="#c62828" stop-opacity="0"/></linearGradient></defs><polygon class="dash-line-chart-area" fill="url(#dash-line-gradient)" points="' + areaStr + '"/><polyline class="dash-line-chart-line" fill="none" stroke="#c62828" stroke-width="0.8" stroke-linecap="round" stroke-linejoin="round" points="' + lineStr + '"/>';
+      for (var ji = 0; ji < daysInMonth; ji++) {
+        var dd = new Date(periodStart.getFullYear(), periodStart.getMonth(), ji + 1);
+        var kkey = toKey(dd);
+        var iinfo = porDia[kkey] || { importe: 0 };
+        var esHoyDay = kkey === hoyKeyStr;
+        var rDot = esHoyDay ? '1.2' : '0.8';
+        html += '<circle class="dash-line-chart-dot' + (esHoyDay ? ' dash-line-chart-dot--hoy' : '') + '" cx="' + (padX + (ji / Math.max(1, daysInMonth - 1)) * (100 - 2 * padX)).toFixed(2) + '" cy="' + (100 - padYBottom - (maxImp > 0 ? (iinfo.importe / maxImp) : 0) * rangeY).toFixed(2) + '" r="' + rDot + '"/>';
+      }
+      html += '</svg></div>';
+      html += '<div class="dash-line-chart-labels">';
+      for (var jl = 1; jl <= daysInMonth; jl++) {
+        var dLabel = new Date(periodStart.getFullYear(), periodStart.getMonth(), jl);
+        var keyLabel = toKey(dLabel);
+        var infoLabel = porDia[keyLabel] || { importe: 0 };
+        var esHoyLabel = keyLabel === hoyKeyStr;
+        html += '<span class="dash-line-chart-label' + (esHoyLabel ? ' dash-line-chart-label--hoy' : '') + '">' + jl + '</span>';
+      }
+      html += '</div><div class="dash-line-chart-values">';
+      for (var jv = 1; jv <= daysInMonth; jv++) {
+        var dVal = new Date(periodStart.getFullYear(), periodStart.getMonth(), jv);
+        var keyVal = toKey(dVal);
+        var infoVal = porDia[keyVal] || { importe: 0 };
+        html += '<span class="dash-line-chart-value">' + (infoVal.importe > 0 ? fmtMoneda(infoVal.importe) : '—') + '</span>';
+      }
+      html += '</div>';
     } else {
+      cont.classList.remove('dash-chart--mensual');
       var porMes = agregarPorMes(datosActual);
       var maxMes = 0;
       for (var m = 1; m <= 12; m++) { if (porMes[m].importe > maxMes) maxMes = porMes[m].importe; }
@@ -496,7 +534,10 @@
     if (el) el.textContent = msg;
   }
   function cargarDatos() {
-    if (!periodStart || !periodEnd) return;
+    if (!periodStart || !periodEnd) {
+      setPeriodFromTipo();
+      if (!periodStart || !periodEnd) return;
+    }
     var desde = toKey(periodStart);
     var hasta = toKey(periodEnd);
     setStatus('Cargando…');
@@ -628,6 +669,21 @@
   function navPrev() {
     if (!periodStart || !periodEnd) return;
     if (tipoAnalisis === 'semanal') {
+      periodStart = addWeeks(periodStart, -1);
+      periodEnd = addDays(periodStart, 6);
+    } else if (tipoAnalisis === 'mensual') {
+      periodStart = addMonths(periodStart, -1);
+      periodEnd = endOfMonth(periodStart);
+    } else {
+      periodStart = addYears(periodStart, -1);
+      periodEnd = endOfYear(periodStart);
+    }
+    cargarDatos();
+  }
+
+  function navNext() {
+    if (!periodStart || !periodEnd) return;
+    if (tipoAnalisis === 'semanal') {
       periodStart = addWeeks(periodStart, 1);
       periodEnd = addDays(periodStart, 6);
     } else if (tipoAnalisis === 'mensual') {
@@ -644,6 +700,7 @@
     setPeriodFromTipo();
     pintarTituloYSegment();
     pintarNav();
+    pintarTodo();
     document.getElementById('btn-semanal').addEventListener('click', function () { tipoAnalisis = 'semanal'; setPeriodFromTipo(); cargarDatos(); });
     document.getElementById('btn-mensual').addEventListener('click', function () { tipoAnalisis = 'mensual'; setPeriodFromTipo(); cargarDatos(); });
     document.getElementById('btn-anual').addEventListener('click', function () { tipoAnalisis = 'anual'; setPeriodFromTipo(); cargarDatos(); });

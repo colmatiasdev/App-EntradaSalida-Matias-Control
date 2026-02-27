@@ -3,84 +3,687 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0d1f5c">
+  <meta name="theme-color" content="#f0f4fb">
   <title>Resumen de Venta Market — 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../../index.css">
-  <link rel="stylesheet" href="../../Header/header.css">
-  <link rel="stylesheet" href="../../Main/main-panel.css">
-  <link rel="stylesheet" href="../../Footer/footer.css">
-  <link rel="stylesheet" href="venta-diaria-resumen.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink-0:   #0f1c2e;
+      --ink-1:   #1e3048;
+      --ink-2:   #4a6480;
+      --ink-3:   #8aa0b8;
+      --ink-4:   #bdd0e0;
+      --bg-base:   #eef2f9;
+      --bg-card:   #ffffff;
+      --bg-card-2: #f5f8fd;
+      --bg-row:    #f0f4fb;
+      --accent:     #2563eb;
+      --accent-pale:#dbeafe;
+      --accent-tint:#eff6ff;
+      --accent-dark: #1d4ed8;
+      --red:        #e11d48;
+      --red-pale:   #ffe4ec;
+      --red-tint:   #fff1f4;
+      --green:      #16a34a;
+      --green-pale: #dcfce7;
+      --amber:      #d97706;
+      --amber-pale: #fef3c7;
+      --purple:     #7c3aed;
+      --purple-pale:#ede9fe;
+      --border:     #dde6f0;
+      --border-2:   #c8d8eb;
+      --shadow-sm:  0 1px 4px rgba(15,28,46,.06), 0 2px 12px rgba(15,28,46,.04);
+      --shadow-md:  0 4px 16px rgba(15,28,46,.08), 0 8px 32px rgba(15,28,46,.05);
+      --r-sm: 10px;
+      --r:    18px;
+      --r-xl: 24px;
+      --font-display: "Bebas Neue", sans-serif;
+      --font-body:    "DM Sans", system-ui, sans-serif;
+      --safe-top:    env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left:   env(safe-area-inset-left, 0px);
+      --safe-right:  env(safe-area-inset-right, 0px);
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-base); color: var(--ink-0);
+      line-height: 1.6; min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow-x: hidden; -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: ""; position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 0% 0%, rgba(37,99,235,.08) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(22,163,74,.05) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 200;
+      padding-top: var(--safe-top);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .header__stripe {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #34d399, var(--accent));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .header__inner {
+      max-width: 720px; margin: 0 auto;
+      padding: .65rem max(1rem, var(--safe-right)) .65rem max(1rem, var(--safe-left));
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; flex-shrink: 0; color: inherit; }
+    .logo__mark {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent) 0%, #1d4ed8 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: .95rem; color: #fff;
+      box-shadow: 0 3px 10px rgba(37,99,235,.3); flex-shrink: 0;
+    }
+    .logo__info { display: flex; flex-direction: column; line-height: 1.15; }
+    .logo__name { font-weight: 800; font-size: .85rem; color: var(--ink-0); letter-spacing: -.02em; }
+    .logo__sub { font-size: .58rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: .09em; }
+    .logo__sub b { color: var(--accent); font-weight: 700; }
+    .header__divider { width: 1px; height: 18px; background: var(--border-2); flex-shrink: 0; }
+    .header__badge {
+      font-size: .68rem; font-weight: 700; color: var(--accent);
+      padding: .18rem .6rem; background: var(--accent-tint);
+      border: 1px solid var(--accent-pale); border-radius: 99px; white-space: nowrap;
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1; position: relative; z-index: 1;
+      max-width: 720px; margin: 0 auto; width: 100%;
+      padding: 1.5rem max(1rem, var(--safe-right)) calc(2.5rem + var(--safe-bottom)) max(1rem, var(--safe-left));
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+
+    /* ── Hero / page header ── */
+    .page-header { display: flex; align-items: flex-end; justify-content: space-between; gap: .75rem; flex-wrap: wrap; }
+    .hero__label {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .13em; color: var(--accent); margin-bottom: .4rem;
+    }
+    .hero__label::before {
+      content: ""; display: block; width: 18px; height: 2.5px;
+      background: linear-gradient(90deg, var(--accent), #60a5fa); border-radius: 2px;
+    }
+    .hero__title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 400;
+      line-height: .95; letter-spacing: .02em; color: var(--ink-0);
+    }
+    .hero__title span { color: var(--accent); }
+
+    /* Botón nueva carga */
+    .btn-nueva {
+      flex-shrink: 0; padding: .5rem .95rem;
+      border: 1.5px solid var(--accent); border-radius: var(--r-sm);
+      background: var(--accent-tint); color: var(--accent);
+      font-size: .75rem; font-weight: 700; cursor: pointer; font-family: var(--font-body);
+      transition: all .16s var(--ease); white-space: nowrap;
+      text-decoration: none; display: inline-flex; align-items: center; gap: .3rem;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-nueva:hover { background: var(--accent); color: #fff; box-shadow: 0 4px 14px rgba(37,99,235,.25); }
+    .btn-nueva:active { transform: scale(.97); }
+
+    /* ── Day card ── */
+    .day-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: 1.1rem 1.15rem;
+      box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .day-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), #34d399);
+    }
+    .day-header { display: flex; align-items: center; gap: .6rem; margin-bottom: .8rem; }
+    .nav-btn {
+      width: 38px; height: 38px; border-radius: var(--r-sm);
+      border: 1.5px solid var(--border-2); background: var(--bg-card-2);
+      color: var(--ink-2); font-size: 1.15rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all .16s var(--ease); touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-btn:hover  { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); }
+    .nav-btn:active { transform: scale(.9); }
+    .day-info { flex: 1; min-width: 0; }
+    .day-label { font-size: .96rem; font-weight: 800; color: var(--ink-0); line-height: 1.2; letter-spacing: -.02em; }
+    .day-meta { display: flex; align-items: center; gap: .4rem; margin-top: .15rem; flex-wrap: wrap; }
+    .day-date { font-size: .68rem; color: var(--ink-3); font-weight: 500; }
+    .badge-hoy {
+      font-size: .56rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em;
+      color: var(--red); background: var(--red-tint); padding: .08rem .38rem;
+      border-radius: 99px; border: 1px solid var(--red-pale);
+    }
+    .btn-hoy {
+      flex-shrink: 0; padding: .38rem .75rem;
+      border: 1.5px solid var(--red-pale); border-radius: var(--r-sm);
+      background: var(--red-tint); color: var(--red);
+      font-size: .7rem; font-weight: 700; cursor: pointer; font-family: var(--font-body);
+      transition: all .16s var(--ease); white-space: nowrap;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-hoy:hover { background: var(--red-pale); border-color: var(--red); }
+    .btn-hoy:active { transform: scale(.95); }
+    .status-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+    .status-msg { font-size: .72rem; color: var(--ink-3); font-weight: 500; }
+    .status-msg.error { color: var(--red); }
+    .status-pill {
+      display: inline-flex; align-items: center; gap: .3rem;
+      font-size: .68rem; color: var(--ink-2); padding: .18rem .55rem;
+      background: var(--bg-row); border: 1px solid var(--border);
+      border-radius: 99px; white-space: nowrap; font-weight: 500;
+    }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+    .status-pill.loading .status-dot { background: var(--ink-4); animation: blink .85s ease infinite; }
+    @keyframes blink { 50% { opacity: .25; } }
+
+    /* ── Bloque listado ── */
+    .bloque {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .bloque__head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .8rem 1rem; border-bottom: 1px solid var(--border);
+      background: var(--bg-card-2); gap: .5rem; flex-wrap: wrap;
+    }
+    .bloque__head-left { display: flex; align-items: center; gap: .45rem; flex-wrap: wrap; }
+    .bloque__titulo { font-family: var(--font-display); font-size: 1.05rem; letter-spacing: .04em; color: var(--ink-0); }
+    .bloque__head-right { display: flex; align-items: center; gap: .4rem; }
+    .bloque__count {
+      font-size: .63rem; font-weight: 700; color: var(--accent);
+      background: var(--accent-tint); border: 1px solid var(--accent-pale);
+      padding: .1rem .42rem; border-radius: 99px; white-space: nowrap;
+    }
+
+    /* View toggle */
+    .view-toggle {
+      display: flex; gap: 2px;
+      background: var(--bg-row); border: 1px solid var(--border);
+      border-radius: 8px; padding: 2px;
+    }
+    .view-btn {
+      display: flex; align-items: center; gap: .25rem;
+      padding: .22rem .5rem; border-radius: 6px;
+      border: none; background: transparent;
+      color: var(--ink-3); font-size: .63rem; font-weight: 700;
+      cursor: pointer; font-family: var(--font-body);
+      transition: all .14s var(--ease);
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+      letter-spacing: .02em; white-space: nowrap;
+    }
+    .view-btn.active { background: var(--bg-card); color: var(--accent); box-shadow: var(--shadow-sm); }
+    .view-btn svg { width: 11px; height: 11px; flex-shrink: 0; }
+
+    /* Vacío */
+    .bloque__vacio {
+      padding: 2.5rem 1rem; text-align: center;
+      color: var(--ink-3); font-size: .82rem; font-weight: 500;
+    }
+    .bloque__vacio-icon { display: block; font-size: 2rem; margin-bottom: .4rem; opacity: .4; }
+
+    /* ── Colores por turno ── */
+    .turno-pill {
+      display: inline-flex; align-items: center; gap: .22rem;
+      font-size: .6rem; font-weight: 700; padding: .1rem .4rem;
+      border-radius: 6px; white-space: nowrap; letter-spacing: .02em;
+    }
+    .turno-manana  { background: var(--amber-pale); color: var(--amber); }
+    .turno-tarde   { background: var(--accent-tint); color: var(--accent); }
+    .turno-noche   { background: var(--purple-pale); color: var(--purple); }
+    .turno-default { background: var(--bg-row); color: var(--ink-2); border: 1px solid var(--border); }
+
+    /* ── Cards list ── */
+    .cards-list { display: flex; flex-direction: column; }
+    .reg-card {
+      padding: .78rem 1rem; border-bottom: 1px solid var(--border);
+      background: var(--bg-card); transition: background .1s var(--ease);
+      animation: fadeSlide .22s ease both;
+    }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .reg-card:last-child { border-bottom: none; }
+    .reg-card:active { background: var(--bg-row); }
+
+    /* Top: tipo + importe */
+    .reg-card__top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      gap: .5rem; margin-bottom: .3rem;
+    }
+    .reg-card__tipo { font-weight: 700; font-size: .86rem; color: var(--ink-0); line-height: 1.25; flex: 1; min-width: 0; }
+    .reg-card__importe { font-weight: 800; font-size: .9rem; color: var(--green); white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+    /* Chips */
+    .reg-card__chips { display: flex; align-items: center; flex-wrap: wrap; gap: .28rem .4rem; }
+    .chip {
+      display: inline-flex; align-items: center; gap: .2rem;
+      font-size: .6rem; font-weight: 600;
+      padding: .1rem .36rem; border-radius: 6px;
+      border: 1px solid var(--border); background: var(--bg-row);
+      color: var(--ink-2); white-space: nowrap; letter-spacing: .01em;
+    }
+    .chip.hora     { color: var(--accent); background: var(--accent-tint); border-color: var(--accent-pale); }
+    .chip.cat      { color: var(--ink-1); background: #f1f5f9; border-color: #cbd5e1; }
+    .chip.cant     { color: var(--green); background: var(--green-pale); border-color: #bbf7d0; }
+    .chip.id       { color: var(--ink-3); }
+
+    /* ── Tabla ── */
+    .bloque__scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .bloque__scroll::-webkit-scrollbar { height: 5px; }
+    .bloque__scroll::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 3px; }
+    .bloque-tabla { width: 100%; min-width: 420px; border-collapse: collapse; font-size: .78rem; }
+    .bloque-tabla thead th {
+      padding: .45rem .6rem; text-align: left;
+      font-size: .6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .05em; color: var(--accent);
+      background: var(--accent-tint); border-bottom: 1px solid var(--accent-pale); white-space: nowrap;
+    }
+    .bloque-tabla thead th.th-num { text-align: right; }
+    .bloque-tabla tbody td { padding: .42rem .6rem; border-bottom: 1px solid var(--border); }
+    .bloque-tabla tbody tr:hover { background: var(--bg-row); }
+    .bloque-tabla .td-num { text-align: right; font-weight: 600; white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .bloque-tabla .td-id  { color: var(--ink-3); font-size: .72rem; }
+    .bloque-tabla tfoot td { padding: .5rem .6rem; font-weight: 700; font-size: .8rem; background: var(--bg-card-2); border-top: 2px solid var(--border); }
+    .bloque-tabla tfoot .td-total { color: var(--accent); text-align: right; }
+
+    /* ── Pie de bloque ── */
+    .bloque__foot {
+      padding: .65rem 1rem; border-top: 2px solid var(--border);
+      background: var(--bg-card-2); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem;
+    }
+    .bloque__foot-left { display: flex; align-items: center; gap: .75rem; }
+    .bloque__foot-item { display: flex; flex-direction: column; gap: .05rem; }
+    .bloque__foot-label { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--ink-3); }
+    .bloque__foot-val { font-size: .82rem; font-weight: 800; font-variant-numeric: tabular-nums; color: var(--ink-0); }
+    .bloque__foot-val.total-imp { color: var(--green); font-size: .92rem; }
+
+    /* ── Resumen rápido KPIs ── */
+    .kpis {
+      display: grid; grid-template-columns: repeat(3,1fr);
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .kpi {
+      padding: .9rem .85rem; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; gap: .18rem;
+    }
+    .kpi:last-child { border-right: none; }
+    .kpi__label { font-size: .58rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--ink-3); }
+    .kpi__val { font-size: .88rem; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1; color: var(--ink-0); }
+    .kpi__val.verde { color: var(--green); }
+
+    /* ── Footer ── */
+    .footer {
+      position: relative; z-index: 1; padding: 1.1rem 1rem;
+      text-align: center; border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.6);
+      font-size: .68rem; color: var(--ink-3); font-weight: 500;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .main { padding-left: max(.85rem, var(--safe-left)); padding-right: max(.85rem, var(--safe-right)); gap: .85rem; }
+      .day-card { padding: .9rem .9rem; }
+      .bloque__head { padding: .7rem .85rem; }
+      .reg-card { padding: .65rem .85rem; }
+      .bloque__foot { padding: .6rem .85rem; }
+      .kpi { padding: .75rem .65rem; }
+      .kpi__val { font-size: .82rem; }
+    }
+    @media (max-width: 340px) {
+      .kpis { grid-template-columns: 1fr 1fr; }
+      .kpi:nth-child(2) { border-right: none; }
+      .kpi:nth-child(3) { grid-column: 1/-1; border-right: none; border-top: 1px solid var(--border); }
+    }
+  </style>
 </head>
-<body class="main-panel-page venta-diaria-resumen-page">
+<body>
 
   <header class="header">
     <div class="header__stripe"></div>
     <div class="header__inner">
       <a href="../../../index.html" class="logo">
-        <div class="logo__ring">
-          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
-        </div>
-        <div class="logo__texto">
-          <span class="logo__nombre"><span>2H</span> Market</span>
-          <span class="logo__sub">Control de <strong>MATIAS</strong></span>
+        <div class="logo__mark">2H</div>
+        <div class="logo__info">
+          <span class="logo__name">2H Market</span>
+          <span class="logo__sub">Control de <b>MATIAS</b></span>
         </div>
       </a>
-      <div class="header__sep"></div>
-      <span class="header__page" aria-current="page">📊 Resumen de Venta Market</span>
-      <nav class="nav">
-        <ul class="nav__menu" id="main-nav">
-          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
-        </ul>
-      </nav>
+      <div class="header__divider"></div>
+      <span class="header__badge">📊 Resumen venta diaria</span>
     </div>
   </header>
 
   <main class="main">
-    <div class="page-header a-in">
-      <h1>Resumen de Venta Market</h1>
-      <button type="button" class="venta-diaria__btn-nueva" id="btn-nueva-pestana" title="Abrir este resumen en una nueva pestaña">📄 Cargar resumen en nueva pestaña</button>
+
+    <div class="page-header">
+      <div>
+        <div class="hero__label">Resumen de venta</div>
+        <h1 class="hero__title">VENTAS<br><span>MARKET</span></h1>
+      </div>
+      <a href="crear-venta-diaria-resumen.html" class="btn-nueva" id="btn-nueva">
+        ➕ Nueva carga
+      </a>
     </div>
 
-    <div class="venta-diaria__day-card a-in-2">
-      <div class="venta-diaria__day-header">
-        <button type="button" class="venta-diaria__nav-btn" id="btn-prev" aria-label="Día anterior">‹</button>
-        <div class="venta-diaria__day-info">
-          <div class="venta-diaria__day-label" id="day-label">—</div>
-          <div class="venta-diaria__day-meta">
-            <span class="venta-diaria__day-date" id="day-date">—</span>
-            <span class="venta-diaria__badge-hoy" id="badge-hoy" hidden>HOY</span>
+    <!-- Selector de día -->
+    <div class="day-card">
+      <div class="day-header">
+        <button class="nav-btn" id="btn-prev" type="button" aria-label="Día anterior">‹</button>
+        <div class="day-info">
+          <div class="day-label" id="day-label">—</div>
+          <div class="day-meta">
+            <span class="day-date" id="day-date">—</span>
+            <span class="badge-hoy" id="badge-hoy" hidden>HOY</span>
           </div>
         </div>
-        <button type="button" class="venta-diaria__btn-hoy" id="btn-hoy">📌 Hoy</button>
-        <button type="button" class="venta-diaria__nav-btn" id="btn-next" aria-label="Día siguiente">›</button>
+        <button class="btn-hoy" id="btn-hoy" type="button">📌 Hoy</button>
+        <button class="nav-btn" id="btn-next" type="button" aria-label="Día siguiente">›</button>
       </div>
-      <p class="venta-diaria__status" id="status-msg">Seleccioná un día.</p>
+      <div class="status-row">
+        <p class="status-msg" id="status-msg">Seleccioná un día.</p>
+        <span class="status-pill" id="status-pill">
+          <span class="status-dot"></span>
+          <span id="status-text">Listo</span>
+        </span>
+      </div>
     </div>
 
-    <section class="hub-section venta-diaria__tabla-section a-in-3" id="tabla-section">
-      <h2 class="hub-section__title">Resumen de Venta Market</h2>
-      <p class="venta-diaria__vacio" id="vacio-msg">Sin registros para este día.</p>
-      <div class="venta-diaria__tabla-wrap" id="tabla-wrap" hidden>
-        <div class="venta-diaria__scroll">
-          <table class="venta-diaria-tabla" id="tabla-ventas">
-            <thead id="ventas-thead"></thead>
-            <tbody id="ventas-tbody"></tbody>
-            <tfoot id="ventas-tfoot"></tfoot>
-          </table>
+    <!-- KPIs rápidos -->
+    <div class="kpis" id="kpis-wrap">
+      <div class="kpi">
+        <span class="kpi__label">Operaciones</span>
+        <span class="kpi__val" id="kpi-regs">0</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__label">Ventas</span>
+        <span class="kpi__val" id="kpi-ops">0</span>
+      </div>
+      <div class="kpi">
+        <span class="kpi__label">Total</span>
+        <span class="kpi__val verde" id="kpi-total">$ 0</span>
+      </div>
+    </div>
+
+    <!-- Listado -->
+    <section class="bloque" id="bloque-ventas">
+      <div class="bloque__head">
+        <div class="bloque__head-left">
+          <h2 class="bloque__titulo">Resumen de Venta Market</h2>
+        </div>
+        <div class="bloque__head-right">
+          <span class="bloque__count" id="ventas-count" hidden></span>
+          <div class="view-toggle" id="vt-ventas"></div>
+        </div>
+      </div>
+      <div id="ventas-body">
+        <div class="bloque__vacio"><span class="bloque__vacio-icon">📊</span>Sin registros para este día.</div>
+      </div>
+      <div class="bloque__foot" id="ventas-foot" hidden>
+        <div class="bloque__foot-left">
+          <div class="bloque__foot-item">
+            <span class="bloque__foot-label">Operaciones</span>
+            <span class="bloque__foot-val" id="foot-regs">0</span>
+          </div>
+          <div class="bloque__foot-item">
+            <span class="bloque__foot-label">Ventas</span>
+            <span class="bloque__foot-val" id="foot-ops">0</span>
+          </div>
+        </div>
+        <div class="bloque__foot-item" style="text-align:right">
+          <span class="bloque__foot-label">Total</span>
+          <span class="bloque__foot-val total-imp" id="foot-total">$ 0</span>
         </div>
       </div>
     </section>
+
   </main>
 
-  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+  <footer class="footer">
+    <p>2H Market · Control operativo de Matias</p>
+  </footer>
 
   <script src="../../Config/config.js"></script>
-  <script src="../../Config/tables.js"></script>
-  <script src="../../Config/negocio.js"></script>
-  <script src="../../../main.js"></script>
-  <script src="../../Footer/footer.js"></script>
-  <script src="venta-diaria-resumen.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var APP_SCRIPT_URL = (window.APP_CONFIG && window.APP_CONFIG.APP_SCRIPT_URL) || null;
+    var CORS_PROXY     = (window.APP_CONFIG && window.APP_CONFIG.CORS_PROXY) || '';
+
+    var VIEW        = 'cards';
+    var _datos      = [];
+    var fechaActual = '';
+
+    var MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    var DIA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    function pad(n) { return n<10?'0'+n:String(n); }
+    function hoyKey() { var d=new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+    function dateFromKey(k) { if (!k||k.length<10) return null; var d=new Date(k+'T12:00:00'); return isNaN(d.getTime())?null:d; }
+    function keyFromDate(d) { return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+    function sumarDias(k,n) { var d=dateFromKey(k); if(!d)return k; d.setDate(d.getDate()+n); return keyFromDate(d); }
+    function fmtCorta(k) { var d=dateFromKey(k); if(!d)return k; return DIA[d.getDay()]+' '+d.getDate()+' '+MES[d.getMonth()]; }
+    function fmtNum(k) { var d=dateFromKey(k); if(!d)return k; return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); }
+    function fi(n) { return '$ '+Number(n).toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+    function esc(s) { if(s==null)return''; var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+    function isMobile() { return window.innerWidth <= 600; }
+
+    /* Cantidad: hoja usa CANTIDAD-VENTAS; API puede devolver ese nombre u otro */
+    function cantVentas(r) {
+      var v = r['CANTIDAD-VENTAS'];
+      if (v != null && v !== '') return parseInt(v, 10) || 0;
+      v = r['CANTIDAD-OPERACIONES'];
+      return (v != null && v !== '') ? (parseInt(v, 10) || 0) : 0;
+    }
+
+    function turnoPill(turno) {
+      var t = String(turno||'').toUpperCase().trim();
+      var cls = t==='MAÑANA'?'turno-manana':t==='TARDE'?'turno-tarde':t==='NOCHE'?'turno-noche':'turno-default';
+      var icon = t==='MAÑANA'?'☀️':t==='TARDE'?'🌤️':t==='NOCHE'?'🌙':'⏰';
+      return '<span class="turno-pill '+cls+'">'+icon+' '+esc(turno||'—')+'</span>';
+    }
+
+    function setMsg(txt, err) { var e=document.getElementById('status-msg'); if(e){e.textContent=txt; e.classList.toggle('error',!!err);} }
+    function setCargando(v) {
+      var p=document.getElementById('status-pill'); var t=document.getElementById('status-text');
+      if(p)p.classList.toggle('loading',v); if(t)t.textContent=v?'Cargando…':'Listo';
+    }
+    function pintarCabecera() {
+      var l=document.getElementById('day-label'); var d=document.getElementById('day-date'); var b=document.getElementById('badge-hoy');
+      if(l)l.textContent=fmtCorta(fechaActual)||'—'; if(d)d.textContent=fmtNum(fechaActual)||'—'; if(b)b.hidden=(fechaActual!==hoyKey());
+    }
+
+    function pintarKPIs(datos) {
+      var totalOps = datos.reduce(function(s,r){ return s + cantVentas(r); }, 0);
+      var totalImp = datos.reduce(function(s,r){ return s+(parseFloat(r.IMPORTE)||0); }, 0);
+      var ek=document.getElementById('kpi-regs'); var eo=document.getElementById('kpi-ops'); var et=document.getElementById('kpi-total');
+      if(ek)ek.textContent=datos.length; if(eo)eo.textContent=totalOps; if(et)et.textContent=fi(totalImp);
+    }
+
+    function buildToggle() {
+      var cont = document.getElementById('vt-ventas');
+      if (!cont) return;
+      var svgCards = '<svg viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="14" height="5.5" rx="1.5"/><rect x="0" y="7.5" width="14" height="5.5" rx="1.5"/></svg>';
+      var svgTable = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x=".8" y=".8" width="12.4" height="12.4" rx="1.5"/><line x1=".8" y1="4.8" x2="13.2" y2="4.8"/><line x1="4.8" y1="4.8" x2="4.8" y2="13.2"/></svg>';
+      cont.innerHTML =
+        '<button class="view-btn" data-v="cards">'+svgCards+' Cards</button>'+
+        '<button class="view-btn" data-v="table">'+svgTable+' Tabla</button>';
+      VIEW = isMobile() ? 'cards' : 'table';
+      cont.querySelectorAll('.view-btn').forEach(function(btn){
+        btn.classList.toggle('active', btn.dataset.v===VIEW);
+        btn.addEventListener('click', function(){
+          VIEW = btn.dataset.v;
+          cont.querySelectorAll('.view-btn').forEach(function(b){ b.classList.toggle('active',b===btn); });
+          repintar();
+        });
+      });
+    }
+
+    function renderCards(datos) {
+      return '<div class="cards-list">'+datos.map(function(r,i){
+        var imp = parseFloat(r.IMPORTE)||0;
+        var cant = cantVentas(r);
+        var cantStr = cant > 0 ? String(cant) : '';
+        return '<div class="reg-card" style="animation-delay:'+(i*.03)+'s">'+
+          '<div class="reg-card__top">'+
+          '<div><div class="reg-card__tipo">'+esc(r['TIPO-OPERACION']||r['TIPO-OPERACION-VENTA-DIARIA']||'—')+'</div>'+
+          '<div style="margin-top:.22rem">'+turnoPill(r.TURNO)+'</div></div>'+
+          '<span class="reg-card__importe">'+fi(imp)+'</span>'+
+          '</div>'+
+          '<div class="reg-card__chips">'+
+          (r.HORA ? '<span class="chip hora">⏱ '+esc(r.HORA)+'</span>' : '')+
+          (r.CATEGORIA ? '<span class="chip cat">'+esc(r.CATEGORIA)+'</span>' : '')+
+          (cantStr ? '<span class="chip cant">×'+esc(cantStr)+' op.</span>' : '')+
+          '</div></div>';
+      }).join('')+'</div>';
+    }
+
+    function renderTable(datos) {
+      var totalCant = 0, totalImp = 0;
+      var rows = datos.map(function(r){
+        var cant = cantVentas(r);
+        var imp  = parseFloat(r.IMPORTE)||0;
+        totalCant += cant; totalImp += imp;
+        return '<tr>'+
+          '<td>'+esc(String(r.HORA||'—'))+'</td>'+
+          '<td>'+turnoPill(r.TURNO)+'</td>'+
+          '<td>'+esc(String(r['TIPO-OPERACION']||r['TIPO-OPERACION-VENTA-DIARIA']||''))+'</td>'+
+          '<td>'+esc(String(r.CATEGORIA||''))+'</td>'+
+          '<td class="td-num">'+cant+'</td>'+
+          '<td class="td-num">'+fi(imp)+'</td>'+
+          '</tr>';
+      }).join('');
+      return '<div class="bloque__scroll"><table class="bloque-tabla">'+
+        '<thead><tr><th>HORA</th><th>TURNO</th><th>TIPO-OPERACIÓN</th><th>CATEGORÍA</th><th class="th-num">CANT.</th><th class="th-num">IMPORTE</th></tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+        '<tfoot><tr><td colspan="4"><strong>Total</strong></td><td class="td-num"><strong>'+totalCant+'</strong></td><td class="td-num td-total">'+fi(totalImp)+'</td></tr></tfoot>'+
+        '</table></div>';
+    }
+
+    function repintar() {
+      var bodyEl  = document.getElementById('ventas-body');
+      var footEl  = document.getElementById('ventas-foot');
+      var countEl = document.getElementById('ventas-count');
+      var fRegs   = document.getElementById('foot-regs');
+      var fOps    = document.getElementById('foot-ops');
+      var fTotal  = document.getElementById('foot-total');
+      if (!bodyEl) return;
+
+      if (!_datos || _datos.length === 0) {
+        bodyEl.innerHTML = '<div class="bloque__vacio"><span class="bloque__vacio-icon">📊</span>Sin registros para este día.</div>';
+        if (footEl)  footEl.hidden  = true;
+        if (countEl) countEl.hidden = true;
+        pintarKPIs([]);
+        return;
+      }
+
+      bodyEl.innerHTML = VIEW === 'cards' ? renderCards(_datos) : renderTable(_datos);
+
+      if (footEl)  footEl.hidden  = false;
+      if (countEl) { countEl.hidden = false; countEl.textContent = _datos.length+' reg.'; }
+
+      var totalCant = _datos.reduce(function(s,r){ return s + cantVentas(r); }, 0);
+      var totalImp  = _datos.reduce(function(s,r){ return s+(parseFloat(r.IMPORTE)||0); }, 0);
+      if (fRegs)  fRegs.textContent  = _datos.length;
+      if (fOps)   fOps.textContent   = totalCant;
+      if (fTotal) fTotal.textContent = fi(totalImp);
+      pintarKPIs(_datos);
+    }
+
+    function datosDemo(fecha) {
+      if (fecha !== hoyKey()) return { ok:true, fecha:fecha, datos:[] };
+      return { ok:true, fecha:fecha, datos:[
+        { 'ID-RESUMEN':'R-001', HORA:'09:30', TURNO:'MAÑANA',  'TIPO-OPERACION':'EFECTIVO',            CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':12, IMPORTE:18400 },
+        { 'ID-RESUMEN':'R-002', HORA:'09:45', TURNO:'MAÑANA',  'TIPO-OPERACION':'DÉBITO',              CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':5,  IMPORTE:8750 },
+        { 'ID-RESUMEN':'R-003', HORA:'10:15', TURNO:'MAÑANA',  'TIPO-OPERACION':'QR / TRANSFERENCIA',  CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':8,  IMPORTE:12300 },
+        { 'ID-RESUMEN':'R-004', HORA:'14:00', TURNO:'TARDE',   'TIPO-OPERACION':'EFECTIVO',            CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':20, IMPORTE:32000 },
+        { 'ID-RESUMEN':'R-005', HORA:'14:30', TURNO:'TARDE',   'TIPO-OPERACION':'CRÉDITO',             CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':3,  IMPORTE:5600 },
+        { 'ID-RESUMEN':'R-006', HORA:'15:00', TURNO:'TARDE',   'TIPO-OPERACION':'CUENTA CORRIENTE',    CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':2,  IMPORTE:9800 },
+        { 'ID-RESUMEN':'R-007', HORA:'20:00', TURNO:'NOCHE',   'TIPO-OPERACION':'EFECTIVO',            CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':15, IMPORTE:22500 },
+        { 'ID-RESUMEN':'R-008', HORA:'20:30', TURNO:'NOCHE',   'TIPO-OPERACION':'DÉBITO',              CATEGORIA:'CARGA MANUAL', 'CANTIDAD-VENTAS':6,  IMPORTE:11200 },
+      ]};
+    }
+
+    function cargarDatos() {
+      setMsg('Cargando resumen del '+fmtNum(fechaActual)+'…');
+      setCargando(true);
+
+      if (!APP_SCRIPT_URL) {
+        setTimeout(function(){
+          setCargando(false);
+          var d = datosDemo(fechaActual);
+          setMsg(d.datos.length ? 'Datos de demo — '+fmtNum(fechaActual) : 'Sin registros para '+fmtNum(fechaActual));
+          _datos = d.datos;
+          repintar();
+        }, 550);
+        return;
+      }
+
+      var url = (CORS_PROXY&&CORS_PROXY.length) ? CORS_PROXY+encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
+      fetch(url, {
+        method:'POST', mode:'cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'data='+encodeURIComponent(JSON.stringify({accion:'resumenVentaLeer', fecha:fechaActual}))
+      })
+      .then(function(r){ if(!r.ok)throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(data){
+        setCargando(false);
+        if (!data||!data.ok){ setMsg((data&&(data.error||data.mensaje))||'Error al cargar.',true); _datos=[]; repintar(); return; }
+        setMsg('Resumen del '+fmtNum(data.fecha||fechaActual)+' cargado.');
+        _datos = data.datos||[];
+        repintar();
+      })
+      .catch(function(err){
+        setCargando(false);
+        setMsg('Error: '+(err&&err.message?err.message:String(err)),true);
+        _datos=[]; repintar();
+      });
+    }
+
+    function actualizarBtnNueva() {
+      var btn = document.getElementById('btn-nueva');
+      if (btn) btn.href = 'crear-venta-diaria-resumen.html' + (fechaActual ? '?fecha='+encodeURIComponent(fechaActual) : '');
+    }
+
+    function render() { pintarCabecera(); actualizarBtnNueva(); cargarDatos(); }
+
+    function init() {
+      fechaActual = hoyKey();
+      var params = new URLSearchParams(window.location.search);
+      var f = params.get('fecha');
+      if (f&&f.length>=10){ var d=dateFromKey(f); if(d) fechaActual=keyFromDate(d); }
+
+      buildToggle();
+
+      document.getElementById('btn-prev').addEventListener('click', function(){ fechaActual=sumarDias(fechaActual,-1); render(); });
+      document.getElementById('btn-next').addEventListener('click', function(){ fechaActual=sumarDias(fechaActual,+1); render(); });
+      document.getElementById('btn-hoy').addEventListener('click',  function(){ fechaActual=hoyKey(); render(); });
+
+      render();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
 </body>
 </html>

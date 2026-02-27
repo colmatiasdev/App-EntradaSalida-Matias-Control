@@ -320,6 +320,75 @@
   min-height: 160px;
   padding-top: .5rem;
 }
+.dash-chart--mensual {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: .5rem;
+  display: block;
+}
+.dash-chart--mensual.dash-chart--line {
+  display: block;
+  min-height: 200px;
+}
+.dash-chart--mensual .dash-chart-bar-wrap {
+  flex: 0 0 28px;
+  min-width: 28px;
+}
+
+/* Line chart (vista mensual) */
+.dash-line-chart-wrap {
+  width: 100%;
+  min-width: 400px;
+  height: 140px;
+  margin-bottom: .5rem;
+}
+.dash-line-chart-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.dash-line-chart-area {
+  vector-effect: non-scaling-stroke;
+}
+.dash-line-chart-line {
+  vector-effect: non-scaling-stroke;
+}
+.dash-line-chart-dot {
+  fill: var(--dash-red);
+}
+.dash-line-chart-dot--hoy {
+  fill: var(--dash-red);
+  stroke: var(--bg-card);
+  stroke-width: 0.3;
+}
+.dash-line-chart-labels,
+.dash-line-chart-values {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  font-size: .65rem;
+  color: var(--texto-2);
+  min-width: min-content;
+}
+.dash-line-chart-labels {
+  margin-bottom: .2rem;
+}
+.dash-line-chart-label,
+.dash-line-chart-value {
+  flex: 0 0 24px;
+  min-width: 24px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.dash-line-chart-label--hoy {
+  font-weight: 700;
+  color: var(--dash-red);
+}
+.dash-line-chart-value {
+  font-size: .6rem;
+  font-variant-numeric: tabular-nums;
+}
 .dash-chart-bar-wrap {
   flex: 1;
   display: flex;

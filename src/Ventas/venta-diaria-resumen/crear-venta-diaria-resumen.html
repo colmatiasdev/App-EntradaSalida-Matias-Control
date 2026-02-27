@@ -3,111 +3,604 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0d1f5c">
+  <meta name="theme-color" content="#f0f4fb">
   <title>Crear resumen venta diaria — 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../../../index.css">
-  <link rel="stylesheet" href="../../Header/header.css">
-  <link rel="stylesheet" href="../../Main/main-panel.css">
-  <link rel="stylesheet" href="../../Footer/footer.css">
-  <link rel="stylesheet" href="venta-diaria-resumen.css">
-  <link rel="stylesheet" href="crear-venta-diaria-resumen.css">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink-0:   #0f1c2e;
+      --ink-1:   #1e3048;
+      --ink-2:   #4a6480;
+      --ink-3:   #8aa0b8;
+      --ink-4:   #bdd0e0;
+      --bg-base:   #eef2f9;
+      --bg-card:   #ffffff;
+      --bg-card-2: #f5f8fd;
+      --bg-row:    #f0f4fb;
+      --accent:     #2563eb;
+      --accent-pale:#dbeafe;
+      --accent-tint:#eff6ff;
+      --accent-dark: #1d4ed8;
+      --red:        #e11d48;
+      --red-pale:   #ffe4ec;
+      --red-tint:   #fff1f4;
+      --green:      #16a34a;
+      --green-pale: #dcfce7;
+      --border:     #dde6f0;
+      --border-2:   #c8d8eb;
+      --shadow-sm:  0 1px 4px rgba(15,28,46,.06), 0 2px 12px rgba(15,28,46,.04);
+      --shadow-md:  0 4px 16px rgba(15,28,46,.08), 0 8px 32px rgba(15,28,46,.05);
+      --r-sm: 10px;
+      --r:    18px;
+      --r-xl: 24px;
+      --font-display: "Bebas Neue", sans-serif;
+      --font-body:    "DM Sans", system-ui, sans-serif;
+      --safe-top:    env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --safe-left:   env(safe-area-inset-left, 0px);
+      --safe-right:  env(safe-area-inset-right, 0px);
+      --ease: cubic-bezier(.4,0,.2,1);
+    }
+
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: var(--font-body);
+      background: var(--bg-base);
+      color: var(--ink-0);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+    body::before {
+      content: "";
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 0% 0%, rgba(37,99,235,.08) 0%, transparent 55%),
+        radial-gradient(ellipse 60% 40% at 100% 100%, rgba(22,163,74,.05) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky; top: 0; z-index: 200;
+      padding-top: var(--safe-top);
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid var(--border);
+      box-shadow: var(--shadow-sm);
+    }
+    .header__stripe {
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), #34d399, var(--accent));
+      background-size: 200% 100%;
+      animation: shimmer 3s linear infinite;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    .header__inner {
+      max-width: 680px; margin: 0 auto;
+      padding: .65rem max(1rem, var(--safe-right)) .65rem max(1rem, var(--safe-left));
+      display: flex; align-items: center; gap: .7rem;
+    }
+    .logo { display: flex; align-items: center; gap: .55rem; text-decoration: none; flex-shrink: 0; color: inherit; }
+    .logo__mark {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: linear-gradient(135deg, var(--accent) 0%, #1d4ed8 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display); font-size: .95rem; color: #fff;
+      box-shadow: 0 3px 10px rgba(37,99,235,.3); flex-shrink: 0;
+    }
+    .logo__info { display: flex; flex-direction: column; line-height: 1.15; }
+    .logo__name { font-weight: 800; font-size: .85rem; color: var(--ink-0); letter-spacing: -.02em; }
+    .logo__sub { font-size: .58rem; color: var(--ink-3); text-transform: uppercase; letter-spacing: .09em; }
+    .logo__sub b { color: var(--accent); font-weight: 700; }
+    .header__divider { width: 1px; height: 18px; background: var(--border-2); flex-shrink: 0; }
+    .header__badge {
+      font-size: .68rem; font-weight: 700; color: var(--green);
+      padding: .18rem .6rem; background: var(--green-pale);
+      border: 1px solid #bbf7d0; border-radius: 99px; white-space: nowrap;
+    }
+    .header__link {
+      margin-left: auto;
+      font-size: .68rem; font-weight: 700; color: var(--accent);
+      padding: .18rem .6rem; background: var(--accent-tint);
+      border: 1px solid var(--accent-pale); border-radius: 99px;
+      text-decoration: none; white-space: nowrap;
+      transition: all .15s var(--ease);
+    }
+    .header__link:hover { background: var(--accent-pale); }
+
+    /* ── Main ── */
+    .main {
+      flex: 1; position: relative; z-index: 1;
+      max-width: 680px; margin: 0 auto; width: 100%;
+      padding: 1.5rem max(1rem, var(--safe-right)) calc(2.5rem + var(--safe-bottom)) max(1rem, var(--safe-left));
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+
+    /* ── Hero ── */
+    .hero__label {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .62rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .13em; color: var(--green); margin-bottom: .5rem;
+    }
+    .hero__label::before {
+      content: ""; display: block; width: 18px; height: 2.5px;
+      background: linear-gradient(90deg, var(--green), #86efac); border-radius: 2px;
+    }
+    .hero__title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 400;
+      line-height: .95; letter-spacing: .02em; color: var(--ink-0); margin-bottom: .35rem;
+    }
+    .hero__title span { color: var(--accent); }
+
+    /* ── Day card ── */
+    .day-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r-xl); padding: 1.1rem 1.15rem;
+      box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+    }
+    .day-card::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: linear-gradient(90deg, var(--accent), #34d399);
+    }
+    .day-header { display: flex; align-items: center; gap: .6rem; margin-bottom: .75rem; }
+    .nav-btn {
+      width: 38px; height: 38px; border-radius: var(--r-sm);
+      border: 1.5px solid var(--border-2); background: var(--bg-card-2);
+      color: var(--ink-2); font-size: 1.15rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: all .16s var(--ease); touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-btn:hover  { background: var(--accent-tint); border-color: var(--accent); color: var(--accent); }
+    .nav-btn:active { transform: scale(.9); }
+    .day-info { flex: 1; min-width: 0; }
+    .day-label { font-size: .96rem; font-weight: 800; color: var(--ink-0); line-height: 1.2; letter-spacing: -.02em; }
+    .day-meta { display: flex; align-items: center; gap: .4rem; margin-top: .15rem; flex-wrap: wrap; }
+    .day-date { font-size: .68rem; color: var(--ink-3); font-weight: 500; }
+    .badge-hoy {
+      font-size: .56rem; font-weight: 800; text-transform: uppercase; letter-spacing: .07em;
+      color: var(--red); background: var(--red-tint); padding: .08rem .38rem;
+      border-radius: 99px; border: 1px solid var(--red-pale);
+    }
+    .btn-hoy {
+      flex-shrink: 0; padding: .38rem .75rem;
+      border: 1.5px solid var(--red-pale); border-radius: var(--r-sm);
+      background: var(--red-tint); color: var(--red);
+      font-size: .7rem; font-weight: 700; cursor: pointer; font-family: var(--font-body);
+      transition: all .16s var(--ease); white-space: nowrap;
+      touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    }
+    .btn-hoy:hover { background: var(--red-pale); border-color: var(--red); }
+    .btn-hoy:active { transform: scale(.95); }
+    .day-status { font-size: .72rem; color: var(--ink-3); font-weight: 500; margin: 0; }
+
+    /* ── Formulario card ── */
+    .form-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow-sm);
+    }
+    .form-card__head {
+      padding: .85rem 1.1rem; border-bottom: 1px solid var(--border);
+      background: var(--bg-card-2);
+    }
+    .form-card__title {
+      font-family: var(--font-display); font-size: 1.05rem;
+      letter-spacing: .04em; color: var(--ink-0);
+    }
+    .form-card__subtitle { font-size: .68rem; color: var(--ink-3); font-weight: 500; margin-top: .18rem; }
+    .form-body { padding: 1.1rem; display: flex; flex-direction: column; gap: .85rem; }
+
+    /* Rows y campos */
+    .form-row { display: flex; flex-direction: column; gap: .3rem; }
+    .form-row--2 { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+    .form-label {
+      font-size: .62rem; font-weight: 800; text-transform: uppercase;
+      letter-spacing: .07em; color: var(--accent);
+    }
+    .form-input, .form-select {
+      width: 100%; padding: .6rem .75rem;
+      border: 1.5px solid var(--border-2); border-radius: var(--r-sm);
+      font-size: .88rem; font-family: var(--font-body);
+      background: var(--bg-card); color: var(--ink-0);
+      transition: border-color .15s var(--ease), box-shadow .15s var(--ease);
+      -webkit-appearance: none; appearance: auto;
+    }
+    .form-input:focus, .form-select:focus {
+      outline: none; border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+    .form-input::placeholder { color: var(--ink-4); }
+    .form-input.error { border-color: var(--red); }
+
+    /* Campo readonly (CATEGORIA) */
+    .form-readonly {
+      width: 100%; padding: .6rem .75rem;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      font-size: .88rem; font-family: var(--font-body);
+      font-weight: 600; color: var(--ink-2);
+      background: var(--bg-row); cursor: default;
+    }
+
+    /* Divisor */
+    .form-divider { height: 1px; background: var(--border); margin: .1rem 0; }
+
+    /* Submit */
+    .form-actions { padding: 0 1.1rem 1.1rem; }
+    .btn-submit {
+      width: 100%; padding: .7rem 1rem;
+      border: none; border-radius: var(--r-sm);
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-dark) 100%);
+      color: #fff; font-size: .92rem; font-weight: 800;
+      font-family: var(--font-body); cursor: pointer;
+      transition: all .16s var(--ease);
+      box-shadow: 0 4px 14px rgba(37,99,235,.28);
+      letter-spacing: .01em;
+    }
+    .btn-submit:hover:not(:disabled) {
+      box-shadow: 0 6px 20px rgba(37,99,235,.38);
+      transform: translateY(-1px);
+    }
+    .btn-submit:active:not(:disabled) { transform: scale(.98); }
+    .btn-submit:disabled {
+      opacity: .45; cursor: not-allowed;
+      box-shadow: none; transform: none;
+    }
+
+    /* Mensaje feedback */
+    .form-msg {
+      padding: .7rem .9rem; border-radius: var(--r-sm);
+      font-size: .8rem; font-weight: 600;
+      display: none; margin-top: .5rem;
+      animation: fadeSlide .2s ease forwards;
+    }
+    @keyframes fadeSlide { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+    .form-msg.show { display: block; }
+    .form-msg.success {
+      background: var(--green-pale); color: var(--green);
+      border: 1px solid #bbf7d0;
+    }
+    .form-msg.error {
+      background: var(--red-tint); color: var(--red);
+      border: 1px solid var(--red-pale);
+    }
+    .form-msg.loading {
+      background: var(--accent-tint); color: var(--accent);
+      border: 1px solid var(--accent-pale);
+    }
+
+    /* ── Footer ── */
+    .footer {
+      position: relative; z-index: 1; padding: 1.1rem 1rem;
+      text-align: center; border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.6);
+      font-size: .68rem; color: var(--ink-3); font-weight: 500;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 480px) {
+      .main { padding-left: max(.85rem, var(--safe-left)); padding-right: max(.85rem, var(--safe-right)); gap: .85rem; }
+      .day-card { padding: .9rem .9rem; }
+      .form-card__head { padding: .7rem .9rem; }
+      .form-body { padding: .9rem; gap: .75rem; }
+      .form-actions { padding: 0 .9rem .9rem; }
+      .form-row--2 { grid-template-columns: 1fr; gap: .75rem; }
+    }
+  </style>
 </head>
-<body class="main-panel-page venta-diaria-resumen-page crear-resumen-page">
+<body>
 
   <header class="header">
     <div class="header__stripe"></div>
     <div class="header__inner">
       <a href="../../../index.html" class="logo">
-        <div class="logo__ring">
-          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
-        </div>
-        <div class="logo__texto">
-          <span class="logo__nombre"><span>2H</span> Market</span>
-          <span class="logo__sub">Control de <strong>MATIAS</strong></span>
+        <div class="logo__mark">2H</div>
+        <div class="logo__info">
+          <span class="logo__name">2H Market</span>
+          <span class="logo__sub">Control de <b>MATIAS</b></span>
         </div>
       </a>
-      <div class="header__sep"></div>
-      <span class="header__page" aria-current="page">📊 Crear resumen venta diaria</span>
-      <nav class="nav">
-        <ul class="nav__menu" id="main-nav">
-          <li><a href="venta-diaria-resumen.html" class="nav__link">📋 Resumen venta diaria</a></li>
-          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
-        </ul>
-      </nav>
+      <div class="header__divider"></div>
+      <span class="header__badge">➕ Carga manual</span>
+      <a href="venta-diaria-resumen.html" class="header__link">📋 Ver listado</a>
     </div>
   </header>
 
   <main class="main">
-    <div class="page-header a-in">
-      <h1>Crear resumen venta diaria</h1>
-    </div>
+    <section class="hero">
+      <div class="hero__label">Resumen de venta</div>
+      <h1 class="hero__title">CARGA<br><span>MANUAL</span></h1>
+    </section>
 
-    <div class="venta-diaria__day-card a-in-2">
-      <div class="venta-diaria__day-header">
-        <button type="button" class="venta-diaria__nav-btn" id="btn-prev" aria-label="Día anterior">‹</button>
-        <div class="venta-diaria__day-info">
-          <div class="venta-diaria__day-label" id="day-label">—</div>
-          <div class="venta-diaria__day-meta">
-            <span class="venta-diaria__day-date" id="day-date">—</span>
-            <span class="venta-diaria__badge-hoy" id="badge-hoy" hidden>HOY</span>
+    <!-- Selector de día -->
+    <div class="day-card">
+      <div class="day-header">
+        <button class="nav-btn" id="btn-prev" type="button" aria-label="Día anterior">‹</button>
+        <div class="day-info">
+          <div class="day-label" id="day-label">—</div>
+          <div class="day-meta">
+            <span class="day-date" id="day-date">—</span>
+            <span class="badge-hoy" id="badge-hoy" hidden>HOY</span>
           </div>
         </div>
-        <button type="button" class="venta-diaria__btn-hoy" id="btn-hoy">📌 Hoy</button>
-        <button type="button" class="venta-diaria__nav-btn" id="btn-next" aria-label="Día siguiente">›</button>
+        <button class="btn-hoy" id="btn-hoy" type="button">📌 Hoy</button>
+        <button class="nav-btn" id="btn-next" type="button" aria-label="Día siguiente">›</button>
       </div>
-      <p class="venta-diaria__status" id="status-day">Seleccioná un día para la fecha del resumen.</p>
+      <p class="day-status" id="status-day">Seleccioná la fecha para el resumen.</p>
     </div>
 
-    <section class="crear-resumen__form-section a-in-3" id="form-section">
-      <h2 class="hub-section__title">Carga Manual para el Resumen de Venta Diario</h2>
-      <form id="form-resumen-venta" class="crear-resumen__form">
-        <input type="hidden" id="fecha-operativa" name="FECHA_OPERATIVA" value="">
-        <input type="hidden" id="hora" name="HORA" value="">
-        <div class="crear-resumen__row">
-          <label class="crear-resumen__label" for="turno">TURNO</label>
-          <select id="turno" name="TURNO" class="crear-resumen__select">
-            <option value="">— Seleccionar —</option>
-            <option value="MAÑANA">MAÑANA</option>
-            <option value="TARDE">TARDE</option>
-            <option value="NOCHE">NOCHE</option>
-          </select>
+    <!-- Formulario -->
+    <div class="form-card">
+      <div class="form-card__head">
+        <div class="form-card__title">Carga Manual — Resumen de Venta Diario</div>
+        <div class="form-card__subtitle">Completá todos los campos para guardar el registro.</div>
+      </div>
+
+      <form id="form-resumen-venta">
+        <input type="hidden" id="fecha-operativa" value="">
+        <input type="hidden" id="hora-hidden" value="">
+
+        <div class="form-body">
+          <div class="form-row--2">
+            <div class="form-row">
+              <label class="form-label" for="turno">Turno</label>
+              <select id="turno" class="form-select">
+                <option value="">— Seleccionar —</option>
+                <option value="MAÑANA">MAÑANA</option>
+                <option value="TARDE">TARDE</option>
+                <option value="NOCHE">NOCHE</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="tipo-operacion">Tipo de Operación</label>
+              <select id="tipo-operacion" class="form-select">
+                <option value="">— Seleccionar —</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <span class="form-label">Categoría</span>
+            <div class="form-readonly">CARGA MANUAL</div>
+          </div>
+
+          <div class="form-row--2">
+            <div class="form-row">
+              <label class="form-label" for="cantidad-ventas">Cantidad de ventas</label>
+              <input type="number" id="cantidad-ventas" class="form-input"
+                placeholder="1" min="1" max="9999" step="1" value="1" inputmode="numeric">
+            </div>
+            <div class="form-row">
+              <label class="form-label" for="importe">Importe</label>
+              <input type="number" id="importe" class="form-input"
+                placeholder="0.00" min="0.01" max="9999999999.99" step="0.01" inputmode="decimal">
+            </div>
+          </div>
         </div>
-        <div class="crear-resumen__row">
-          <label class="crear-resumen__label" for="tipo-operacion">TIPO-OPERACION</label>
-          <select id="tipo-operacion" name="TIPO-OPERACION" class="crear-resumen__select">
-            <option value="">— Seleccionar —</option>
-          </select>
-        </div>
-        <div class="crear-resumen__row">
-          <span class="crear-resumen__label">CATEGORIA</span>
-          <input type="hidden" id="categoria" name="CATEGORIA" value="CARGA MANUAL">
-          <p class="crear-resumen__value" id="categoria-value">CARGA MANUAL</p>
-        </div>
-        <div class="crear-resumen__row">
-          <label class="crear-resumen__label" for="cantidad-ventas">CANTIDAD-VENTAS</label>
-          <input type="number" id="cantidad-ventas" name="CANTIDAD-VENTAS" class="crear-resumen__input" placeholder="1" min="1" max="9999" step="1" value="1" inputmode="numeric" title="Número entero, mayor a 0, máximo 4 dígitos (1-9999)">
-        </div>
-        <div class="crear-resumen__row">
-          <label class="crear-resumen__label" for="importe">IMPORTE</label>
-          <input type="number" id="importe" name="IMPORTE" class="crear-resumen__input" placeholder="0,00" min="0.01" max="9999999999.99" step="0.01" value="" inputmode="decimal" title="Mayor a 0. Hasta 10 enteros y 2 decimales">
-        </div>
-        <div class="crear-resumen__actions">
-          <button type="submit" class="crear-resumen__btn-submit" id="btn-guardar" disabled>Carga Manual</button>
+
+        <div class="form-divider"></div>
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="btn-guardar" disabled>
+            Guardar carga manual
+          </button>
+          <div class="form-msg" id="form-msg" role="status" aria-live="polite"></div>
         </div>
       </form>
-      <p class="crear-resumen__msg" id="form-msg" role="status" aria-live="polite"></p>
-    </section>
+    </div>
   </main>
 
-  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+  <footer class="footer">
+    <p>2H Market · Control operativo de Matias</p>
+  </footer>
 
   <script src="../../Config/config.js"></script>
-  <script src="../../Config/tables.js"></script>
-  <script src="../../Config/negocio.js"></script>
-  <script src="../../../main.js"></script>
-  <script src="../../Footer/footer.js"></script>
-  <script src="crear-venta-diaria-resumen.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var APP_SCRIPT_URL = (window.APP_CONFIG && window.APP_CONFIG.APP_SCRIPT_URL) || null;
+    var CORS_PROXY     = (window.APP_CONFIG && window.APP_CONFIG.CORS_PROXY) || '';
+
+    var TIPOS_DEMO = ['EFECTIVO', 'DÉBITO', 'CRÉDITO', 'QR / TRANSFERENCIA', 'CUENTA CORRIENTE'];
+
+    var MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    var DIA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+    var fechaActual = '';
+
+    function pad(n) { return n < 10 ? '0'+n : String(n); }
+    function hoyKey() { var d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+    function dateFromKey(k) { if (!k||k.length<10) return null; var d=new Date(k+'T12:00:00'); return isNaN(d.getTime())?null:d; }
+    function keyFromDate(d) { return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+    function sumarDias(k,n) { var d=dateFromKey(k); if (!d) return k; d.setDate(d.getDate()+n); return keyFromDate(d); }
+    function fmtCorta(k) { var d=dateFromKey(k); if (!d) return k; return DIA[d.getDay()]+' '+d.getDate()+' '+MES[d.getMonth()]; }
+    function fmtNum(k) { var d=dateFromKey(k); if (!d) return k; return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); }
+    function horaActual() { var d=new Date(); return pad(d.getHours())+':'+pad(d.getMinutes()); }
+
+    function pintarCabecera() {
+      var l = document.getElementById('day-label');
+      var d = document.getElementById('day-date');
+      var b = document.getElementById('badge-hoy');
+      var fi = document.getElementById('fecha-operativa');
+      var st = document.getElementById('status-day');
+      if (l) l.textContent = fmtCorta(fechaActual) || '—';
+      if (d) d.textContent = fmtNum(fechaActual) || '—';
+      if (b) b.hidden = fechaActual !== hoyKey();
+      if (fi) fi.value = fechaActual;
+      if (st) st.textContent = 'Fecha del resumen: ' + (fmtNum(fechaActual) || '—') + '. Completá el formulario y guardá.';
+    }
+
+    function setMsg(txt, type) {
+      var e = document.getElementById('form-msg');
+      if (!e) return;
+      e.textContent = txt || '';
+      e.className = 'form-msg' + (txt ? ' show ' + (type||'') : '');
+    }
+
+    function validar() {
+      var fecha = document.getElementById('fecha-operativa').value;
+      var turno = (document.getElementById('turno') || {}).value || '';
+      var tipo  = (document.getElementById('tipo-operacion') || {}).value || '';
+      var cant  = parseInt((document.getElementById('cantidad-ventas') || {}).value, 10);
+      var imp   = parseFloat(String((document.getElementById('importe') || {}).value).replace(',','.'));
+      return !!(fecha && turno && tipo && !isNaN(cant) && cant >= 1 && cant <= 9999 && !isNaN(imp) && imp > 0);
+    }
+    function syncBtn() {
+      var btn = document.getElementById('btn-guardar');
+      if (btn) btn.disabled = !validar();
+    }
+
+    function cargarCombos() {
+      if (!APP_SCRIPT_URL) {
+        var sel = document.getElementById('tipo-operacion');
+        if (sel) TIPOS_DEMO.forEach(function(t) {
+          var opt = document.createElement('option');
+          opt.value = t; opt.textContent = t;
+          sel.appendChild(opt);
+        });
+        syncBtn();
+        return;
+      }
+      var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
+      fetch(url, {
+        method:'POST', mode:'cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'data='+encodeURIComponent(JSON.stringify({accion:'componenteComboLeer'}))
+      })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(data) {
+        if (!data||!data.ok||!data.datos) return;
+        var sel = document.getElementById('tipo-operacion');
+        if (!sel) return;
+        var tipos = {};
+        data.datos.forEach(function(r){
+          var t = (r['TIPO-OPERACION-VENTA-DIARIA']||'').trim();
+          if (t) tipos[t] = true;
+        });
+        Object.keys(tipos).sort().forEach(function(v){
+          var opt = document.createElement('option');
+          opt.value = v; opt.textContent = v;
+          sel.appendChild(opt);
+        });
+        syncBtn();
+      })
+      .catch(function(){});
+    }
+
+    function normCant() {
+      var el = document.getElementById('cantidad-ventas');
+      if (!el) return;
+      var v = parseInt(String(el.value).replace(/\D/g,''),10);
+      if (isNaN(v)||v<1) v=1;
+      if (v>9999) v=9999;
+      el.value = v;
+      syncBtn();
+    }
+    function normImp() {
+      var el = document.getElementById('importe');
+      if (!el) return;
+      var v = parseFloat(String(el.value).replace(',','.'));
+      if (isNaN(v)||v<=0) { el.value=''; syncBtn(); return; }
+      if (v>9999999999.99) v=9999999999.99;
+      el.value = (Math.round(v*100)/100).toFixed(2);
+      syncBtn();
+    }
+
+    function enviar(ev) {
+      ev.preventDefault();
+      var fecha    = document.getElementById('fecha-operativa').value || fechaActual;
+      var hora     = horaActual();
+      var turno    = document.getElementById('turno').value;
+      var tipo     = document.getElementById('tipo-operacion').value;
+      var cantEl   = document.getElementById('cantidad-ventas');
+      var impEl    = document.getElementById('importe');
+      var cant     = Math.max(1, Math.min(9999, parseInt(cantEl && cantEl.value, 10) || 1));
+      var imp      = Math.max(0, parseFloat(String(impEl && impEl.value).replace(',','.')) || 0);
+      var categoria = 'CARGA MANUAL';
+
+      if (!fecha)  { setMsg('Seleccioná un día.', 'error'); return; }
+      if (!turno)  { setMsg('Seleccioná un turno.', 'error'); return; }
+      if (!tipo)   { setMsg('Seleccioná un tipo de operación.', 'error'); return; }
+      if (imp<=0)  { setMsg('El importe debe ser mayor a 0.', 'error'); return; }
+
+      if (!APP_SCRIPT_URL) {
+        var btn = document.getElementById('btn-guardar');
+        if (btn) btn.disabled = true;
+        setMsg('Guardando…', 'loading');
+        setTimeout(function() {
+          setMsg('✓ Guardado correctamente (modo demo). Redirigiendo…', 'success');
+          setTimeout(function() {
+            window.location.href = 'venta-diaria-resumen.html?fecha=' + encodeURIComponent(fecha);
+          }, 1400);
+        }, 800);
+        return;
+      }
+
+      var btn = document.getElementById('btn-guardar');
+      if (btn) btn.disabled = true;
+      setMsg('Guardando…', 'loading');
+      var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
+      fetch(url, {
+        method:'POST', mode:'cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:'data='+encodeURIComponent(JSON.stringify({
+          accion:'resumenVentaAlta', fechaOperativa:fecha, hora:hora,
+          turno:turno, tipoOperacion:tipo, categoria:categoria,
+          cantidadVentas:cant, importe:imp
+        }))
+      })
+      .then(function(r){ return r.ok ? r.json() : r.text().then(function(t){ try { return JSON.parse(t); } catch(e){ return {ok:false}; }; }); })
+      .then(function(data) {
+        if (btn) btn.disabled = false;
+        if (data && data.ok) {
+          setMsg('✓ Guardado correctamente. Redirigiendo…', 'success');
+          setTimeout(function(){ window.location.href='venta-diaria-resumen.html'; }, 1200);
+        } else {
+          setMsg((data&&(data.error||data.mensaje))||'Error al guardar.', 'error');
+        }
+      })
+      .catch(function(err) {
+        if (btn) btn.disabled = false;
+        setMsg('Error: '+(err&&err.message?err.message:String(err)), 'error');
+      });
+    }
+
+    function init() {
+      fechaActual = hoyKey();
+      var params = new URLSearchParams(window.location.search);
+      var f = params.get('fecha');
+      if (f && f.length >= 10) { var d = dateFromKey(f); if (d) fechaActual = keyFromDate(d); }
+
+      document.getElementById('btn-prev').addEventListener('click', function(){ fechaActual=sumarDias(fechaActual,-1); pintarCabecera(); syncBtn(); });
+      document.getElementById('btn-next').addEventListener('click', function(){ fechaActual=sumarDias(fechaActual,+1); pintarCabecera(); syncBtn(); });
+      document.getElementById('btn-hoy').addEventListener('click',  function(){ fechaActual=hoyKey(); pintarCabecera(); syncBtn(); });
+
+      pintarCabecera();
+      cargarCombos();
+
+      var turnoEl = document.getElementById('turno');
+      var tipoEl  = document.getElementById('tipo-operacion');
+      var cantEl  = document.getElementById('cantidad-ventas');
+      var impEl   = document.getElementById('importe');
+      if (turnoEl) turnoEl.addEventListener('change', syncBtn);
+      if (tipoEl)  tipoEl.addEventListener('change', syncBtn);
+      if (cantEl)  { cantEl.addEventListener('input', syncBtn); cantEl.addEventListener('blur', normCant); }
+      if (impEl)   { impEl.addEventListener('input', syncBtn);  impEl.addEventListener('blur', normImp); }
+
+      var form = document.getElementById('form-resumen-venta');
+      if (form) form.addEventListener('submit', enviar);
+
+      syncBtn();
+    }
+
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+    else init();
+  })();
+  </script>
 </body>
 </html>
