@@ -303,6 +303,7 @@
       mapCorresponde[clave].push(r);
     });
 
+    var subtotalesPorGrupo = {};
     theadEl.innerHTML = '<tr><th>HORA</th><th>TIPO-OPERACION</th><th>CATEGORIA</th><th class="th-num">IMPORTE</th></tr>';
     tbodyEl.innerHTML = '';
     grupos.forEach(function (correspondeA) {
@@ -312,6 +313,7 @@
         var n = parseFloat(r.IMPORTE);
         if (!isNaN(n)) subtotalGrupo += n;
       });
+      subtotalesPorGrupo[correspondeA] = subtotalGrupo;
       var userColor = getColorForCorrespondeA(correspondeA);
       var groupStyle = '';
       var subtotalStyle = '';
@@ -340,7 +342,17 @@
         '<td class="td-num ver-resumen-operativo-detalle-subtotal__valor"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>' + formatImporte(subtotalGrupo) + '</td>';
       tbodyEl.appendChild(trSubtotal);
     });
-    tfootEl.innerHTML = '<tr><td colspan="3">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
+
+    var tfootRows = '';
+    if (grupos.length >= 2) {
+      var nombreA = grupos[0];
+      var nombreB = grupos[1];
+      var diferencia = (subtotalesPorGrupo[nombreB] || 0) - (subtotalesPorGrupo[nombreA] || 0);
+      var claseDiferencia = diferencia >= 0 ? 'ver-resumen-operativo-detalle-diferencia--positivo' : 'ver-resumen-operativo-detalle-diferencia--negativo';
+      tfootRows += '<tr class="ver-resumen-operativo-detalle-diferencia"><td colspan="3" class="ver-resumen-operativo-detalle-diferencia__label">Diferencia ' + escapeHtml(nombreB) + ' − ' + escapeHtml(nombreA) + '</td><td class="td-num ver-resumen-operativo-detalle-diferencia__valor ' + claseDiferencia + '">' + formatImporte(diferencia) + '</td></tr>';
+    }
+    tfootRows += '<tr><td colspan="3">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
+    tfootEl.innerHTML = tfootRows;
   }
 
   function escapeHtml(s) {
