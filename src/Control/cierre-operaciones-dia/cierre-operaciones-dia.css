@@ -361,6 +361,40 @@ body::before {
 }
 .bloque-tabla tfoot .td-total { color: var(--accent); text-align: right; }
 
+/* Resumen totales del día */
+.bloque-resumen-totales .bloque__titulo { margin-bottom: 0; }
+.resumen-totales {
+  padding: 1rem 1.25rem 1.25rem;
+}
+.resumen-totales__formula {
+  font-size: .75rem;
+  color: var(--ink-2);
+  margin-bottom: .6rem;
+  font-weight: 500;
+}
+.resumen-totales__valores {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .35rem .5rem;
+  font-size: .95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.resumen-totales__op {
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.resumen-totales__paren { color: var(--ink-3); font-weight: 400; }
+.resumen-totales__resultado {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin-left: .15rem;
+}
+.resumen-totales__resultado--rojo { color: var(--red); }
+.resumen-totales__resultado--verde { color: var(--green); }
+.resumen-totales__resultado--neutro { color: var(--ink-2); }
+
 /* Footer inyectado */
 #footer-container { position: relative; z-index: 1; }
 #footer-container .footer {

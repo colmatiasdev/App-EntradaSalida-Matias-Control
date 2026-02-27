@@ -263,6 +263,16 @@
   }
 
   function init() {
+    var etiquetas = window.APP_CONFIG && window.APP_CONFIG.USUARIO_ETIQUETAS;
+    var userInfo = etiquetas && (etiquetas['USR-SILVINA'] || Object.keys(etiquetas).map(function (k) { return etiquetas[k]; }).filter(function (e) { return e && String(e.etiqueta).toUpperCase() === 'SILVINA'; })[0]);
+    if (userInfo && userInfo.color) {
+      var hex = userInfo.color;
+      var r = parseInt(hex.slice(1, 3), 16);
+      var g = parseInt(hex.slice(3, 5), 16);
+      var b = parseInt(hex.slice(5, 7), 16);
+      document.documentElement.style.setProperty('--hero-user-color', hex);
+      document.documentElement.style.setProperty('--hero-user-bg', 'rgba(' + r + ',' + g + ',' + b + ',0.08)');
+    }
     cargarComboTipoOperacion();
     var form = document.getElementById('gastos-salida-form');
     if (form) {

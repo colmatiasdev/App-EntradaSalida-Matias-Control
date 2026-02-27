@@ -30,7 +30,6 @@
     <section class="hero">
       <div class="hero__label">Cierre diario</div>
       <h1 class="hero__title">CIERRE<br><span>OPERACIONES</span></h1>
-      <p class="hero__sub">Resumen de compras panadería, ventas market y gastos de salida por fecha operativa.</p>
     </section>
 
     <div class="day-card">
@@ -94,6 +93,24 @@
               <tbody id="gastos-tbody"></tbody>
               <tfoot id="gastos-tfoot"></tfoot>
             </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bloque bloque-resumen-totales" id="bloque-resumen-totales">
+        <h2 class="bloque__titulo">Resumen del día</h2>
+        <div class="resumen-totales" id="resumen-totales">
+          <p class="resumen-totales__formula">Compras Panadería − (Ventas Market + Gastos de Salida)</p>
+          <div class="resumen-totales__valores" id="resumen-totales-valores">
+            <span id="resumen-compras">$ 0</span>
+            <span class="resumen-totales__op">−</span>
+            <span class="resumen-totales__paren">(</span>
+            <span id="resumen-ventas">$ 0</span>
+            <span class="resumen-totales__op">+</span>
+            <span id="resumen-gastos">$ 0</span>
+            <span class="resumen-totales__paren">)</span>
+            <span class="resumen-totales__op">=</span>
+            <span class="resumen-totales__resultado" id="resumen-resultado">$ 0</span>
           </div>
         </div>
       </section>

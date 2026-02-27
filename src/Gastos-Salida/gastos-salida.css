@@ -1,5 +1,7 @@
 /* Gastos de Salida — paleta igual que listado/Nueva venta (azul + cian) */
 :root {
+  --hero-user-color: #c0392b;
+  --hero-user-bg: rgba(192, 57, 43, 0.08);
   --azul-950: #060e2a;
   --azul-900: #0d1f5c;
   --azul-700: #1565c0;
@@ -17,6 +19,15 @@
   --r-s: 8px;
   --r-l: 20px;
   --t: 0.2s ease;
+}
+
+/* Resaltado sutil del nombre del usuario (color de identificación) */
+.hero__user-name {
+  color: var(--hero-user-color);
+  background: var(--hero-user-bg);
+  padding: 0.12em 0.4em;
+  border-radius: 6px;
+  font-weight: 700;
 }
 
 .header--no-nav .nav {
