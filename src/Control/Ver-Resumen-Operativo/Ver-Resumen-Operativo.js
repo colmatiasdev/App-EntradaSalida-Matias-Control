@@ -193,7 +193,7 @@
   }
 
   function mostrarMensaje(texto, esError) {
-    var el = document.getElementById('ver-resumen-operativo-mensaje');
+    var el = document.getElementById('mensaje');
     if (el) {
       el.textContent = texto;
       el.style.color = esError ? '#c62828' : '';
@@ -201,14 +201,14 @@
   }
 
   function setCargando(cargando) {
-    var el = document.getElementById('ver-resumen-operativo-loaded');
-    if (el) el.classList.toggle('cargando', cargando);
+    var el = document.getElementById('status-indicator');
+    if (el) el.classList.toggle('loading', cargando);
   }
 
   function pintarCabeceraSemana(lunes) {
-    var rangeEl = document.getElementById('ver-resumen-operativo-range-text');
-    var metaEl = document.getElementById('ver-resumen-operativo-week-meta');
-    var badgeEl = document.getElementById('ver-resumen-operativo-badge-actual');
+    var rangeEl = document.getElementById('range-text');
+    var metaEl = document.getElementById('week-meta');
+    var badgeEl = document.getElementById('badge-actual');
     if (!rangeEl || !metaEl) return;
     var hoy = new Date();
     hoy.setHours(0, 0, 0, 0);
@@ -220,7 +220,7 @@
   }
 
   function pintarTarjetas(lunes, porFecha) {
-    var container = document.getElementById('ver-resumen-operativo-cards');
+    var container = document.getElementById('cards');
     if (!container) return;
     var siete = getSieteDias(lunes);
     container.innerHTML = '';
@@ -228,22 +228,24 @@
       var info = porFecha[dia.key] || { total: 0, cantidad: 0 };
       var card = document.createElement('div');
       var esSelected = dia.key === selectedDayKey;
-      card.className = 'ver-resumen-operativo-card' +
-        (dia.esHoy ? ' ver-resumen-operativo-card--hoy' : '') +
-        (esSelected ? ' ver-resumen-operativo-card--selected' : '');
+      card.className = 'day-card' +
+        (dia.esHoy ? ' hoy' : '') +
+        (esSelected ? ' selected' : '');
       card.setAttribute('data-fecha', dia.key);
       var resumen = info.cantidad === 0 ? 'Sin datos' : (info.cantidad === 1 ? '1 operación' : info.cantidad + ' operaciones');
       var importeStr = info.cantidad === 0 ? '—' : formatImporte(info.total);
       card.innerHTML =
-        (dia.esHoy ? '<span class="ver-resumen-operativo-card__hoy-badge">HOY</span>' : '') +
-        '<span class="ver-resumen-operativo-card__dia">' + dia.labelDia + '</span>' +
-        '<span class="ver-resumen-operativo-card__num">' + dia.labelNum + '</span>' +
-        '<span class="ver-resumen-operativo-card__resumen">' + resumen + '</span>' +
-        '<span class="ver-resumen-operativo-card__importe">' + importeStr + '</span>';
+        (dia.esHoy ? '<span class="hoy-badge">HOY</span>' : '') +
+        '<span class="card-dia">' + dia.labelDia + '</span>' +
+        '<span class="card-num">' + dia.labelNum + '</span>' +
+        '<span class="card-resumen">' + resumen + '</span>' +
+        '<span class="card-importe">' + importeStr + '</span>';
       card.addEventListener('click', function () {
         selectedDayKey = dia.key;
         renderWeek();
         pintarDetalleDia(selectedDayKey);
+        var det = document.getElementById('detalle');
+        if (det) setTimeout(function () { det.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
       });
       container.appendChild(card);
     });
@@ -251,12 +253,12 @@
 
   /** Pinta la tabla de detalle del día: filas de RESUMEN-OPERATIVO filtradas por FECHA_OPERATIVA. */
   function pintarDetalleDia(fechaKeyVal) {
-    var tituloEl = document.getElementById('ver-resumen-operativo-detalle-titulo');
-    var vacioEl = document.getElementById('ver-resumen-operativo-detalle-vacio');
-    var wrapEl = document.getElementById('ver-resumen-operativo-detalle-tabla-wrap');
-    var theadEl = document.getElementById('ver-resumen-operativo-detalle-thead');
-    var tbodyEl = document.getElementById('ver-resumen-operativo-detalle-tbody');
-    var tfootEl = document.getElementById('ver-resumen-operativo-detalle-tfoot');
+    var tituloEl = document.getElementById('detalle-titulo');
+    var vacioEl = document.getElementById('detalle-vacio');
+    var wrapEl = document.getElementById('detalle-wrap');
+    var theadEl = document.getElementById('detalle-thead');
+    var tbodyEl = document.getElementById('detalle-tbody');
+    var tfootEl = document.getElementById('detalle-tfoot');
     if (!tituloEl || !vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
 
     var key = (fechaKeyVal !== undefined && fechaKeyVal !== null) ? String(fechaKeyVal).trim() : '';
@@ -323,8 +325,8 @@
         subtotalStyle = ' background:' + bgSuave + '; color:' + userColor + ';';
       }
       var trHeader = document.createElement('tr');
-      trHeader.className = 'ver-resumen-operativo-detalle-grupo' + (userColor ? ' ver-resumen-operativo-detalle-grupo--usuario' : '');
-      trHeader.innerHTML = '<td colspan="4" class="ver-resumen-operativo-detalle-grupo__titulo"' + (groupStyle ? ' style="' + groupStyle + '"' : '') + '>' + escapeHtml(correspondeA) + '</td>';
+      trHeader.className = 'grupo';
+      trHeader.innerHTML = '<td colspan="4" class="grupo-titulo"' + (groupStyle ? ' style="' + groupStyle + '"' : '') + '>' + escapeHtml(correspondeA) + '</td>';
       tbodyEl.appendChild(trHeader);
       grupoFilas.forEach(function (r) {
         var tr = document.createElement('tr');
@@ -336,10 +338,10 @@
         tbodyEl.appendChild(tr);
       });
       var trSubtotal = document.createElement('tr');
-      trSubtotal.className = 'ver-resumen-operativo-detalle-subtotal' + (userColor ? ' ver-resumen-operativo-detalle-subtotal--usuario' : '');
+      trSubtotal.className = 'subtotal';
       trSubtotal.innerHTML =
-        '<td colspan="3" class="ver-resumen-operativo-detalle-subtotal__label"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>Subtotal ' + escapeHtml(correspondeA) + '</td>' +
-        '<td class="td-num ver-resumen-operativo-detalle-subtotal__valor"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>' + formatImporte(subtotalGrupo) + '</td>';
+        '<td colspan="3" class="subtotal-label"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>Subtotal ' + escapeHtml(correspondeA) + '</td>' +
+        '<td class="td-num subtotal-valor"' + (subtotalStyle ? ' style="' + subtotalStyle + '"' : '') + '>' + formatImporte(subtotalGrupo) + '</td>';
       tbodyEl.appendChild(trSubtotal);
     });
 
@@ -348,8 +350,8 @@
       var nombreA = grupos[0];
       var nombreB = grupos[1];
       var diferencia = (subtotalesPorGrupo[nombreB] || 0) - (subtotalesPorGrupo[nombreA] || 0);
-      var claseDiferencia = diferencia >= 0 ? 'ver-resumen-operativo-detalle-diferencia--positivo' : 'ver-resumen-operativo-detalle-diferencia--negativo';
-      tfootRows += '<tr class="ver-resumen-operativo-detalle-diferencia"><td colspan="3" class="ver-resumen-operativo-detalle-diferencia__label">Diferencia ' + escapeHtml(nombreB) + ' − ' + escapeHtml(nombreA) + '</td><td class="td-num ver-resumen-operativo-detalle-diferencia__valor ' + claseDiferencia + '">' + formatImporte(diferencia) + '</td></tr>';
+      var claseDiferencia = diferencia >= 0 ? 'dif-positivo' : 'dif-negativo';
+      tfootRows += '<tr class="diferencia"><td colspan="3" class="dif-label">Diferencia ' + escapeHtml(nombreB) + ' − ' + escapeHtml(nombreA) + '</td><td class="td-num ' + claseDiferencia + '">' + formatImporte(diferencia) + '</td></tr>';
     }
     tfootRows += '<tr><td colspan="3">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
     tfootEl.innerHTML = tfootRows;
@@ -419,9 +421,9 @@
   function init() {
     weekStart = getMonday(new Date());
     selectedDayKey = hoyKey();
-    var btnPrev = document.getElementById('ver-resumen-operativo-prev');
-    var btnNext = document.getElementById('ver-resumen-operativo-next');
-    var btnActual = document.getElementById('ver-resumen-operativo-btn-actual');
+    var btnPrev = document.getElementById('btn-prev');
+    var btnNext = document.getElementById('btn-next');
+    var btnActual = document.getElementById('btn-actual');
 
     if (btnPrev) {
       btnPrev.addEventListener('click', function () {
@@ -440,6 +442,7 @@
     if (btnActual) {
       btnActual.addEventListener('click', function () {
         weekStart = getMonday(new Date());
+        selectedDayKey = hoyKey();
         renderWeek();
       });
     }

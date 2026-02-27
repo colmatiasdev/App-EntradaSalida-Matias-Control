@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#0d1f5c">
   <title>Ver Resumen Operativo — 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../../Header/header.css">
   <link rel="stylesheet" href="Ver-Resumen-Operativo.css">
 </head>
@@ -35,44 +35,47 @@
   </header>
 
   <main class="main">
-    <section class="ver-resumen-operativo-hero">
-      <div class="ver-resumen-operativo-hero__eyebrow">📋 Control</div>
-      <h1 class="ver-resumen-operativo-hero__title">Ver Resumen Operativo</h1>
-      <p class="ver-resumen-operativo-hero__text">Consultá el resumen operativo del negocio.</p>
+    <section class="hero">
+      <div class="hero__eyebrow">📋 Control</div>
+      <h1 class="hero__title">Ver Resumen Operativo</h1>
+      <p class="hero__text">Consultá el resumen operativo del negocio.</p>
     </section>
 
-    <section class="ver-resumen-operativo-section hub-section">
-      <div class="ver-resumen-operativo-week-header">
-        <div class="ver-resumen-operativo-week-nav">
-          <button type="button" class="ver-resumen-operativo-week-nav__btn" id="ver-resumen-operativo-prev" aria-label="Semana anterior">‹</button>
-          <button type="button" class="ver-resumen-operativo-week-nav__btn" id="ver-resumen-operativo-next" aria-label="Semana siguiente">›</button>
+    <section class="hub-section">
+      <div class="week-header">
+        <div class="week-nav">
+          <button type="button" class="week-nav__btn" id="btn-prev" aria-label="Semana anterior">‹</button>
+          <button type="button" class="week-nav__btn" id="btn-next" aria-label="Semana siguiente">›</button>
         </div>
-        <div class="ver-resumen-operativo-week-range">
-          <span id="ver-resumen-operativo-range-text">—</span>
-          <span class="ver-resumen-operativo-week-meta" id="ver-resumen-operativo-week-meta">—</span>
-          <span class="ver-resumen-operativo-badge-actual" id="ver-resumen-operativo-badge-actual" hidden>ACTUAL</span>
+        <div class="week-range">
+          <span class="week-range__text" id="range-text">—</span>
+          <span class="week-meta" id="week-meta">—</span>
+          <span class="badge-actual" id="badge-actual" hidden>ACTUAL</span>
         </div>
-        <div class="ver-resumen-operativo-week-actions">
-          <button type="button" class="ver-resumen-operativo-btn-actual" id="ver-resumen-operativo-btn-actual" aria-label="Ir a semana actual">📌 Semana actual</button>
-          <span class="ver-resumen-operativo-loaded" id="ver-resumen-operativo-loaded"><span class="ver-resumen-operativo-loaded__dot"></span> Semana cargada</span>
-        </div>
-      </div>
-      <p class="ver-resumen-operativo__mensaje" id="ver-resumen-operativo-mensaje">Cargando resumen…</p>
-      <div class="ver-resumen-operativo-cards-wrap" aria-label="Días de la semana">
-        <div class="ver-resumen-operativo-cards" id="ver-resumen-operativo-cards">
-          <!-- 7 tarjetas LUN–DOM se generan por JS -->
+        <div class="week-actions">
+          <button type="button" class="btn-actual" id="btn-actual" aria-label="Ir a semana actual">📌 Semana actual</button>
+          <span class="status-indicator" id="status-indicator">
+            <span class="status-dot"></span>
+            <span id="status-text">Semana cargada</span>
+          </span>
         </div>
       </div>
 
-      <div class="ver-resumen-operativo-detalle" id="ver-resumen-operativo-detalle">
-        <h3 class="ver-resumen-operativo-detalle__titulo" id="ver-resumen-operativo-detalle-titulo">Detalle del día</h3>
-        <p class="ver-resumen-operativo-detalle__vacio" id="ver-resumen-operativo-detalle-vacio">Seleccioná un día en la semana para ver los datos filtrados por fecha operativa.</p>
-        <div class="ver-resumen-operativo-detalle-tabla-wrap" id="ver-resumen-operativo-detalle-tabla-wrap" hidden>
-          <div class="ver-resumen-operativo-detalle-table-scroll">
-            <table class="ver-resumen-operativo-detalle-tabla">
-              <thead id="ver-resumen-operativo-detalle-thead"></thead>
-              <tbody id="ver-resumen-operativo-detalle-tbody"></tbody>
-              <tfoot id="ver-resumen-operativo-detalle-tfoot"></tfoot>
+      <p class="mensaje" id="mensaje">Cargando resumen…</p>
+
+      <div class="cards-wrap" aria-label="Días de la semana">
+        <div class="cards" id="cards"></div>
+      </div>
+
+      <div class="detalle" id="detalle">
+        <h3 class="detalle__titulo" id="detalle-titulo">Detalle del día</h3>
+        <p class="detalle__vacio" id="detalle-vacio">Seleccioná un día en la semana para ver los datos filtrados por fecha operativa.</p>
+        <div class="detalle-tabla-wrap" id="detalle-wrap" hidden>
+          <div class="detalle-scroll">
+            <table class="detalle-tabla">
+              <thead id="detalle-thead"></thead>
+              <tbody id="detalle-tbody"></tbody>
+              <tfoot id="detalle-tfoot"></tfoot>
             </table>
           </div>
         </div>
