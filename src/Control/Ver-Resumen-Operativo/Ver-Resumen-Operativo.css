@@ -63,6 +63,7 @@ body.ver-resumen-operativo-page::before {
   max-width: 1100px;
   margin: 0 auto;
   width: 100%;
+  min-width: 0;
   position: relative;
   z-index: 1;
 }
@@ -167,6 +168,8 @@ body.ver-resumen-operativo-page::before {
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--texto);
+  word-break: break-word;
+  min-width: 0;
 }
 
 .ver-resumen-operativo-week-meta {
@@ -277,16 +280,17 @@ body.ver-resumen-operativo-page::before {
 
 @media (max-width: 900px) {
   .ver-resumen-operativo-cards {
-    min-width: 560px;
-    grid-template-columns: repeat(7, minmax(72px, 1fr));
+    min-width: 420px;
+    grid-template-columns: repeat(7, minmax(56px, 1fr));
+    gap: 0.5rem;
   }
 }
 
 @media (max-width: 600px) {
   .ver-resumen-operativo-cards {
-    min-width: 490px;
-    grid-template-columns: repeat(7, minmax(64px, 1fr));
-    gap: 0.5rem;
+    min-width: 364px;
+    grid-template-columns: repeat(7, minmax(48px, 1fr));
+    gap: 0.4rem;
   }
 }
 
@@ -398,15 +402,28 @@ body.ver-resumen-operativo-page::before {
   overflow: hidden;
   border-radius: var(--r-s);
   border: 1px solid var(--borde);
+  -webkit-overflow-scrolling: touch;
 }
 
 .ver-resumen-operativo-detalle-table-scroll {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  overflow-y: visible;
+  margin: 0 -1px;
+}
+
+.ver-resumen-operativo-detalle-table-scroll::-webkit-scrollbar {
+  height: 6px;
+}
+
+.ver-resumen-operativo-detalle-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--borde);
+  border-radius: 3px;
 }
 
 .ver-resumen-operativo-detalle-tabla {
   width: 100%;
+  min-width: 320px;
   border-collapse: collapse;
   font-size: 0.85rem;
 }
@@ -421,6 +438,7 @@ body.ver-resumen-operativo-page::before {
   color: var(--azul-700);
   background: var(--azul-50);
   border-bottom: 1.5px solid var(--azul-200);
+  white-space: nowrap;
 }
 
 .ver-resumen-operativo-detalle-tabla thead th.th-num {
@@ -480,6 +498,7 @@ body.ver-resumen-operativo-page::before {
 .ver-resumen-operativo-detalle-tabla tbody td.td-num {
   text-align: right;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .ver-resumen-operativo-detalle-tabla tfoot td {
@@ -494,12 +513,14 @@ body.ver-resumen-operativo-page::before {
 .ver-resumen-operativo-detalle-tabla tfoot .td-total {
   text-align: right;
   color: var(--azul-700);
+  white-space: nowrap;
 }
 
 @media (max-width: 600px) {
   .ver-resumen-operativo-week-header {
     flex-direction: column;
     align-items: flex-start;
+    gap: 0.5rem;
   }
 
   .ver-resumen-operativo-week-actions {
@@ -507,27 +528,94 @@ body.ver-resumen-operativo-page::before {
   }
 
   .ver-resumen-operativo-card {
-    min-height: 88px;
-    padding: 0.65rem 0.5rem;
+    min-height: 72px;
+    padding: 0.45rem 0.35rem;
   }
 
   .ver-resumen-operativo-card__num {
-    font-size: 1rem;
+    font-size: 0.95rem;
   }
 
   .ver-resumen-operativo-card__dia {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
   }
 
   .ver-resumen-operativo-card__resumen,
   .ver-resumen-operativo-card__importe {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
+  }
+
+  .ver-resumen-operativo-card__hoy-badge {
+    font-size: 0.5rem;
+    padding: 0.1rem 0.3rem;
+  }
+
+  .ver-resumen-operativo-cards-wrap {
+    margin: 0 -0.5rem;
+    padding: 0.35rem 0 0.6rem;
+  }
+
+  .ver-resumen-operativo-detalle-tabla {
+    font-size: 0.78rem;
+    min-width: 300px;
+  }
+
+  .ver-resumen-operativo-detalle-tabla thead th {
+    padding: 0.4rem 0.5rem;
+    font-size: 0.62rem;
+  }
+
+  .ver-resumen-operativo-detalle-tabla tbody td {
+    padding: 0.35rem 0.5rem;
+  }
+
+  .ver-resumen-operativo-detalle-grupo__titulo {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.75rem;
+  }
+
+  .ver-resumen-operativo-detalle-subtotal__label {
+    padding: 0.4rem 0.5rem !important;
+    font-size: 0.78rem;
+  }
+
+  .ver-resumen-operativo-detalle-subtotal__valor {
+    font-size: 0.82rem;
+  }
+
+  .ver-resumen-operativo-detalle-tabla tfoot td {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.85rem;
   }
 }
 
 @media (max-width: 768px) {
   .ver-resumen-operativo-page .main {
-    padding: 1.75rem 1.1rem;
+    padding: 1.25rem 0.75rem;
+    padding-left: max(0.75rem, env(safe-area-inset-left));
+    padding-right: max(0.75rem, env(safe-area-inset-right));
+  }
+
+  .ver-resumen-operativo-hero {
+    margin-bottom: 1.5rem;
+  }
+
+  .ver-resumen-operativo-hero__title {
+    font-size: 1.35rem;
+  }
+
+  .ver-resumen-operativo-section {
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .ver-resumen-operativo-detalle {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+  }
+
+  .ver-resumen-operativo-detalle__titulo {
+    font-size: 0.9rem;
   }
 }
 
