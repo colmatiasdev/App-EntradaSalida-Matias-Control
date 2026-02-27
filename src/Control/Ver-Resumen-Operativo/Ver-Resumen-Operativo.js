@@ -18,6 +18,7 @@
 
   var datosCompletos = [];
   var weekStart = null; // Date: lunes de la semana mostrada
+  var selectedDayKey = ''; // Fecha operativa seleccionada (YYYY-MM-DD) para el detalle
   var cargaInicial = true;
 
   function normalizarFila(obj, headers) {
@@ -25,6 +26,10 @@
     var keys = Object.keys(obj || {});
     (headers || COLUMNAS).forEach(function (col) {
       var val = obj[col];
+      if (val === undefined) {
+        var colAlt = col.replace(/_/g, ' ');
+        if (obj[colAlt] !== undefined) val = obj[colAlt];
+      }
       if (val === undefined) {
         var colLower = col.toLowerCase();
         for (var k = 0; k < keys.length; k++) {
@@ -36,11 +41,24 @@
     return out;
   }
 
-  /** FECHA_OPERATIVA → YYYY-MM-DD */
+  /** FECHA_OPERATIVA → YYYY-MM-DD. Acepta Date, ISO string o texto DD/MM/YYYY. */
   function fechaKey(val) {
     if (val === undefined || val === null || val === '') return '';
     var d = new Date(val);
-    if (isNaN(d.getTime())) return String(val).trim();
+    if (isNaN(d.getTime())) {
+      var s = String(val).trim();
+      var parts = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+      if (parts) {
+        d = new Date(parseInt(parts[3], 10), parseInt(parts[2], 10) - 1, parseInt(parts[1], 10));
+        if (!isNaN(d.getTime())) {
+          var y = d.getFullYear();
+          var m = d.getMonth() + 1;
+          var day = d.getDate();
+          return y + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+        }
+      }
+      return s;
+    }
     var y = d.getFullYear();
     var m = d.getMonth() + 1;
     var day = d.getDate();
@@ -95,6 +113,19 @@
 
   function formatImporte(n) {
     return '$ ' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  }
+
+  /** Formatea valor HORA para mostrar (ej. 14:30 o texto tal cual si no es hora). */
+  function formatHora(val) {
+    if (val === undefined || val === null || val === '') return '—';
+    var s = String(val).trim();
+    var d = new Date(val);
+    if (!isNaN(d.getTime())) {
+      var h = d.getHours();
+      var m = d.getMinutes();
+      return (h < 10 ? '0' : '') + h + ':' + (m < 10 ? '0' : '') + m;
+    }
+    return s;
   }
 
   /** Para cada día de la semana (lun..dom) devuelve { date, key, labelDia, labelNum, esHoy, total, cantidad }. */
@@ -165,7 +196,10 @@
     siete.forEach(function (dia) {
       var info = porFecha[dia.key] || { total: 0, cantidad: 0 };
       var card = document.createElement('div');
-      card.className = 'ver-resumen-operativo-card' + (dia.esHoy ? ' ver-resumen-operativo-card--hoy' : '');
+      var esSelected = dia.key === selectedDayKey;
+      card.className = 'ver-resumen-operativo-card' +
+        (dia.esHoy ? ' ver-resumen-operativo-card--hoy' : '') +
+        (esSelected ? ' ver-resumen-operativo-card--selected' : '');
       card.setAttribute('data-fecha', dia.key);
       var resumen = info.cantidad === 0 ? 'Sin datos' : (info.cantidad === 1 ? '1 operación' : info.cantidad + ' operaciones');
       var importeStr = info.cantidad === 0 ? '—' : formatImporte(info.total);
@@ -175,8 +209,75 @@
         '<span class="ver-resumen-operativo-card__num">' + dia.labelNum + '</span>' +
         '<span class="ver-resumen-operativo-card__resumen">' + resumen + '</span>' +
         '<span class="ver-resumen-operativo-card__importe">' + importeStr + '</span>';
+      card.addEventListener('click', function () {
+        selectedDayKey = dia.key;
+        renderWeek();
+        pintarDetalleDia(selectedDayKey);
+      });
       container.appendChild(card);
     });
+  }
+
+  /** Pinta la tabla de detalle del día: filas de RESUMEN-OPERATIVO filtradas por FECHA_OPERATIVA. */
+  function pintarDetalleDia(fechaKeyVal) {
+    var tituloEl = document.getElementById('ver-resumen-operativo-detalle-titulo');
+    var vacioEl = document.getElementById('ver-resumen-operativo-detalle-vacio');
+    var wrapEl = document.getElementById('ver-resumen-operativo-detalle-tabla-wrap');
+    var theadEl = document.getElementById('ver-resumen-operativo-detalle-thead');
+    var tbodyEl = document.getElementById('ver-resumen-operativo-detalle-tbody');
+    var tfootEl = document.getElementById('ver-resumen-operativo-detalle-tfoot');
+    if (!tituloEl || !vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
+
+    var key = (fechaKeyVal !== undefined && fechaKeyVal !== null) ? String(fechaKeyVal).trim() : '';
+    if (!key) {
+      tituloEl.textContent = 'Detalle del día';
+      vacioEl.hidden = false;
+      vacioEl.textContent = 'Seleccioná un día en la semana para ver los datos filtrados por fecha operativa.';
+      wrapEl.hidden = true;
+      return;
+    }
+
+    var filas = datosCompletos.filter(function (r) { return fechaKey(r.FECHA_OPERATIVA) === key; });
+    var totalImporte = 0;
+    filas.forEach(function (r) {
+      var n = parseFloat(r.IMPORTE);
+      if (!isNaN(n)) totalImporte += n;
+    });
+
+    var d = new Date(key + 'T12:00:00');
+    var labelDia = isNaN(d.getTime()) ? key : d.getDate() + ' ' + MESES_ABREV[d.getMonth()] + ' ' + d.getFullYear();
+    tituloEl.textContent = 'Detalle del día — ' + labelDia;
+
+    if (filas.length === 0) {
+      vacioEl.hidden = false;
+      vacioEl.textContent = 'Sin registros para esta fecha.';
+      wrapEl.hidden = true;
+      return;
+    }
+
+    vacioEl.hidden = true;
+    wrapEl.hidden = false;
+
+    theadEl.innerHTML = '<tr><th>HORA</th><th>CORRESPONDE-A</th><th>TIPO-OPERACION</th><th>CATEGORIA</th><th class="th-num">IMPORTE</th></tr>';
+    tbodyEl.innerHTML = '';
+    filas.forEach(function (r) {
+      var tr = document.createElement('tr');
+      tr.innerHTML =
+        '<td>' + escapeHtml(formatHora(r.HORA)) + '</td>' +
+        '<td>' + escapeHtml(r['CORRESPONDE-A']) + '</td>' +
+        '<td>' + escapeHtml(r['TIPO-OPERACION']) + '</td>' +
+        '<td>' + escapeHtml(r.CATEGORIA) + '</td>' +
+        '<td class="td-num">' + escapeHtml(formatImporte(parseFloat(r.IMPORTE) || 0)) + '</td>';
+      tbodyEl.appendChild(tr);
+    });
+    tfootEl.innerHTML = '<tr><td colspan="4">Total del día</td><td class="td-num td-total">' + formatImporte(totalImporte) + '</td></tr>';
+  }
+
+  function escapeHtml(s) {
+    if (s === undefined || s === null) return '';
+    var div = document.createElement('div');
+    div.textContent = s;
+    return div.innerHTML;
   }
 
   function renderWeek() {
@@ -184,6 +285,7 @@
     var porFecha = agruparPorFecha(datosCompletos);
     pintarCabeceraSemana(weekStart);
     pintarTarjetas(weekStart, porFecha);
+    pintarDetalleDia(selectedDayKey);
   }
 
   function cargarDatos() {
@@ -234,6 +336,7 @@
 
   function init() {
     weekStart = getMonday(new Date());
+    selectedDayKey = hoyKey();
     var btnPrev = document.getElementById('ver-resumen-operativo-prev');
     var btnNext = document.getElementById('ver-resumen-operativo-next');
     var btnActual = document.getElementById('ver-resumen-operativo-btn-actual');

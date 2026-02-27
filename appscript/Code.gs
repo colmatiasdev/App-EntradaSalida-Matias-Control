@@ -758,20 +758,23 @@ function resumenOperativoLeer(params) {
   var datos = sheet.getDataRange().getValues();
   if (datos.length < 2) return respuestaJson({ ok: true, datos: [] });
   var headers = datos[0];
+  var colCount = Math.min(headers.length, def.columns.length);
   var filas = [];
   for (var i = 1; i < datos.length; i++) {
     var obj = {};
     for (var c = 0; c < headers.length; c++) {
       var val = datos[i][c];
-      obj[headers[c]] = (val !== undefined && val !== null) ? val : '';
+      var key = (c < colCount) ? def.columns[c] : headers[c];
+      obj[key] = (val !== undefined && val !== null) ? val : '';
     }
-    var pkVal = (obj[def.pk] !== undefined && obj[def.pk] !== null) ? String(obj[def.pk]).trim() : '';
-    if (pkVal === '') continue;
+    for (var k = 0; k < def.columns.length; k++) {
+      if (obj[def.columns[k]] === undefined) obj[def.columns[k]] = '';
+    }
     filas.push(obj);
   }
   var id = params[def.pk] || params.id;
   if (id) {
-    filas = filas.filter(function (f) { return String(f[def.pk]).trim() === String(id).trim(); });
+    filas = filas.filter(function (f) { return String(f[def.pk] || '').trim() === String(id).trim(); });
   }
   return respuestaJson({ ok: true, datos: filas });
 }
