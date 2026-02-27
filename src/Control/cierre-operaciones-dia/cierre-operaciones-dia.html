@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#f5f7ff">
+  <meta name="theme-color" content="#f0f4fb">
   <title>Cierre operaciones del día — 2H Market</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="cierre-operaciones-dia.css">
 </head>
 <body>
@@ -55,63 +55,84 @@
     </div>
 
     <div class="resumen-wrap" id="resumen-wrap">
-      <section class="bloque bloque-compras" id="bloque-compras">
-        <h2 class="bloque__titulo">Compras Panadería <span class="bloque__mes" id="mes-compras"></span></h2>
-        <p class="bloque__vacio" id="compras-vacio">Sin registros para este día.</p>
-        <div class="bloque__tabla-wrap" id="compras-wrap" hidden>
-          <div class="bloque__scroll">
-            <table class="bloque-tabla" id="tabla-compras">
-              <thead id="compras-thead"></thead>
-              <tbody id="compras-tbody"></tbody>
-              <tfoot id="compras-tfoot"></tfoot>
-            </table>
+
+      <section class="bloque" id="bloque-compras">
+        <div class="bloque__head">
+          <div class="bloque__head-left">
+            <h2 class="bloque__titulo">Compras Panadería</h2>
+            <span class="bloque__mes" id="mes-compras"></span>
           </div>
+          <div class="bloque__head-right">
+            <span class="bloque__count" id="compras-count" hidden></span>
+            <div class="view-toggle" id="vt-compras"></div>
+          </div>
+        </div>
+        <div id="compras-body">
+          <div class="bloque__vacio"><span class="bloque__vacio-icon">🛒</span>Sin registros para este día.</div>
+        </div>
+        <div class="bloque__foot" id="compras-foot" hidden>
+          <span class="bloque__foot-label">Total Compras</span>
+          <span class="bloque__foot-total" id="compras-total-foot">$ 0</span>
         </div>
       </section>
 
-      <section class="bloque bloque-ventas" id="bloque-ventas">
-        <h2 class="bloque__titulo">Ventas Market</h2>
-        <p class="bloque__vacio" id="ventas-vacio">Sin registros para este día.</p>
-        <div class="bloque__tabla-wrap" id="ventas-wrap" hidden>
-          <div class="bloque__scroll">
-            <table class="bloque-tabla" id="tabla-ventas">
-              <thead id="ventas-thead"></thead>
-              <tbody id="ventas-tbody"></tbody>
-              <tfoot id="ventas-tfoot"></tfoot>
-            </table>
+      <section class="bloque" id="bloque-ventas">
+        <div class="bloque__head">
+          <div class="bloque__head-left">
+            <h2 class="bloque__titulo">Ventas Market</h2>
           </div>
+          <div class="bloque__head-right">
+            <span class="bloque__count" id="ventas-count" hidden></span>
+            <div class="view-toggle" id="vt-ventas"></div>
+          </div>
+        </div>
+        <div id="ventas-body">
+          <div class="bloque__vacio"><span class="bloque__vacio-icon">💰</span>Sin registros para este día.</div>
+        </div>
+        <div class="bloque__foot" id="ventas-foot" hidden>
+          <span class="bloque__foot-label">Total Ventas</span>
+          <span class="bloque__foot-total" id="ventas-total-foot">$ 0</span>
         </div>
       </section>
 
-      <section class="bloque bloque-gastos" id="bloque-gastos">
-        <h2 class="bloque__titulo">Gastos de Salida</h2>
-        <p class="bloque__vacio" id="gastos-vacio">Sin registros para este día.</p>
-        <div class="bloque__tabla-wrap" id="gastos-wrap" hidden>
-          <div class="bloque__scroll">
-            <table class="bloque-tabla" id="tabla-gastos">
-              <thead id="gastos-thead"></thead>
-              <tbody id="gastos-tbody"></tbody>
-              <tfoot id="gastos-tfoot"></tfoot>
-            </table>
+      <section class="bloque" id="bloque-gastos">
+        <div class="bloque__head">
+          <div class="bloque__head-left">
+            <h2 class="bloque__titulo">Gastos de Salida</h2>
           </div>
+          <div class="bloque__head-right">
+            <span class="bloque__count" id="gastos-count" hidden></span>
+            <div class="view-toggle" id="vt-gastos"></div>
+          </div>
+        </div>
+        <div id="gastos-body">
+          <div class="bloque__vacio"><span class="bloque__vacio-icon">💸</span>Sin registros para este día.</div>
+        </div>
+        <div class="bloque__foot" id="gastos-foot" hidden>
+          <span class="bloque__foot-label">Total Gastos</span>
+          <span class="bloque__foot-total" id="gastos-total-foot">$ 0</span>
         </div>
       </section>
 
-      <section class="bloque bloque-resumen-totales" id="bloque-resumen-totales">
-        <h2 class="bloque__titulo">Resumen del día</h2>
-        <div class="resumen-totales" id="resumen-totales">
-          <p class="resumen-totales__formula">Compras Panadería − (Ventas Market + Gastos de Salida)</p>
-          <div class="resumen-totales__valores" id="resumen-totales-valores">
-            <span id="resumen-compras">$ 0</span>
-            <span class="resumen-totales__op">−</span>
-            <span class="resumen-totales__paren">(</span>
-            <span id="resumen-ventas">$ 0</span>
-            <span class="resumen-totales__op">+</span>
-            <span id="resumen-gastos">$ 0</span>
-            <span class="resumen-totales__paren">)</span>
-            <span class="resumen-totales__op">=</span>
-            <span class="resumen-totales__resultado" id="resumen-resultado">$ 0</span>
+      <section class="bloque-resumen" id="bloque-resumen-totales">
+        <div class="resumen-head"><h2>Resumen del día</h2></div>
+        <div class="resumen-grid">
+          <div class="resumen-item">
+            <span class="resumen-item__label">Compras</span>
+            <span class="resumen-item__val compra" id="resumen-compras">$ 0</span>
           </div>
+          <div class="resumen-item">
+            <span class="resumen-item__label">Ventas</span>
+            <span class="resumen-item__val venta" id="resumen-ventas">$ 0</span>
+          </div>
+          <div class="resumen-item">
+            <span class="resumen-item__label">Gastos</span>
+            <span class="resumen-item__val gasto" id="resumen-gastos">$ 0</span>
+          </div>
+        </div>
+        <div class="resumen-resultado">
+          <div class="resumen-resultado__formula">Compras − (Ventas + Gastos)</div>
+          <span class="resumen-resultado__num neutro" id="resumen-resultado">$ 0</span>
         </div>
       </section>
     </div>

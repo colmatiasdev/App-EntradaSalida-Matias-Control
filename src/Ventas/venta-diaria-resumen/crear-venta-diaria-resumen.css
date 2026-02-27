@@ -1,0 +1,120 @@
+/* Crear resumen venta diaria — formulario */
+.crear-resumen-page .crear-resumen__form-section {
+  margin-top: 0;
+}
+
+.crear-resumen__form-section .hub-section__title {
+  margin-bottom: 1rem;
+}
+
+.crear-resumen__form {
+  background: var(--bg-card);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-l);
+  padding: 1.5rem;
+  box-shadow: var(--s1);
+  max-width: 420px;
+}
+
+.crear-resumen__row {
+  margin-bottom: 1rem;
+}
+
+.crear-resumen__row:last-of-type {
+  margin-bottom: 0;
+}
+
+.crear-resumen__label {
+  display: block;
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--azul-700);
+  margin-bottom: .35rem;
+}
+
+.crear-resumen__input,
+.crear-resumen__select {
+  width: 100%;
+  padding: .5rem .65rem;
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-s);
+  font-size: .95rem;
+  font-family: var(--font-body);
+  background: var(--bg-card);
+  color: var(--texto);
+  box-sizing: border-box;
+}
+
+.crear-resumen__input:focus,
+.crear-resumen__select:focus {
+  outline: none;
+  border-color: var(--azul-700);
+  box-shadow: 0 0 0 2px rgba(21, 101, 192, 0.2);
+}
+
+.crear-resumen__input::placeholder {
+  color: var(--texto-2);
+}
+
+.crear-resumen__value {
+  margin: 0;
+  padding: .5rem .65rem;
+  font-size: .95rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  color: var(--texto);
+  background: var(--azul-50);
+  border: 1.5px solid var(--borde);
+  border-radius: var(--r-s);
+}
+
+.crear-resumen__select {
+  cursor: pointer;
+  appearance: auto;
+}
+
+.crear-resumen__actions {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--borde);
+}
+
+.crear-resumen__btn-submit {
+  width: 100%;
+  padding: .65rem 1rem;
+  border: none;
+  border-radius: var(--r-s);
+  background: var(--azul-700);
+  color: #fff;
+  font-size: .95rem;
+  font-weight: 700;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: background var(--t), transform 0.1s;
+}
+
+.crear-resumen__btn-submit:hover,
+.crear-resumen__btn-submit:active {
+  background: var(--azul-800);
+}
+
+.crear-resumen__btn-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.crear-resumen__msg {
+  margin-top: 1rem;
+  font-size: .9rem;
+  min-height: 1.4em;
+}
+
+.crear-resumen__msg.success {
+  color: #2e7d32;
+}
+
+.crear-resumen__msg.error {
+  color: #c62828;
+}

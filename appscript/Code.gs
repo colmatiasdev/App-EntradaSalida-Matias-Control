@@ -56,6 +56,11 @@ var TABLAS = {
     pk: 'ID-RESUMEN',
     columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'CATEGORIA', 'IMPORTE']
   },
+  RESUMEN_VENTA: {
+    sheet: 'RESUMEN-VENTA',
+    pk: 'ID-RESUMEN',
+    columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-OPERACIONES', 'IMPORTE']
+  },
   OPERACIONES_GENERALES: {
     sheet: 'OPERACIONES-GENERALES',
     pk: 'ID-OPERACION-GRAL',
@@ -63,7 +68,7 @@ var TABLAS = {
   },
   COMPONENTE_COMBO: {
     sheet: 'COMPONENTE-COMBO',
-    columns: ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
+    columns: ['TIPO-OPERACION-VENTA-DIARIA', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
   },
   VENTAS_MARKET: {
     sheet: 'VENTAS-MARKET',
@@ -111,6 +116,7 @@ function doPost(e) {
       case 'componenteComboLeer':        return componenteComboLeer(params);
       case 'operacionesGralAlta':        return operacionesGralAlta(params);
       case 'cierreOperacionesDiaLeer':   return cierreOperacionesDiaLeer(params);
+      case 'resumenVentaAlta':           return resumenVentaAlta(params);
       default:
         return respuestaJson({ ok: false, error: 'Acción no reconocida: ' + accion });
     }
@@ -819,6 +825,49 @@ function operacionesGralAlta(params) {
   return respuestaJson({ ok: true, mensaje: 'Operación guardada en OPERACIONES-GENERALES.' });
 }
 
+// --- RESUMEN-VENTA (resumen venta diaria) ---
+
+function siguienteIdResumenVenta(sheet, def) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return 'RVD-1';
+  var colPk = def.columns.indexOf(def.pk);
+  if (colPk === -1) return 'RVD-1';
+  var lastVal = sheet.getRange(lastRow, colPk + 1).getValue();
+  var num = 1;
+  if (lastVal !== undefined && lastVal !== null && lastVal !== '') {
+    var str = String(lastVal).trim();
+    var match = /^RVD-(\d+)$/i.exec(str);
+    if (match) num = parseInt(match[1], 10) + 1;
+  }
+  return 'RVD-' + num;
+}
+
+function resumenVentaAlta(params) {
+  var def = TABLAS.RESUMEN_VENTA;
+  var dato = params.dato || params;
+  var ss = getSS();
+  var sheet = getHoja(ss, def.sheet, def.columns);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, def.columns.length).setValues([def.columns]);
+    sheet.getRange(1, 1, 1, def.columns.length).setFontWeight('bold');
+  }
+  var idResumen = dato['ID-RESUMEN'] || params.idResumen || '';
+  if (!idResumen) idResumen = siguienteIdResumenVenta(sheet, def);
+  var obj = {
+    'ID-RESUMEN': idResumen,
+    'FECHA_OPERATIVA': dato['FECHA_OPERATIVA'] !== undefined ? dato['FECHA_OPERATIVA'] : (params.fechaOperativa || ''),
+    'HORA': dato['HORA'] !== undefined ? dato['HORA'] : (params.hora || ''),
+    'TURNO': dato['TURNO'] !== undefined ? dato['TURNO'] : (params.turno || ''),
+    'TIPO-OPERACION': dato['TIPO-OPERACION'] !== undefined ? dato['TIPO-OPERACION'] : (params.tipoOperacion || ''),
+    'CATEGORIA': dato['CATEGORIA'] !== undefined ? dato['CATEGORIA'] : (params.categoria || ''),
+    'CANTIDAD-OPERACIONES': dato['CANTIDAD-OPERACIONES'] !== undefined ? dato['CANTIDAD-OPERACIONES'] : (params.cantidadOperaciones !== undefined ? params.cantidadOperaciones : 0),
+    'IMPORTE': dato['IMPORTE'] !== undefined ? dato['IMPORTE'] : (params.importe !== undefined ? params.importe : 0)
+  };
+  var fila = objetoAFila(def, obj);
+  sheet.appendRow(fila);
+  return respuestaJson({ ok: true, mensaje: 'Resumen venta guardado.', idResumen: idResumen });
+}
+
 // --- COMPONENTE-COMBO (valores para combos: sucursal, tipo operación, categorías) ---
 
 function componenteComboLeer(params) {
@@ -829,7 +878,7 @@ function componenteComboLeer(params) {
   var datos = sheet.getDataRange().getValues();
   if (datos.length < 2) return respuestaJson({ ok: true, datos: [] });
   var headers = datos[0];
-  var colNames = ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET'];
+  var colNames = def.columns.length ? def.columns : ['TIPO-OPERACION-VENTA-DIARIA', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET'];
   var indices = colNames.map(function (name) { return headers.indexOf(name); });
   var filas = [];
   for (var i = 1; i < datos.length; i++) {

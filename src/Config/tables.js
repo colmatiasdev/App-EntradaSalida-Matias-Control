@@ -110,10 +110,17 @@
       columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'CORRESPONDE-A', 'TIPO-OPERACION', 'CATEGORIA', 'IMPORTE']
     },
 
-    /** Tabla COMPONENTE-COMBO: valores para combos (sucursal, tipo operación, categorías). */
+    /** Tabla RESUMEN-VENTA: resumen venta diaria (crear desde módulo Crear resumen venta diaria). */
+    RESUMEN_VENTA: {
+      sheet: 'RESUMEN-VENTA',
+      pk: 'ID-RESUMEN',
+      columns: ['ID-RESUMEN', 'FECHA_OPERATIVA', 'HORA', 'TURNO', 'TIPO-OPERACION', 'CATEGORIA', 'CANTIDAD-OPERACIONES', 'IMPORTE']
+    },
+
+    /** Tabla COMPONENTE-COMBO: valores para combos (tipo operación venta diaria, tipo operación, categorías panadería/market). */
     COMPONENTE_COMBO: {
       sheet: 'COMPONENTE-COMBO',
-      columns: ['COMBO-SUCURSAL-COMERCIO', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
+      columns: ['TIPO-OPERACION-VENTA-DIARIA', 'TIPO-OPERACION', 'COMBO-CATEGORIA-PANADERIA', 'COMBO-CATEGORIA-MARKET']
     },
 
     /** Tabla VENTAS-MARKET: ventas del market (formulario Nueva Venta). */

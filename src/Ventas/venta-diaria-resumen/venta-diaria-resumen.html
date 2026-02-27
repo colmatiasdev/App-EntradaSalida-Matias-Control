@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1f5c">
+  <title>Resumen venta diaria — 2H Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../Header/header.css">
+  <link rel="stylesheet" href="../../Main/main-panel.css">
+  <link rel="stylesheet" href="../../Footer/footer.css">
+  <link rel="stylesheet" href="venta-diaria-resumen.css">
+</head>
+<body class="main-panel-page venta-diaria-resumen-page">
+
+  <header class="header">
+    <div class="header__stripe"></div>
+    <div class="header__inner">
+      <a href="../../../index.html" class="logo">
+        <div class="logo__ring">
+          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
+        </div>
+        <div class="logo__texto">
+          <span class="logo__nombre"><span>2H</span> Market</span>
+          <span class="logo__sub">Control de <strong>MATIAS</strong></span>
+        </div>
+      </a>
+      <div class="header__sep"></div>
+      <span class="header__page" aria-current="page">📊 Resumen venta diaria</span>
+      <nav class="nav">
+        <ul class="nav__menu" id="main-nav">
+          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-header a-in">
+      <h1>Resumen venta diaria</h1>
+      <button type="button" class="venta-diaria__btn-nueva" id="btn-nueva-pestana" title="Abrir este resumen en una nueva pestaña">📄 Cargar resumen en nueva pestaña</button>
+    </div>
+
+    <div class="venta-diaria__day-card a-in-2">
+      <div class="venta-diaria__day-header">
+        <button type="button" class="venta-diaria__nav-btn" id="btn-prev" aria-label="Día anterior">‹</button>
+        <div class="venta-diaria__day-info">
+          <div class="venta-diaria__day-label" id="day-label">—</div>
+          <div class="venta-diaria__day-meta">
+            <span class="venta-diaria__day-date" id="day-date">—</span>
+            <span class="venta-diaria__badge-hoy" id="badge-hoy" hidden>HOY</span>
+          </div>
+        </div>
+        <button type="button" class="venta-diaria__btn-hoy" id="btn-hoy">📌 Hoy</button>
+        <button type="button" class="venta-diaria__nav-btn" id="btn-next" aria-label="Día siguiente">›</button>
+      </div>
+      <p class="venta-diaria__status" id="status-msg">Seleccioná un día.</p>
+    </div>
+
+    <section class="hub-section venta-diaria__tabla-section a-in-3" id="tabla-section">
+      <h2 class="hub-section__title">Ventas Market del día</h2>
+      <p class="venta-diaria__vacio" id="vacio-msg">Sin registros para este día.</p>
+      <div class="venta-diaria__tabla-wrap" id="tabla-wrap" hidden>
+        <div class="venta-diaria__scroll">
+          <table class="venta-diaria-tabla" id="tabla-ventas">
+            <thead id="ventas-thead"></thead>
+            <tbody id="ventas-tbody"></tbody>
+            <tfoot id="ventas-tfoot"></tfoot>
+          </table>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+
+  <script src="../../Config/config.js"></script>
+  <script src="../../Config/tables.js"></script>
+  <script src="../../Config/negocio.js"></script>
+  <script src="../../../main.js"></script>
+  <script src="../../Footer/footer.js"></script>
+  <script src="venta-diaria-resumen.js"></script>
+</body>
+</html>

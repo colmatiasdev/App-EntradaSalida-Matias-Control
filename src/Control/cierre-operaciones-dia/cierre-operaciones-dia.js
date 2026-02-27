@@ -1,79 +1,32 @@
 /**
- * Cierre operaciones del día — 2H Market
- * Muestra el día seleccionado (por defecto hoy) y permite moverse entre días.
- * Resumen: Compras Panadería (hoja del mes), Ventas Market, Gastos de Salida (OPERACIONES-GENERALES).
+ * Cierre operaciones del día — 2H Market (template: Cards / Tabla, resumen)
  */
 (function () {
   'use strict';
 
   var APP_CONFIG = window.APP_CONFIG;
-  var APP_TABLES = window.APP_TABLES;
-  var APP_SCRIPT_URL = APP_CONFIG && APP_CONFIG.APP_SCRIPT_URL;
-  var CORS_PROXY = APP_CONFIG && APP_CONFIG.CORS_PROXY;
+  var APP_SCRIPT_URL = (APP_CONFIG && APP_CONFIG.APP_SCRIPT_URL) || null;
+  var CORS_PROXY = (APP_CONFIG && APP_CONFIG.CORS_PROXY) || '';
 
-  var NOMBRES_MES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-  var DIAS_SEMANA = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+  var VIEWS = { compras: 'cards', ventas: 'cards', gastos: 'cards' };
+  var _compras = [], _ventas = [], _gastos = [];
+  var fechaActual = '';
 
-  var fechaActual = ''; // YYYY-MM-DD
+  var MES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  var DIA = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
-  function pad(n) {
-    return n < 10 ? '0' + n : String(n);
-  }
+  function pad(n) { return n < 10 ? '0'+n : String(n); }
+  function hoyKey() { var d = new Date(); return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function dateFromKey(k) { if (!k || k.length < 10) return null; var d = new Date(k+'T12:00:00'); return isNaN(d.getTime()) ? null : d; }
+  function keyFromDate(d) { return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate()); }
+  function sumarDias(k, n) { var d = dateFromKey(k); if (!d) return k; d.setDate(d.getDate()+n); return keyFromDate(d); }
+  function fmtCorta(k) { var d = dateFromKey(k); if (!d) return k; return DIA[d.getDay()]+' '+d.getDate()+' '+MES[d.getMonth()]; }
+  function fmtNum(k) { var d = dateFromKey(k); if (!d) return k; return d.getDate()+'/'+(d.getMonth()+1)+'/'+d.getFullYear(); }
+  function nombreMes(k) { if (!k) return ''; var m = parseInt(k.substring(5,7),10); return (m>=1&&m<=12) ? MES[m-1] : ''; }
+  function fi(n) { return '$ '+Number(n).toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+  function esc(s) { if (s==null) return ''; var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+  function isMobile() { return window.innerWidth <= 600; }
 
-  function hoyKey() {
-    var d = new Date();
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  }
-
-  function dateFromKey(key) {
-    if (!key || key.length < 10) return null;
-    var d = new Date(key + 'T12:00:00');
-    return isNaN(d.getTime()) ? null : d;
-  }
-
-  function keyFromDate(d) {
-    return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
-  }
-
-  function sumarDias(key, delta) {
-    var d = dateFromKey(key);
-    if (!d) return key;
-    d.setDate(d.getDate() + delta);
-    return keyFromDate(d);
-  }
-
-  function formatearFechaCorta(key) {
-    var d = dateFromKey(key);
-    if (!d) return key;
-    var dia = DIAS_SEMANA[d.getDay()];
-    return dia + ' ' + d.getDate() + ' ' + NOMBRES_MES[d.getMonth()];
-  }
-
-  function formatearFechaNum(key) {
-    var d = dateFromKey(key);
-    if (!d) return key;
-    return d.getDate() + '/' + (d.getMonth() + 1) + '/' + d.getFullYear();
-  }
-
-  function nombreMesDesdeKey(key) {
-    if (!key || key.length < 10) return '';
-    var mes = parseInt(key.substring(5, 7), 10);
-    if (isNaN(mes) || mes < 1 || mes > 12) return '';
-    return NOMBRES_MES[mes - 1];
-  }
-
-  function formatImporte(n) {
-    return '$ ' + Number(n).toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  }
-
-  function escapeHtml(s) {
-    if (s === undefined || s === null) return '';
-    var d = document.createElement('div');
-    d.textContent = s;
-    return d.innerHTML;
-  }
-
-  /** Devuelve { color: '#hex', etiqueta: 'Nombre' } para la columna USUARIO según APP_CONFIG.USUARIO_ETIQUETAS, o null. */
   function estiloUsuario(usuario) {
     var etiquetas = APP_CONFIG && APP_CONFIG.USUARIO_ETIQUETAS;
     if (!etiquetas || !usuario) return null;
@@ -84,280 +37,261 @@
     var nombreLower = String(usuario).toLowerCase().trim();
     for (var k in etiquetas) {
       var e = etiquetas[k];
-      if (e && e.etiqueta && String(e.etiqueta).toLowerCase() === nombreLower)
-        return { color: e.color || null, etiqueta: e.etiqueta || null };
+      if (e && e.etiqueta && String(e.etiqueta).toLowerCase() === nombreLower) return { color: e.color || null, etiqueta: e.etiqueta || null };
     }
     return null;
   }
-
-  /** Genera el HTML de la celda USUARIO con color y etiqueta si están definidos. */
   function celdaUsuario(r) {
     var val = r.USUARIO != null ? String(r.USUARIO).trim() : '';
     var estilo = estiloUsuario(val);
     var texto = (estilo && estilo.etiqueta) ? estilo.etiqueta : (val || '—');
-    var style = (estilo && estilo.color) ? ' style="color:' + escapeHtml(estilo.color) + ';font-weight:600;"' : '';
-    return '<td class="td-usuario"' + style + '>' + escapeHtml(texto) + '</td>';
+    var style = (estilo && estilo.color) ? ' style="color:'+esc(estilo.color)+';font-weight:600;"' : '';
+    return '<td class="td-usuario"'+style+'>'+esc(texto)+'</td>';
+  }
+  function chipUsuario(r) {
+    var val = r.USUARIO != null ? String(r.USUARIO).trim() : '';
+    if (!val) return '';
+    var estilo = estiloUsuario(val);
+    var texto = (estilo && estilo.etiqueta) ? estilo.etiqueta : val;
+    var style = (estilo && estilo.color) ? ' style="color:'+esc(estilo.color)+';border-color:'+esc(estilo.color)+'40;background:'+esc(estilo.color)+'12;"' : '';
+    return '<span class="chip chip-user"'+style+'>👤 '+esc(texto)+'</span>';
   }
 
-  function setMensaje(texto, esError) {
-    var el = document.getElementById('status-msg');
-    if (el) {
-      el.textContent = texto;
-      el.classList.toggle('error', !!esError);
+  function setMsg(txt, err) { var e = document.getElementById('status-msg'); if (e) { e.textContent = txt; e.classList.toggle('error', !!err); } }
+  function setCargando(v) {
+    var pill = document.getElementById('status-pill');
+    var txt  = document.getElementById('status-text');
+    if (pill) pill.classList.toggle('loading', v);
+    if (txt)  txt.textContent = v ? 'Cargando…' : 'Listo';
+  }
+  function pintarCabecera() {
+    var l = document.getElementById('day-label');
+    var d = document.getElementById('day-date');
+    var b = document.getElementById('badge-hoy');
+    if (l) l.textContent = fmtCorta(fechaActual);
+    if (d) d.textContent = fmtNum(fechaActual);
+    if (b) b.hidden = (fechaActual !== hoyKey());
+  }
+
+  function buildToggle(id) {
+    var cont = document.getElementById('vt-'+id);
+    if (!cont) return;
+    var svgCards = '<svg viewBox="0 0 14 14" fill="currentColor"><rect x="0" y="0" width="14" height="5.5" rx="1.5"/><rect x="0" y="7.5" width="14" height="5.5" rx="1.5"/></svg>';
+    var svgTable = '<svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6"><rect x=".8" y=".8" width="12.4" height="12.4" rx="1.5"/><line x1=".8" y1="4.8" x2="13.2" y2="4.8"/><line x1="4.8" y1="4.8" x2="4.8" y2="13.2"/></svg>';
+    cont.innerHTML = '<button class="view-btn" data-v="cards">'+svgCards+' Cards</button><button class="view-btn" data-v="table">'+svgTable+' Tabla</button>';
+    var def = isMobile() ? 'cards' : 'table';
+    VIEWS[id] = def;
+    cont.querySelectorAll('.view-btn').forEach(function(btn) {
+      btn.classList.toggle('active', btn.dataset.v === def);
+      btn.addEventListener('click', function() {
+        VIEWS[id] = btn.dataset.v;
+        cont.querySelectorAll('.view-btn').forEach(function(b){ b.classList.toggle('active', b === btn); });
+        repintarBloque(id);
+      });
+    });
+  }
+
+  function renderCardsCompras(datos) {
+    return '<div class="cards-list">'+datos.map(function(r,i){
+      var m = parseFloat(r.MONTO)||0;
+      return '<div class="reg-card" style="animation-delay:'+(i*.03)+'s">'+
+        '<div class="reg-card__top"><span class="reg-card__nombre">'+esc(r.PRODUCTO||'—')+'</span>'+
+        '<span class="reg-card__monto compra">'+fi(m)+'</span></div>'+
+        '<div class="reg-card__chips">'+
+        (r.HORA ? '<span class="chip hora">⏱ '+esc(r.HORA)+'</span>' : '')+
+        (r.CATEGORIA ? '<span class="chip cat">'+esc(r.CATEGORIA)+'</span>' : '')+
+        (r.CANTIDAD!=null ? '<span class="chip cant">×'+esc(r.CANTIDAD)+'</span>' : '')+
+        chipUsuario(r)+
+        '</div></div>';
+    }).join('')+'</div>';
+  }
+  function renderCardsVentas(datos) {
+    return '<div class="cards-list">'+datos.map(function(r,i){
+      var m = parseFloat(r.MONTO)||0;
+      return '<div class="reg-card" style="animation-delay:'+(i*.03)+'s">'+
+        '<div class="reg-card__top"><span class="reg-card__nombre">'+esc(r.PRODUCTO||'—')+'</span>'+
+        '<span class="reg-card__monto venta">'+fi(m)+'</span></div>'+
+        '<div class="reg-card__chips">'+
+        (r.HORA ? '<span class="chip hora">⏱ '+esc(r.HORA)+'</span>' : '')+
+        (r.CATEGORIA ? '<span class="chip cat">'+esc(r.CATEGORIA)+'</span>' : '')+
+        (r.CANTIDAD!=null ? '<span class="chip cant">×'+esc(r.CANTIDAD)+'</span>' : '')+
+        chipUsuario(r)+
+        '</div></div>';
+    }).join('')+'</div>';
+  }
+  function renderCardsGastos(datos) {
+    return '<div class="cards-list">'+datos.map(function(r,i){
+      var m = parseFloat(r.IMPORTE)||0;
+      return '<div class="reg-card" style="animation-delay:'+(i*.03)+'s">'+
+        '<div class="reg-card__top"><span class="reg-card__nombre">'+esc(r.DESCRIPCION||r['TIPO-OPERACION']||'—')+'</span>'+
+        '<span class="reg-card__monto gasto">'+fi(m)+'</span></div>'+
+        '<div class="reg-card__chips">'+
+        (r.HORA ? '<span class="chip hora">⏱ '+esc(r.HORA)+'</span>' : '')+
+        (r['TIPO-OPERACION'] ? '<span class="chip tipo">'+esc(r['TIPO-OPERACION'])+'</span>' : '')+
+        chipUsuario(r)+
+        '</div></div>';
+    }).join('')+'</div>';
+  }
+
+  function renderTableCompras(datos) {
+    var total = datos.reduce(function(s,r){return s+(parseFloat(r.MONTO)||0);},0);
+    return '<div class="bloque__scroll"><table class="bloque-tabla">'+
+      '<thead><tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORÍA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr></thead><tbody>'+
+      datos.map(function(r){ return '<tr><td>'+esc(r.HORA||'—')+'</td><td>'+esc(r.PRODUCTO||'')+'</td><td>'+esc(r.CATEGORIA||'')+'</td><td class="td-num">'+esc(r.CANTIDAD!=null?r.CANTIDAD:'')+'</td><td class="td-num">'+fi(parseFloat(r.MONTO)||0)+'</td>'+celdaUsuario(r)+'</tr>'; }).join('')+
+      '</tbody><tfoot><tr><td colspan="5"><strong>Total</strong></td><td class="td-num td-total">'+fi(total)+'</td></tr></tfoot></table></div>';
+  }
+  function renderTableVentas(datos) {
+    var total = datos.reduce(function(s,r){return s+(parseFloat(r.MONTO)||0);},0);
+    return '<div class="bloque__scroll"><table class="bloque-tabla">'+
+      '<thead><tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORÍA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr></thead><tbody>'+
+      datos.map(function(r){ return '<tr><td>'+esc(r.HORA||'—')+'</td><td>'+esc(r.PRODUCTO||'')+'</td><td>'+esc(r.CATEGORIA||'')+'</td><td class="td-num">'+esc(r.CANTIDAD!=null?r.CANTIDAD:'')+'</td><td class="td-num">'+fi(parseFloat(r.MONTO)||0)+'</td>'+celdaUsuario(r)+'</tr>'; }).join('')+
+      '</tbody><tfoot><tr><td colspan="5"><strong>Total</strong></td><td class="td-num td-total">'+fi(total)+'</td></tr></tfoot></table></div>';
+  }
+  function renderTableGastos(datos) {
+    var total = datos.reduce(function(s,r){return s+(parseFloat(r.IMPORTE)||0);},0);
+    return '<div class="bloque__scroll"><table class="bloque-tabla">'+
+      '<thead><tr><th>HORA</th><th>TIPO-OPERACIÓN</th><th>DESCRIPCIÓN</th><th class="th-num">IMPORTE</th><th>USUARIO</th></tr></thead><tbody>'+
+      datos.map(function(r){ return '<tr><td>'+esc(r.HORA||'—')+'</td><td>'+esc(r['TIPO-OPERACION']||'')+'</td><td>'+esc(r.DESCRIPCION||'')+'</td><td class="td-num">'+fi(parseFloat(r.IMPORTE)||0)+'</td>'+celdaUsuario(r)+'</tr>'; }).join('')+
+      '</tbody><tfoot><tr><td colspan="4"><strong>Total</strong></td><td class="td-num td-total">'+fi(total)+'</td></tr></tfoot></table></div>';
+  }
+
+  function repintarBloque(id) {
+    var datos   = id==='compras' ? _compras : (id==='ventas' ? _ventas : _gastos);
+    var bodyEl  = document.getElementById(id+'-body');
+    var footEl  = document.getElementById(id+'-foot');
+    var countEl = document.getElementById(id+'-count');
+    var footTot = document.getElementById(id+'-total-foot');
+    var emojis  = { compras:'🛒', ventas:'💰', gastos:'💸' };
+    var labels  = { compras:'Sin compras para este día.', ventas:'Sin ventas para este día.', gastos:'Sin gastos para este día.' };
+    if (!bodyEl) return;
+
+    if (!datos || datos.length === 0) {
+      bodyEl.innerHTML = '<div class="bloque__vacio"><span class="bloque__vacio-icon">'+emojis[id]+'</span>'+labels[id]+'</div>';
+      if (footEl)  footEl.hidden  = true;
+      if (countEl) countEl.hidden = true;
+      return;
+    }
+
+    var view = VIEWS[id] || 'cards';
+    var html;
+    if (id === 'compras') html = view === 'cards' ? renderCardsCompras(datos) : renderTableCompras(datos);
+    else if (id === 'ventas') html = view === 'cards' ? renderCardsVentas(datos) : renderTableVentas(datos);
+    else html = view === 'cards' ? renderCardsGastos(datos) : renderTableGastos(datos);
+    bodyEl.innerHTML = html;
+
+    if (footEl)  footEl.hidden  = false;
+    if (countEl) { countEl.hidden = false; countEl.textContent = datos.length + ' reg.'; }
+    if (footTot) {
+      var total = id === 'gastos'
+        ? datos.reduce(function(s,r){return s+(parseFloat(r.IMPORTE)||0);},0)
+        : datos.reduce(function(s,r){return s+(parseFloat(r.MONTO)||0);},0);
+      footTot.textContent = fi(total);
     }
   }
 
-  function setCargando(cargando) {
-    var el = document.getElementById('status-pill');
-    var txt = document.getElementById('status-text');
-    if (el) el.classList.toggle('loading', cargando);
-    if (txt) txt.textContent = cargando ? 'Cargando…' : 'Listo';
+  function pintarResumen() {
+    var tc = _compras.reduce(function(s,r){return s+(parseFloat(r.MONTO)||0);},0);
+    var tv = _ventas.reduce(function(s,r){return s+(parseFloat(r.MONTO)||0);},0);
+    var tg = _gastos.reduce(function(s,r){return s+(parseFloat(r.IMPORTE)||0);},0);
+    var ec = document.getElementById('resumen-compras');
+    var ev = document.getElementById('resumen-ventas');
+    var eg = document.getElementById('resumen-gastos');
+    var er = document.getElementById('resumen-resultado');
+    if (ec) ec.textContent = fi(tc);
+    if (ev) ev.textContent = fi(tv);
+    if (eg) eg.textContent = fi(tg);
+    if (er) {
+      var res = tc - (tv + tg);
+      er.textContent = fi(Math.abs(res));
+      er.className = 'resumen-resultado__num ' + (res > 0 ? 'rojo' : res < 0 ? 'verde' : 'neutro');
+    }
   }
 
-  function pintarCabeceraDia() {
-    var labelEl = document.getElementById('day-label');
-    var dateEl = document.getElementById('day-date');
-    var badgeEl = document.getElementById('badge-hoy');
-    if (!labelEl || !dateEl) return;
-    labelEl.textContent = formatearFechaCorta(fechaActual);
-    dateEl.textContent = formatearFechaNum(fechaActual);
-    if (badgeEl) badgeEl.hidden = fechaActual !== hoyKey();
-  }
-
-  function pintarTablaCompras(datos) {
-    var vacioEl = document.getElementById('compras-vacio');
-    var wrapEl = document.getElementById('compras-wrap');
-    var theadEl = document.getElementById('compras-thead');
-    var tbodyEl = document.getElementById('compras-tbody');
-    var tfootEl = document.getElementById('compras-tfoot');
+  function pintarTodo(compras, ventas, gastos) {
+    _compras = compras || [];
+    _ventas  = ventas  || [];
+    _gastos  = gastos  || [];
     var mesEl = document.getElementById('mes-compras');
-    if (!vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
-
-    if (mesEl) mesEl.textContent = '(' + nombreMesDesdeKey(fechaActual) + ')';
-
-    if (!datos || datos.length === 0) {
-      vacioEl.hidden = false;
-      wrapEl.hidden = true;
-      return;
-    }
-    vacioEl.hidden = true;
-    wrapEl.hidden = false;
-
-    theadEl.innerHTML = '<tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORIA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
-    tbodyEl.innerHTML = '';
-    var total = 0;
-    datos.forEach(function (r) {
-      var monto = parseFloat(r.MONTO);
-      if (!isNaN(monto)) total += monto;
-      tbodyEl.innerHTML +=
-        '<tr><td>' + escapeHtml(String(r.HORA || '—')) + '</td>' +
-        '<td>' + escapeHtml(String(r.PRODUCTO || '')) + '</td>' +
-        '<td>' + escapeHtml(String(r.CATEGORIA || '')) + '</td>' +
-        '<td class="td-num">' + escapeHtml(String(r.CANTIDAD != null ? r.CANTIDAD : '')) + '</td>' +
-        '<td class="td-num">' + formatImporte(monto || 0) + '</td>' +
-        celdaUsuario(r) + '</tr>';
-    });
-    tfootEl.innerHTML = '<tr><td colspan="5"><strong>Total Compras Panadería</strong></td><td class="td-num td-total">' + formatImporte(total) + '</td></tr>';
+    if (mesEl) mesEl.textContent = nombreMes(fechaActual) ? '('+nombreMes(fechaActual)+')' : '';
+    repintarBloque('compras');
+    repintarBloque('ventas');
+    repintarBloque('gastos');
+    pintarResumen();
   }
 
-  function pintarTablaVentas(datos) {
-    var vacioEl = document.getElementById('ventas-vacio');
-    var wrapEl = document.getElementById('ventas-wrap');
-    var theadEl = document.getElementById('ventas-thead');
-    var tbodyEl = document.getElementById('ventas-tbody');
-    var tfootEl = document.getElementById('ventas-tfoot');
-    if (!vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
-
-    if (!datos || datos.length === 0) {
-      vacioEl.hidden = false;
-      wrapEl.hidden = true;
-      return;
-    }
-    vacioEl.hidden = true;
-    wrapEl.hidden = false;
-
-    theadEl.innerHTML = '<tr><th>HORA</th><th>PRODUCTO</th><th>CATEGORIA</th><th class="th-num">CANT.</th><th class="th-num">MONTO</th><th>USUARIO</th></tr>';
-    tbodyEl.innerHTML = '';
-    var total = 0;
-    datos.forEach(function (r) {
-      var monto = parseFloat(r.MONTO);
-      if (!isNaN(monto)) total += monto;
-      tbodyEl.innerHTML +=
-        '<tr><td>' + escapeHtml(String(r.HORA || '—')) + '</td>' +
-        '<td>' + escapeHtml(String(r.PRODUCTO || '')) + '</td>' +
-        '<td>' + escapeHtml(String(r.CATEGORIA || '')) + '</td>' +
-        '<td class="td-num">' + escapeHtml(String(r.CANTIDAD != null ? r.CANTIDAD : '')) + '</td>' +
-        '<td class="td-num">' + formatImporte(monto || 0) + '</td>' +
-        celdaUsuario(r) + '</tr>';
-    });
-    tfootEl.innerHTML = '<tr><td colspan="5"><strong>Total Ventas Market</strong></td><td class="td-num td-total">' + formatImporte(total) + '</td></tr>';
-  }
-
-  function pintarTablaGastos(datos) {
-    var vacioEl = document.getElementById('gastos-vacio');
-    var wrapEl = document.getElementById('gastos-wrap');
-    var theadEl = document.getElementById('gastos-thead');
-    var tbodyEl = document.getElementById('gastos-tbody');
-    var tfootEl = document.getElementById('gastos-tfoot');
-    if (!vacioEl || !wrapEl || !theadEl || !tbodyEl || !tfootEl) return;
-
-    if (!datos || datos.length === 0) {
-      vacioEl.hidden = false;
-      wrapEl.hidden = true;
-      return;
-    }
-    vacioEl.hidden = true;
-    wrapEl.hidden = false;
-
-    theadEl.innerHTML = '<tr><th>HORA</th><th>TIPO-OPERACION</th><th>DESCRIPCION</th><th class="th-num">IMPORTE</th><th>USUARIO</th></tr>';
-    tbodyEl.innerHTML = '';
-    var total = 0;
-    datos.forEach(function (r) {
-      var imp = parseFloat(r.IMPORTE);
-      if (!isNaN(imp)) total += imp;
-      tbodyEl.innerHTML +=
-        '<tr><td>' + escapeHtml(String(r.HORA || '—')) + '</td>' +
-        '<td>' + escapeHtml(String(r['TIPO-OPERACION'] || '')) + '</td>' +
-        '<td>' + escapeHtml(String(r.DESCRIPCION || '')) + '</td>' +
-        '<td class="td-num">' + formatImporte(imp || 0) + '</td>' +
-        celdaUsuario(r) + '</tr>';
-    });
-    tfootEl.innerHTML = '<tr><td colspan="4"><strong>Total Gastos de Salida</strong></td><td class="td-num td-total">' + formatImporte(total) + '</td></tr>';
-  }
-
-  function sumarMonto(datos) {
-    var t = 0;
-    if (!datos || !datos.length) return t;
-    datos.forEach(function (r) {
-      var n = parseFloat(r.MONTO);
-      if (!isNaN(n)) t += n;
-    });
-    return t;
-  }
-
-  function sumarImporte(datos) {
-    var t = 0;
-    if (!datos || !datos.length) return t;
-    datos.forEach(function (r) {
-      var n = parseFloat(r.IMPORTE);
-      if (!isNaN(n)) t += n;
-    });
-    return t;
-  }
-
-  function pintarResumenTotales(totalCompras, totalVentas, totalGastos) {
-    var elCompras = document.getElementById('resumen-compras');
-    var elVentas = document.getElementById('resumen-ventas');
-    var elGastos = document.getElementById('resumen-gastos');
-    var elResultado = document.getElementById('resumen-resultado');
-    if (!elCompras || !elVentas || !elGastos || !elResultado) return;
-    elCompras.textContent = formatImporte(totalCompras);
-    elVentas.textContent = formatImporte(totalVentas);
-    elGastos.textContent = formatImporte(totalGastos);
-    var resultado = totalCompras - (totalVentas + totalGastos);
-    elResultado.textContent = formatImporte(Math.abs(resultado));
-    elResultado.classList.remove('resumen-totales__resultado--rojo', 'resumen-totales__resultado--verde', 'resumen-totales__resultado--neutro');
-    if (resultado > 0) {
-      elResultado.classList.add('resumen-totales__resultado--rojo');
-    } else if (resultado < 0) {
-      elResultado.classList.add('resumen-totales__resultado--verde');
-    } else {
-      elResultado.classList.add('resumen-totales__resultado--neutro');
-    }
+  function datosDemo(fecha) {
+    if (fecha !== hoyKey()) return { ok:true, fecha:fecha, comprasPanaderia:[], ventasMarket:[], gastosSalida:[] };
+    return {
+      ok: true, fecha: fecha,
+      comprasPanaderia: [
+        { HORA:'07:15', PRODUCTO:'Medialunas x12', CATEGORIA:'Panadería', CANTIDAD:2, MONTO:3600, USUARIO:'USR-MATIAS' },
+        { HORA:'07:40', PRODUCTO:'Pan francés', CATEGORIA:'Panadería', CANTIDAD:10, MONTO:1200, USUARIO:'USR-MATIAS' },
+        { HORA:'08:00', PRODUCTO:'Facturas surtidas', CATEGORIA:'Panadería', CANTIDAD:24, MONTO:8400, USUARIO:'USR-SILVINA' },
+      ],
+      ventasMarket: [
+        { HORA:'09:15', PRODUCTO:'Bebidas varias', CATEGORIA:'Bebidas', CANTIDAD:8, MONTO:6400, USUARIO:'USR-MATIAS' },
+        { HORA:'10:30', PRODUCTO:'Snacks surtidos', CATEGORIA:'Almacén', CANTIDAD:15, MONTO:4500, USUARIO:'USR-SILVINA' },
+      ],
+      gastosSalida: [
+        { HORA:'11:00', 'TIPO-OPERACION':'Transporte', DESCRIPCION:'Flete mercadería', IMPORTE:2500, USUARIO:'USR-MATIAS' },
+      ]
+    };
   }
 
   function cargarDatos() {
+    setMsg('Cargando cierre del '+fmtNum(fechaActual)+'…');
+    setCargando(true);
+
     if (!APP_SCRIPT_URL) {
-      setMensaje('No está configurada APP_SCRIPT_URL en config.js.', true);
-      setCargando(false);
-      pintarTablaCompras([]);
-      pintarTablaVentas([]);
-      pintarTablaGastos([]);
-      pintarResumenTotales(0, 0, 0);
+      setTimeout(function() {
+        setCargando(false);
+        var d = datosDemo(fechaActual);
+        var tiene = d.comprasPanaderia.length || d.ventasMarket.length || d.gastosSalida.length;
+        setMsg(tiene ? 'Datos de demo — '+fmtNum(fechaActual) : 'Sin registros para '+fmtNum(fechaActual));
+        pintarTodo(d.comprasPanaderia, d.ventasMarket, d.gastosSalida);
+      }, 550);
       return;
     }
-    setMensaje('Cargando cierre del ' + formatearFechaNum(fechaActual) + '…');
-    setCargando(true);
-    var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY + encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
+
+    var url = (CORS_PROXY && CORS_PROXY.length) ? CORS_PROXY+encodeURIComponent(APP_SCRIPT_URL) : APP_SCRIPT_URL;
     fetch(url, {
-      method: 'POST',
-      mode: 'cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: 'data=' + encodeURIComponent(JSON.stringify({ accion: 'cierreOperacionesDiaLeer', fecha: fechaActual }))
+      method:'POST', mode:'cors',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:'data='+encodeURIComponent(JSON.stringify({accion:'cierreOperacionesDiaLeer', fecha:fechaActual}))
     })
-      .then(function (res) {
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        var ct = (res.headers.get('Content-Type') || '').toLowerCase();
-        if (ct.indexOf('json') !== -1) return res.json();
-        return res.text().then(function (t) {
-          try { return JSON.parse(t); } catch (e) { return { ok: false, error: t }; };
-        });
-      })
-      .then(function (data) {
-        setCargando(false);
-        if (!data || !data.ok) {
-          setMensaje(data && (data.error || data.mensaje) || 'Error al cargar.', true);
-          pintarTablaCompras([]);
-          pintarTablaVentas([]);
-          pintarTablaGastos([]);
-          pintarResumenTotales(0, 0, 0);
-          return;
-        }
-        setMensaje('Cierre del ' + formatearFechaNum(data.fecha || fechaActual) + ' cargado.');
-        var compras = data.comprasPanaderia || [];
-        var ventas = data.ventasMarket || [];
-        var gastos = data.gastosSalida || [];
-        pintarTablaCompras(compras);
-        pintarTablaVentas(ventas);
-        pintarTablaGastos(gastos);
-        pintarResumenTotales(sumarMonto(compras), sumarMonto(ventas), sumarImporte(gastos));
-      })
-      .catch(function (err) {
-        setCargando(false);
-        setMensaje('Error: ' + (err && err.message ? err.message : String(err)), true);
-        pintarTablaCompras([]);
-        pintarTablaVentas([]);
-        pintarTablaGastos([]);
-        pintarResumenTotales(0, 0, 0);
-      });
+    .then(function(res) {
+      if (!res.ok) throw new Error('HTTP '+res.status);
+      var ct = (res.headers.get('Content-Type')||'').toLowerCase();
+      if (ct.indexOf('json')!==-1) return res.json();
+      return res.text().then(function(t){ try{return JSON.parse(t);}catch(e){return{ok:false,error:t};} });
+    })
+    .then(function(data) {
+      setCargando(false);
+      if (!data||!data.ok) { setMsg((data&&(data.error||data.mensaje))||'Error al cargar.',true); pintarTodo([],[],[]); return; }
+      setMsg('Cierre del '+fmtNum(data.fecha||fechaActual)+' cargado.');
+      pintarTodo(data.comprasPanaderia, data.ventasMarket, data.gastosSalida);
+    })
+    .catch(function(err) {
+      setCargando(false);
+      setMsg('Error: '+(err&&err.message?err.message:String(err)),true);
+      pintarTodo([],[],[]);
+    });
   }
 
-  function render() {
-    pintarCabeceraDia();
-    cargarDatos();
-  }
+  function render() { pintarCabecera(); cargarDatos(); }
 
   function init() {
     fechaActual = hoyKey();
+    ['compras','ventas','gastos'].forEach(buildToggle);
     var btnPrev = document.getElementById('btn-prev');
     var btnNext = document.getElementById('btn-next');
     var btnHoy = document.getElementById('btn-hoy');
-
-    if (btnPrev) {
-      btnPrev.addEventListener('click', function () {
-        fechaActual = sumarDias(fechaActual, -1);
-        render();
-      });
-    }
-    if (btnNext) {
-      btnNext.addEventListener('click', function () {
-        fechaActual = sumarDias(fechaActual, 1);
-        render();
-      });
-    }
-    if (btnHoy) {
-      btnHoy.addEventListener('click', function () {
-        fechaActual = hoyKey();
-        render();
-      });
-    }
-
+    if (btnPrev) btnPrev.addEventListener('click', function(){ fechaActual=sumarDias(fechaActual,-1); render(); });
+    if (btnNext) btnNext.addEventListener('click', function(){ fechaActual=sumarDias(fechaActual,1); render(); });
+    if (btnHoy) btnHoy.addEventListener('click', function(){ fechaActual=hoyKey(); render(); });
     render();
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    init();
-  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
 })();

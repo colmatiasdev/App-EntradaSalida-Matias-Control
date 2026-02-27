@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0d1f5c">
+  <title>Crear resumen venta diaria — 2H Market</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../../../index.css">
+  <link rel="stylesheet" href="../../Header/header.css">
+  <link rel="stylesheet" href="../../Main/main-panel.css">
+  <link rel="stylesheet" href="../../Footer/footer.css">
+  <link rel="stylesheet" href="venta-diaria-resumen.css">
+  <link rel="stylesheet" href="crear-venta-diaria-resumen.css">
+</head>
+<body class="main-panel-page venta-diaria-resumen-page crear-resumen-page">
+
+  <header class="header">
+    <div class="header__stripe"></div>
+    <div class="header__inner">
+      <a href="../../../index.html" class="logo">
+        <div class="logo__ring">
+          <img src="../../img/Logo3.png" alt="2H Market" class="logo__img">
+        </div>
+        <div class="logo__texto">
+          <span class="logo__nombre"><span>2H</span> Market</span>
+          <span class="logo__sub">Control de <strong>MATIAS</strong></span>
+        </div>
+      </a>
+      <div class="header__sep"></div>
+      <span class="header__page" aria-current="page">📊 Crear resumen venta diaria</span>
+      <nav class="nav">
+        <ul class="nav__menu" id="main-nav">
+          <li><a href="venta-diaria-resumen.html" class="nav__link">📋 Resumen venta diaria</a></li>
+          <li><a href="../../../index.html" class="nav__link">🏠 Inicio</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <div class="page-header a-in">
+      <h1>Crear resumen venta diaria</h1>
+    </div>
+
+    <div class="venta-diaria__day-card a-in-2">
+      <div class="venta-diaria__day-header">
+        <button type="button" class="venta-diaria__nav-btn" id="btn-prev" aria-label="Día anterior">‹</button>
+        <div class="venta-diaria__day-info">
+          <div class="venta-diaria__day-label" id="day-label">—</div>
+          <div class="venta-diaria__day-meta">
+            <span class="venta-diaria__day-date" id="day-date">—</span>
+            <span class="venta-diaria__badge-hoy" id="badge-hoy" hidden>HOY</span>
+          </div>
+        </div>
+        <button type="button" class="venta-diaria__btn-hoy" id="btn-hoy">📌 Hoy</button>
+        <button type="button" class="venta-diaria__nav-btn" id="btn-next" aria-label="Día siguiente">›</button>
+      </div>
+      <p class="venta-diaria__status" id="status-day">Seleccioná un día para la fecha del resumen.</p>
+    </div>
+
+    <section class="crear-resumen__form-section a-in-3" id="form-section">
+      <h2 class="hub-section__title">Carga Manual para el Resumen de Venta Diario</h2>
+      <form id="form-resumen-venta" class="crear-resumen__form">
+        <input type="hidden" id="fecha-operativa" name="FECHA_OPERATIVA" value="">
+        <input type="hidden" id="hora" name="HORA" value="">
+        <div class="crear-resumen__row">
+          <label class="crear-resumen__label" for="turno">TURNO</label>
+          <select id="turno" name="TURNO" class="crear-resumen__select">
+            <option value="">— Seleccionar —</option>
+            <option value="MAÑANA">MAÑANA</option>
+            <option value="TARDE">TARDE</option>
+            <option value="NOCHE">NOCHE</option>
+          </select>
+        </div>
+        <div class="crear-resumen__row">
+          <label class="crear-resumen__label" for="tipo-operacion">TIPO-OPERACION</label>
+          <select id="tipo-operacion" name="TIPO-OPERACION" class="crear-resumen__select">
+            <option value="">— Seleccionar —</option>
+          </select>
+        </div>
+        <div class="crear-resumen__row">
+          <span class="crear-resumen__label">CATEGORIA</span>
+          <input type="hidden" id="categoria" name="CATEGORIA" value="CARGA MANUAL">
+          <p class="crear-resumen__value" id="categoria-value">CARGA MANUAL</p>
+        </div>
+        <div class="crear-resumen__row">
+          <label class="crear-resumen__label" for="cantidad-operaciones">CANTIDAD-OPERACIONES</label>
+          <input type="number" id="cantidad-operaciones" name="CANTIDAD-OPERACIONES" class="crear-resumen__input" placeholder="1" min="1" max="9999" step="1" value="1" inputmode="numeric" title="Número entero, mayor a 0, máximo 4 dígitos (1-9999)">
+        </div>
+        <div class="crear-resumen__row">
+          <label class="crear-resumen__label" for="importe">IMPORTE</label>
+          <input type="number" id="importe" name="IMPORTE" class="crear-resumen__input" placeholder="0,00" min="0.01" max="9999999999.99" step="0.01" value="" inputmode="decimal" title="Mayor a 0. Hasta 10 enteros y 2 decimales">
+        </div>
+        <div class="crear-resumen__actions">
+          <button type="submit" class="crear-resumen__btn-submit" id="btn-guardar" disabled>Carga Manual</button>
+        </div>
+      </form>
+      <p class="crear-resumen__msg" id="form-msg" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <div id="footer-container" data-footer-src="../../Footer/footer.html"></div>
+
+  <script src="../../Config/config.js"></script>
+  <script src="../../Config/tables.js"></script>
+  <script src="../../Config/negocio.js"></script>
+  <script src="../../../main.js"></script>
+  <script src="../../Footer/footer.js"></script>
+  <script src="crear-venta-diaria-resumen.js"></script>
+</body>
+</html>
