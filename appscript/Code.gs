@@ -74,6 +74,16 @@ var TABLAS = {
     sheet: 'VENTAS-MARKET',
     pk: 'ID-VENTA',
     columns: ['ID-VENTA', 'AÑO', 'FECHA_OPERATIVA', 'HORA', 'NOMBRE-APELLIDO', 'TIPO-LISTA-PRECIO', 'ID-PRODUCTO', 'CATEGORIA', 'PRODUCTO', 'CANTIDAD', 'PRESENTACION-UNIDAD-MEDIDA', 'PRECIO', 'MONTO', 'USUARIO']
+  },
+  PROVEEDORES_COMPRAS: {
+    sheet: 'PROVEEDORES-COMPRAS',
+    pk: 'IDPROVEEDORES-COMPRA',
+    columns: ['IDPROVEEDORES-COMPRA', 'FECHA', 'PROVEEDOR-NOMBRE-EMPRESA', 'MONTO-TOTAL-COMPRA', 'CATEGORIA', 'PORCENTAJE-GANANCIA', 'MONTO-GANANCIA']
+  },
+  PROVEEDORES_COMPRAS_DETALLE: {
+    sheet: 'PROVEEDORES-COMPRAS-DETALLE',
+    pk: 'IDPROVEEDORES-COMPRA-DETALLE',
+    columns: ['IDPROVEEDORES-COMPRA', 'IDPROVEEDORES-COMPRA-DETALLE', 'PRODUCTO', 'CANTIDAD', 'PRECIO-UNITARIO', 'SUBTOTAL']
   }
 };
 
@@ -119,6 +129,20 @@ function doPost(e) {
       case 'resumenVentaAlta':           return resumenVentaAlta(params);
       case 'resumenVentaLeer':           return resumenVentaLeer(params);
       case 'resumenVentaLeerRango':      return resumenVentaLeerRango(params);
+      case 'proveedorCompraLeerRango':   return proveedorCompraLeerRango(params);
+
+      // --- PROVEEDORES COMPRAS ---
+      case 'proveedorCompraAlta':         return proveedorCompraAlta(params);
+      case 'proveedorCompraBaja':         return proveedorCompraBaja(params);
+      case 'proveedorCompraModificacion': return proveedorCompraModificacion(params);
+      case 'proveedorCompraLeer':         return proveedorCompraLeer(params);
+
+      // --- PROVEEDORES COMPRAS DETALLE ---
+      case 'proveedorCompraDetalleAlta':         return proveedorCompraDetalleAlta(params);
+      case 'proveedorCompraDetalleBaja':         return proveedorCompraDetalleBaja(params);
+      case 'proveedorCompraDetalleModificacion': return proveedorCompraDetalleModificacion(params);
+      case 'proveedorCompraDetalleLeer':         return proveedorCompraDetalleLeer(params);
+
       default:
         return respuestaJson({ ok: false, error: 'Acción no reconocida: ' + accion });
     }
@@ -1059,3 +1083,276 @@ function cierreOperacionesDiaLeer(params) {
 function respuestaJson(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
+
+// --- PROVEEDORES-COMPRAS ---
+
+function proveedorCompraAlta(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS;
+  var dato = params.dato || params;
+  if (!dato[def.pk]) return respuestaJson({ ok: false, error: 'Falta ' + def.pk });
+  var ss = getSS();
+  var sheet = getHoja(ss, def.sheet, def.columns);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, def.columns.length).setValues([def.columns]);
+    sheet.getRange(1, 1, 1, def.columns.length).setFontWeight('bold');
+  }
+  var fila = objetoAFila(def, dato);
+  var rowNum = buscarFilaPorPK(sheet, def, dato[def.pk]);
+  if (rowNum > 0) return respuestaJson({ ok: false, error: 'Ya existe una compra con ese ' + def.pk });
+  sheet.appendRow(fila);
+  return respuestaJson({ ok: true, mensaje: 'Compra de proveedor registrada.', id: dato[def.pk] });
+}
+
+function proveedorCompraBaja(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS;
+  var pkValor = params[def.pk] || params.id;
+  if (!pkValor) return respuestaJson({ ok: false, error: 'Falta ' + def.pk });
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: false, error: 'No existe la hoja ' + def.sheet });
+  var rowNum = buscarFilaPorPK(sheet, def, pkValor);
+  if (rowNum === -1) return respuestaJson({ ok: false, error: 'No encontrado.' });
+  sheet.deleteRow(rowNum);
+  return respuestaJson({ ok: true, mensaje: 'Compra de proveedor eliminada.' });
+}
+
+function proveedorCompraModificacion(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS;
+  var dato = params.dato || params;
+  if (!dato[def.pk]) return respuestaJson({ ok: false, error: 'Falta ' + def.pk });
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: false, error: 'No existe la hoja ' + def.sheet });
+  var rowNum = buscarFilaPorPK(sheet, def, dato[def.pk]);
+  if (rowNum === -1) return respuestaJson({ ok: false, error: 'No encontrado.' });
+  var fila = objetoAFila(def, dato);
+  sheet.getRange(rowNum, 1, 1, def.columns.length).setValues([fila]);
+  return respuestaJson({ ok: true, mensaje: 'Compra de proveedor actualizada.' });
+}
+
+function proveedorCompraLeer(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS;
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: true, datos: [] });
+  var datos = sheet.getDataRange().getValues();
+  if (datos.length < 2) return respuestaJson({ ok: true, datos: [] });
+  var headers = datos[0];
+  var filas = [];
+  var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+  for (var i = 1; i < datos.length; i++) {
+    var obj = {};
+    for (var c = 0; c < headers.length; c++) {
+      var val = c < datos[i].length ? datos[i][c] : '';
+      if (headers[c] === 'FECHA' && val instanceof Date) {
+        val = Utilities.formatDate(val, tz, 'yyyy-MM-dd');
+      }
+      obj[headers[c]] = (val !== undefined && val !== null) ? val : '';
+    }
+    var pkVal = (obj[def.pk] !== undefined && obj[def.pk] !== null) ? String(obj[def.pk]).trim() : '';
+    if (pkVal === '') continue;
+    filas.push(obj);
+  }
+  var id = params[def.pk] || params.id;
+  if (id) {
+    filas = filas.filter(function (f) { return String(f[def.pk]).trim() === String(id).trim(); });
+  }
+  return respuestaJson({ ok: true, datos: filas });
+}
+
+function proveedorCompraLeerRango(params) {
+  var defCompra = TABLAS.PROVEEDORES_COMPRAS;
+  var defDetalle = TABLAS.PROVEEDORES_COMPRAS_DETALLE;
+
+  var fechaDesde = params.fechaDesde ? new Date(params.fechaDesde + 'T00:00:00') : null;
+  var fechaHasta = params.fechaHasta ? new Date(params.fechaHasta + 'T23:59:59') : null;
+
+  var ss = getSS();
+  var sheetCompra = ss.getSheetByName(defCompra.sheet);
+  if (!sheetCompra) return respuestaJson({ ok: true, datos: [] });
+
+  var datosCompra = sheetCompra.getDataRange().getValues();
+  if (datosCompra.length < 2) return respuestaJson({ ok: true, datos: [] });
+
+  var sheetDetalle = ss.getSheetByName(defDetalle.sheet);
+  var datosDetalle = sheetDetalle ? sheetDetalle.getDataRange().getValues() : [];
+
+  var headersCompra = datosCompra[0];
+  var headersDetalle = datosDetalle.length > 0 ? datosDetalle[0] : [];
+  var tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
+
+  // Mapear detalles por IDPROVEEDORES-COMPRA
+  var detallesPorCompra = {};
+  if (datosDetalle.length > 1 && headersDetalle.length > 0) {
+    var colIdCompraDet = headersDetalle.indexOf('IDPROVEEDORES-COMPRA');
+    for (var i = 1; i < datosDetalle.length; i++) {
+      var d = datosDetalle[i];
+      var idc = String(d[colIdCompraDet] || '').trim();
+      if (!idc) continue;
+      if (!detallesPorCompra[idc]) detallesPorCompra[idc] = [];
+      var objDet = {};
+      for (var c = 0; c < headersDetalle.length; c++) {
+        objDet[headersDetalle[c]] = d[c] !== undefined && d[c] !== null ? d[c] : '';
+      }
+      detallesPorCompra[idc].push(objDet);
+    }
+  }
+
+  var filas = [];
+  var colFecha = headersCompra.indexOf('FECHA');
+  var colIdCompra = headersCompra.indexOf('IDPROVEEDORES-COMPRA');
+
+  for (var i = 1; i < datosCompra.length; i++) {
+    var valFecha = datosCompra[i][colFecha];
+    var fechaObj = valFecha instanceof Date ? valFecha : null;
+    if (!fechaObj && typeof valFecha === 'string') {
+      var d = new Date(valFecha + 'T12:00:00');
+      if (!isNaN(d.getTime())) fechaObj = d;
+    }
+
+    if (fechaDesde && fechaObj && fechaObj < fechaDesde) continue;
+    if (fechaHasta && fechaObj && fechaObj > fechaHasta) continue;
+
+    var obj = {};
+    for (var c = 0; c < headersCompra.length; c++) {
+      var val = datosCompra[i][c];
+      if (headersCompra[c] === 'FECHA' && val instanceof Date) {
+        val = Utilities.formatDate(val, tz, 'yyyy-MM-dd');
+      }
+      obj[headersCompra[c]] = (val !== undefined && val !== null) ? val : '';
+    }
+
+    var idc = String(obj['IDPROVEEDORES-COMPRA']).trim();
+    if (idc === '') continue;
+
+    var dets = detallesPorCompra[idc] || [];
+    
+    // Si no tiene detalles, insertamos la compra igualmente
+    if (dets.length === 0) {
+       filas.push(obj);
+    } else {
+       // Multiplicar la fila por cada detalle
+       for (var x = 0; x < dets.length; x++) {
+         var filaCompleta = Object.assign({}, obj, dets[x]);
+         filas.push(filaCompleta);
+       }
+    }
+  }
+
+  return respuestaJson({ ok: true, datos: filas });
+}
+
+// --- PROVEEDORES-COMPRAS-DETALLE ---
+
+function proveedorCompraDetalleAlta(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS_DETALLE;
+  var items = params.items || [];
+  if (!items.length && (params.dato || params)) {
+    items = [params.dato || params];
+  }
+  if (!items.length) return respuestaJson({ ok: false, error: 'No hay ítems para guardar.' });
+  
+  var ss = getSS();
+  var sheet = getHoja(ss, def.sheet, def.columns);
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, def.columns.length).setValues([def.columns]);
+    sheet.getRange(1, 1, 1, def.columns.length).setFontWeight('bold');
+  }
+
+  var filasParaInsertar = [];
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i];
+    if (!it['IDPROVEEDORES-COMPRA-DETALLE']) {
+      // Si no viene ID, generamos uno temporal o simplemente lo dejamos pasar si el sheet lo maneja
+      // pero el CRM suele enviarlo. 
+    }
+    filasParaInsertar.push(objetoAFila(def, it));
+  }
+
+  if (filasParaInsertar.length > 0) {
+    var startRow = sheet.getLastRow() + 1;
+    sheet.getRange(startRow, 1, filasParaInsertar.length, def.columns.length).setValues(filasParaInsertar);
+  }
+  
+  return respuestaJson({ ok: true, mensaje: 'Detalle de compra registrado.', cantidad: filasParaInsertar.length });
+}
+
+function proveedorCompraDetalleBaja(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS_DETALLE;
+  var pkValor = params[def.pk] || params.id;
+  var idCompra = params['IDPROVEEDORES-COMPRA']; // Opción para borrar todo el detalle de una compra
+  
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: false, error: 'No existe la hoja ' + def.sheet });
+  
+  var datos = sheet.getDataRange().getValues();
+  if (datos.length < 2) return respuestaJson({ ok: true, mensaje: 'Nada que borrar.' });
+  
+  var headers = datos[0];
+  var colIdxPK = headers.indexOf(def.pk);
+  var colIdxCompra = headers.indexOf('IDPROVEEDORES-COMPRA');
+  
+  var filasABorrar = [];
+  for (var i = 1; i < datos.length; i++) {
+    var borrar = false;
+    if (pkValor && String(datos[i][colIdxPK]) === String(pkValor)) borrar = true;
+    else if (idCompra && String(datos[i][colIdxCompra]) === String(idCompra)) borrar = true;
+    
+    if (borrar) filasABorrar.push(i + 1);
+  }
+  
+  for (var j = filasABorrar.length - 1; j >= 0; j--) {
+    sheet.deleteRow(filasABorrar[j]);
+  }
+  
+  return respuestaJson({ ok: true, mensaje: 'Detalle(s) eliminado(s).', filasBorradas: filasABorrar.length });
+}
+
+function proveedorCompraDetalleModificacion(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS_DETALLE;
+  var dato = params.dato || params;
+  if (!dato[def.pk]) return respuestaJson({ ok: false, error: 'Falta ' + def.pk });
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: false, error: 'No existe la hoja ' + def.sheet });
+  var rowNum = buscarFilaPorPK(sheet, def, dato[def.pk]);
+  if (rowNum === -1) return respuestaJson({ ok: false, error: 'No encontrado.' });
+  var fila = objetoAFila(def, dato);
+  sheet.getRange(rowNum, 1, 1, def.columns.length).setValues([fila]);
+  return respuestaJson({ ok: true, mensaje: 'Detalle actualizado.' });
+}
+
+function proveedorCompraDetalleLeer(params) {
+  var def = TABLAS.PROVEEDORES_COMPRAS_DETALLE;
+  var idCompra = params['IDPROVEEDORES-COMPRA'] || params.idCompra;
+  var idDetalle = params[def.pk] || params.id;
+  
+  var ss = getSS();
+  var sheet = ss.getSheetByName(def.sheet);
+  if (!sheet) return respuestaJson({ ok: true, datos: [] });
+  
+  var datos = sheet.getDataRange().getValues();
+  if (datos.length < 2) return respuestaJson({ ok: true, datos: [] });
+  
+  var headers = datos[0];
+  var filas = [];
+  for (var i = 1; i < datos.length; i++) {
+    var obj = {};
+    for (var c = 0; c < headers.length; c++) {
+      var val = c < datos[i].length ? datos[i][c] : '';
+      obj[headers[c]] = (val !== undefined && val !== null) ? val : '';
+    }
+    filas.push(obj);
+  }
+  
+  if (idCompra) {
+    filas = filas.filter(function (f) { return String(f['IDPROVEEDORES-COMPRA']).trim() === String(idCompra).trim(); });
+  }
+  if (idDetalle) {
+    filas = filas.filter(function (f) { return String(f[def.pk]).trim() === String(idDetalle).trim(); });
+  }
+  
+  return respuestaJson({ ok: true, datos: filas });
+}
+

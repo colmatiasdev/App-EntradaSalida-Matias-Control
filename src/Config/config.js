@@ -21,7 +21,7 @@
      * URL del Web App de Google Apps Script (despliegue). ÚNICA fuente de datos de la app.
      * Copiar aquí la URL que da "Implementar" > "Aplicación web" en el proyecto Apps Script vinculado al Sheet anterior.
      */
-    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwMA4FeoftY03JAILCxQ2ylFwc9YdzCAmwJjyojZWbdx7aTZRvniT-xVf8WQkO6rRT1ig/exec',
+    APP_SCRIPT_URL: 'https://script.google.com/macros/s/AKfycby6IERd3COce_rfl7xdCbH7ZHYy23eFfND_TognU_mjC1uNuaIDjBGrVZmkutyt_7F9dg/exec',
 
     /** Nombres de las hojas (igual que en Code.gs y tables.js). */
     HOJA_PRODUCTOS: 'PRODUCTOS',
@@ -30,11 +30,11 @@
     /** Valor fijo para la columna USUARIO al guardar ventas/compras en el Sheet. */
     USUARIO: 'USR-MATIAS',
 
-   /**
-   * Cómo se muestra cada código de usuario en pantalla (etiqueta y color de identificación).
-   * Clave = valor guardado en el Sheet (columna USUARIO).
-   * Valor = { etiqueta: 'Nombre', color: '#hex' }.
-   */
+    /**
+    * Cómo se muestra cada código de usuario en pantalla (etiqueta y color de identificación).
+    * Clave = valor guardado en el Sheet (columna USUARIO).
+    * Valor = { etiqueta: 'Nombre', color: '#hex' }.
+    */
     USUARIO_ETIQUETAS: {
       'USR-SILVINA': { etiqueta: 'Silvina', color: '#c0392b' },
       'USR-MATIAS': { etiqueta: 'Matias', color: '#2980b9' },
